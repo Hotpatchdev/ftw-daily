@@ -24,7 +24,6 @@ const BreakdownMaybe = props => {
   const classes = classNames(rootClassName || css.breakdownMaybe, className);
   const breakdownClasses = classNames(breakdownClassName || css.breakdown);
 
-
   // console.log(
   //   'breakdown maybe',
   //   Object.keys(transaction.attributes.protectedData),
@@ -315,8 +314,8 @@ const BreakdownMaybe = props => {
       </div>
     );
   }
-  
-  return loaded ? (
+
+return loaded ? (
     <div className={classes}>
       <BookingBreakdown
         promocode={promocode}
