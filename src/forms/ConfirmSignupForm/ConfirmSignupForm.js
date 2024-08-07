@@ -149,16 +149,12 @@ const ConfirmSignupFormComponent = props => {
         );
 
         // If authInfo is not available we should not show the ConfirmForm
-        // if (!authInfo) {
-        //   return;
-        // }
+        if (!authInfo) {
+          return;
+        }
 
-        // // Initial values from idp provider
-        // const { email, firstName, lastName } = authInfo;
-
-        const email = 'arham@braincrop.com';
-        const firstName = 'arham@braincrop.com';
-        const lastName = 'arham@braincrop.com';
+        // Initial values from idp provider
+        const { email, firstName, lastName } = authInfo;
 
         return (
           <Form className={classes} onSubmit={formRenderProps.handleSubmit}>
