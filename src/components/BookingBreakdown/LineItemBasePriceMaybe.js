@@ -7,7 +7,7 @@ import {
   DAILY_PRICE,
   WEEKLY_PRICE,
   MONTHLY_PRICE,
-  propTypes,
+  propTypes
 } from '../../util/types';
 
 import css from './BookingBreakdown.module.css';
@@ -23,22 +23,19 @@ const LineItemBasePriceMaybe = props => {
   //   : 'BookingBreakdown.baseUnitQuantity';
   let translationKey = 'BookingBreakdown.baseUnitQuantity';
 
-  switch (transactionType) {
-    case DAILY_PRICE:
-      {
-        translationKey = 'BookingBreakdown.baseUnitDay';
-      }
-      break;
-    case WEEKLY_PRICE:
-      {
-        translationKey = 'BookingBreakdown.baseUnitWeek';
-      }
-      break;
-    case MONTHLY_PRICE:
-      {
-        translationKey = 'BookingBreakdown.baseUnitMonth';
-      }
-      break;
+  switch(transactionType){
+    case DAILY_PRICE: {
+      translationKey = 'BookingBreakdown.baseUnitDay';
+    };
+    break;
+    case WEEKLY_PRICE: {
+      translationKey = 'BookingBreakdown.baseUnitWeek';
+    };
+    break;
+    case MONTHLY_PRICE: {
+      translationKey = 'BookingBreakdown.baseUnitMonth';
+    };
+    break;
   }
 
   // Find correct line-item for given unitType prop.

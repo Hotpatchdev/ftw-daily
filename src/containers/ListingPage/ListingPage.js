@@ -48,7 +48,7 @@ import {
   Footer,
   BookingPanel,
 } from '../../components';
-import moment, { relativeTimeRounding } from 'moment';
+import moment from 'moment';
 import { TopbarContainer, NotFoundPage } from '../../containers';
 
 import {
@@ -111,14 +111,6 @@ export class ListingPageComponent extends Component {
       imageCarouselOpen: false,
       enquiryModalOpen: enquiryModalOpenForListingId === params.id,
       bookingType: null,
-      enquiryDateTimeDataError: false,
-      enquiryDateTimeData: {
-        StartDate: '',
-        EndDate: '',
-        StartTime: '',
-        EndTime: '',
-        planType: '',
-      },
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -126,12 +118,6 @@ export class ListingPageComponent extends Component {
     this.onSubmitEnquiry = this.onSubmitEnquiry.bind(this);
     this.toggleBookingType = this.toggleBookingType.bind(this);
   }
-
-  updateEnquiryDateTime = data => {
-    this.setState({
-      enquiryDateTimeData: { ...this.state.enquiryDateTimeData, ...data },
-    });
-  };
 
   updateDiscount = val => {
     this.setState({ promocode: val });
@@ -197,7 +183,6 @@ export class ListingPageComponent extends Component {
     // Clear previous Stripe errors from store if there is any
     onInitializeCardPaymentData();
 
-    console.log('submit booking =>', initialValues);
     // Redirect to CheckoutPage
     history.push(
       createResourceLocatorString(
@@ -219,6 +204,7 @@ export class ListingPageComponent extends Component {
       getOwnListing,
       getListing,
     } = this.props;
+
     // const listingId = new UUID(params.id);
     // const isPendingApprovalVariant = params.variant === LISTING_PAGE_PENDING_APPROVAL_VARIANT;
     // const isDraftVariant = params.variant === LISTING_PAGE_DRAFT_VARIANT;
@@ -247,93 +233,52 @@ export class ListingPageComponent extends Component {
       this.setState({ enquiryModalOpen: true });
     }
   }
-  formatTimeString(StartTime, EndTime, SDate, EDate) {
-    const [startHour, startMinute] = StartTime.split(':').map(Number);
-    const [endHour, endMinute] = EndTime.split(':').map(Number);
 
-    // Create new Date objects for the start and end times
-    const startDateTime = new Date(SDate);
-    startDateTime.setHours(startHour);
-    startDateTime.setMinutes(startMinute);
-
-    const endDateTime = new Date(EDate);
-    endDateTime.setHours(endHour);
-    endDateTime.setMinutes(endMinute);
-
-    // Convert the Date objects to timestamps
-    return {
-      startTimestamp: startDateTime.getTime(),
-      endTimestamp: endDateTime.getTime(),
-    };
-  }
-
-  onSubmitEnquiry(values, unitType, currentListing, lineItems) {
+  onSubmitEnquiry(values, unitType) {
     const { history, params, onSendEnquiry } = this.props;
-    const { EndDate, EndTime, StartDate, StartTime, planType } = this.state.enquiryDateTimeData;
     const routes = routeConfiguration();
     const listingId = new UUID(params.id);
     const { message } = values;
     let modifiedMessage = message;
 
-    if (planType === 'price' && (EndTime === '' || StartDate === '' || StartTime === '')) {
-      this.setState({ enquiryDateTimeDataError: true });
-    } else if (planType !== 'price' && (EndDate === '' || StartDate === '')) {
-      this.setState({ enquiryDateTimeDataError: true });
-    } else {
-      this.setState({ enquiryDateTimeDataError: false });
+    //! Remove comments to apply regex functionality on messages
 
-      const _EndDate = planType === 'price' ? StartDate : EndDate; // if price, end date is same as start date
+    const hideEmail = text =>
+      text.replace(/[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, 'HIDDEN');
+    const hidePhone = text =>
+      text.replace(/(\+?\d{0,2}\s?)?\d{2,4}[\s.-]?\d{3,4}[\s.-]?\d{4}/g, 'HIDDEN');
+    const hideWebsite = text =>
+      text.replace(/(https?:\/\/)?(www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/\S*)?/g, 'HIDDEN');
+    modifiedMessage = hideEmail(modifiedMessage);
+    modifiedMessage = hidePhone(modifiedMessage);
+    modifiedMessage = hideWebsite(modifiedMessage);
 
-      const protectedData = {
-        startTime: StartTime || null,
-        endTime: EndTime || null,
-        displayStartDate: new Date(StartDate).toISOString().split('T')[0],
-        displayEndDate: new Date(_EndDate).toISOString().split('T')[0],
-        startDate: StartDate.toString(),
-        endDate: _EndDate.toString(),
-        planType: planType,
-      };
-
-      console.log('onSubmitEnquiry', protectedData);
-      //! Remove comments to apply regex functionality on messages
-
-      const hideEmail = text =>
-        text.replace(/[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, 'HIDDEN');
-      const hidePhone = text =>
-        text.replace(/(\+?\d{0,2}\s?)?\d{2,4}[\s.-]?\d{3,4}[\s.-]?\d{4}/g, 'HIDDEN');
-      const hideWebsite = text =>
-        text.replace(/(https?:\/\/)?(www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/\S*)?/g, 'HIDDEN');
-      modifiedMessage = hideEmail(modifiedMessage);
-      modifiedMessage = hidePhone(modifiedMessage);
-      modifiedMessage = hideWebsite(modifiedMessage);
-
-      // console.log('regex,', modifiedMessage, !modifiedMessage.includes('HIDDEN'));
-      if (modifiedMessage.includes('HIDDEN')) {
-        Swal.fire({
-          title: "Hold your horses! We can't hit that send button just yet",
-          text: `Contact info can't be shared until a booking is confirmed.
+    // console.log('regex,', modifiedMessage, !modifiedMessage.includes('HIDDEN'));
+    if (modifiedMessage.includes('HIDDEN')) {
+      Swal.fire({
+        title: "Hold your horses! We can't hit that send button just yet",
+        text: `Contact info can't be shared until a booking is confirmed.
            To send the message, please remove the contact info.`,
-          confirmButtonText: 'Edit Message',
-          confirmButtonColor: '#5cbfcc',
-        }).then(() => {
-          return;
-        });
+        confirmButtonText: 'Edit Message',
+        confirmButtonColor: '#5cbfcc',
+      }).then(() => {
         return;
-      }
-
-      onSendEnquiry(listingId, modifiedMessage.trim(), unitType, protectedData)
-        .then(txId => {
-          this.setState({ enquiryModalOpen: false });
-
-          // Redirect to OrderDetailsPage
-          history.push(
-            createResourceLocatorString('OrderDetailsPage', routes, { id: txId.uuid }, {})
-          );
-        })
-        .catch(() => {
-          // Ignore, error handling in duck file
-        });
+      });
+      return;
     }
+
+    onSendEnquiry(listingId, modifiedMessage.trim(), unitType)
+      .then(txId => {
+        this.setState({ enquiryModalOpen: false });
+
+        // Redirect to OrderDetailsPage
+        history.push(
+          createResourceLocatorString('OrderDetailsPage', routes, { id: txId.uuid }, {})
+        );
+      })
+      .catch(() => {
+        // Ignore, error handling in duck file
+      });
   }
 
   render() {
@@ -374,7 +319,6 @@ export class ListingPageComponent extends Component {
 
     const listingSlug = rawParams.slug || createSlug(currentListing.attributes.title || '');
     const params = { slug: listingSlug, ...rawParams };
-    console.log('Listing Page =>', this.state.enquiryDateTimeData);
 
     const listingType = isDraftVariant
       ? LISTING_PAGE_PARAM_TYPE_DRAFT
@@ -696,30 +640,10 @@ export class ListingPageComponent extends Component {
                     onSubmitEnquiry={params => {
                       const { unitType = config.fallbackUnitType } =
                         currentListing.attributes.publicData || {};
-                      this.onSubmitEnquiry(params, unitType, currentListing, lineItems);
+                      this.onSubmitEnquiry(params, unitType);
                     }}
                     currentUser={currentUser}
                     onManageDisableScrolling={onManageDisableScrolling}
-                    updateDiscount={this.updateDiscount}
-                    promocode={this.state.promocode}
-                    className={css.bookingPanel}
-                    isOwnListing={isOwnListing}
-                    unitType={unitType}
-                    onSubmit={handleBookingSubmit}
-                    subTitle={bookingSubTitle}
-                    timeSlots={timeSlots}
-                    fetchTimeSlotsError={fetchTimeSlotsError}
-                    monthlyTimeSlots={monthlyTimeSlots}
-                    onFetchTimeSlots={onFetchTimeSlots}
-                    onFetchTransactionLineItems={onFetchTransactionLineItems}
-                    lineItems={lineItems}
-                    fetchLineItemsInProgress={fetchLineItemsInProgress}
-                    fetchLineItemsError={fetchLineItemsError}
-                    bookingType={this.state.bookingType}
-                    toggleBookingType={this.toggleBookingType}
-                    updateEnquiryDateTime={this.updateEnquiryDateTime}
-                    planType={this.state.enquiryDateTimeData.planType}
-                    enquiryDateTimeDataError={this.state.enquiryDateTimeDataError}
                   />
                 </div>
                 <BookingPanel
@@ -872,15 +796,14 @@ const mapDispatchToProps = dispatch => ({
   onManageDisableScrolling: (componentId, disableScrolling) =>
     dispatch(manageDisableScrolling(componentId, disableScrolling)),
   callSetInitialValues: (setInitialValues, values) => dispatch(setInitialValues(values)),
-  onSendEnquiry: (listingId, message, unitType, protectedData) =>
-    dispatch(sendEnquiry(listingId, message, unitType, protectedData)),
+  onSendEnquiry: (listingId, message, unitType) =>
+    dispatch(sendEnquiry(listingId, message, unitType)),
   callSetInitialValues: (setInitialValues, values, saveToSessionStorage) =>
     dispatch(setInitialValues(values, saveToSessionStorage)),
   onFetchTransactionLineItems: (bookingData, listingId, isOwnListing) => {
     return dispatch(fetchTransactionLineItems(bookingData, listingId, isOwnListing));
   },
-  // onSendEnquiry: (listingId, message, protectedData) =>
-  //   dispatch(sendEnquiry(listingId, message, protectedData)),
+  onSendEnquiry: (listingId, message) => dispatch(sendEnquiry(listingId, message)),
   onInitializeCardPaymentData: () => dispatch(initializeCardPaymentData()),
   onFetchTimeSlots: (listingId, start, end, timeZone) =>
     dispatch(fetchTimeSlotsTime(listingId, start, end, timeZone)),
