@@ -374,7 +374,7 @@ export class ListingPageComponent extends Component {
 
     const listingSlug = rawParams.slug || createSlug(currentListing.attributes.title || '');
     const params = { slug: listingSlug, ...rawParams };
-    console.log('Listing Page =>', this.state.enquiryDateTimeData);
+    // console.log('Listing Page =>', this.state.enquiryDateTimeData);
 
     const listingType = isDraftVariant
       ? LISTING_PAGE_PARAM_TYPE_DRAFT
