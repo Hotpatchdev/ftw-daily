@@ -320,6 +320,7 @@ export class ListingPageComponent extends Component {
     const listingSlug = rawParams.slug || createSlug(currentListing.attributes.title || '');
     const params = { slug: listingSlug, ...rawParams };
 
+
     const listingType = isDraftVariant
       ? LISTING_PAGE_PARAM_TYPE_DRAFT
       : LISTING_PAGE_PARAM_TYPE_EDIT;
