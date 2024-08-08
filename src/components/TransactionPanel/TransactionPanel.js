@@ -447,7 +447,6 @@ export class TransactionPanelComponent extends Component {
               listingTitle={listingTitle}
               listingDeleted={listingDeleted}
             />
-
             {currentTransaction?.attributes?.lastTransition &&
             currentTransaction?.attributes?.lastTransition === 'transition/enquire' ? null : (
               <div className={css.bookingDetailsMobile}>
