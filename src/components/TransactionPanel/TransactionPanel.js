@@ -451,20 +451,22 @@ export class TransactionPanelComponent extends Component {
               listingTitle={listingTitle}
               listingDeleted={listingDeleted}
             />
-
-            <div className={css.bookingDetailsMobile}>
-              <AddressLinkMaybe
-                rootClassName={css.addressMobile}
-                location={location}
-                geolocation={geolocation}
-                showAddress={stateData.showAddress}
-              />
-              <BreakdownMaybe
-                transaction={currentTransaction}
-                transactionRole={transactionRole}
-                unitType={unitType}
-              />
-            </div>
+            {currentTransaction?.attributes?.lastTransition &&
+            currentTransaction?.attributes?.lastTransition === 'transition/enquire' ? null : (
+              <div className={css.bookingDetailsMobile}>
+                <AddressLinkMaybe
+                  rootClassName={css.addressMobile}
+                  location={location}
+                  geolocation={geolocation}
+                  showAddress={stateData.showAddress}
+                />
+                <BreakdownMaybe
+                  transaction={currentTransaction}
+                  transactionRole={transactionRole}
+                  unitType={unitType}
+                />
+              </div>
+            )}
 
             {savePaymentMethodFailed ? (
               <p className={css.genericError}>
