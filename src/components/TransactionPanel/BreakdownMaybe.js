@@ -23,7 +23,9 @@ const BreakdownMaybe = props => {
   
   const classes = classNames(rootClassName || css.breakdownMaybe, className);
   const breakdownClasses = classNames(breakdownClassName || css.breakdown);
-
+  
+console.log('breakdown:', transaction,transaction?.attributes,transaction?.attributes?.protectedData)
+  
   if (
     transaction?.attributes?.lastTransition &&
     transaction.attributes.lastTransition === 'transition/enquire' &&
