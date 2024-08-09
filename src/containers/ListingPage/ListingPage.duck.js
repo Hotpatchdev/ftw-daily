@@ -20,10 +20,6 @@ const { UUID } = sdkTypes;
 
 // ================ Action types ================ //
 
-export const INITIATE_INQUIRY_REQUEST = 'app/CheckoutPage/INITIATE_INQUIRY_REQUEST';
-export const INITIATE_INQUIRY_SUCCESS = 'app/CheckoutPage/INITIATE_INQUIRY_SUCCESS';
-export const INITIATE_INQUIRY_ERROR = 'app/CheckoutPage/INITIATE_INQUIRY_ERROR';
-
 export const SET_INITIAL_VALUES = 'app/ListingPage/SET_INITIAL_VALUES';
 
 export const SHOW_LISTING_REQUEST = 'app/ListingPage/SHOW_LISTING_REQUEST';
@@ -49,8 +45,6 @@ export const SEND_ENQUIRY_REQUEST = 'app/ListingPage/SEND_ENQUIRY_REQUEST';
 export const SEND_ENQUIRY_SUCCESS = 'app/ListingPage/SEND_ENQUIRY_SUCCESS';
 export const SEND_ENQUIRY_ERROR = 'app/ListingPage/SEND_ENQUIRY_ERROR';
 
-export const initiateInquirySuccess = () => ({ type: INITIATE_INQUIRY_SUCCESS });
-export const initiateInquiryRequest = () => ({ type: INITIATE_INQUIRY_REQUEST });
 // ================ Reducer ================ //
 
 const initialState = {
@@ -90,8 +84,8 @@ const listingPageReducer = (state = initialState, action = {}) => {
     case FETCH_TIME_SLOTS_REQUEST_DAY:
       return { ...state, fetchTimeSlotsError: null };
     case FETCH_TIME_SLOTS_SUCCESS_DAY: {
-      return { ...state, timeSlots: payload };
-    }
+      return { ...state, timeSlots: payload }
+    };
     case FETCH_TIME_SLOTS_ERROR_DAY:
       return { ...state, fetchTimeSlotsError: payload };
 
@@ -144,14 +138,6 @@ const listingPageReducer = (state = initialState, action = {}) => {
       return { ...state, sendEnquiryInProgress: false };
     case SEND_ENQUIRY_ERROR:
       return { ...state, sendEnquiryInProgress: false, sendEnquiryError: payload };
-
-    case INITIATE_INQUIRY_REQUEST:
-      return { ...state, initiateInquiryInProgress: true, initiateInquiryError: null };
-
-    case INITIATE_INQUIRY_SUCCESS:
-      return { ...state, initiateInquiryInProgress: false };
-    case INITIATE_INQUIRY_ERROR:
-      return { ...state, initiateInquiryInProgress: false, initiateInquiryError: payload };
 
     default:
       return state;
@@ -225,11 +211,6 @@ export const fetchLineItemsError = error => ({
 export const sendEnquiryRequest = () => ({ type: SEND_ENQUIRY_REQUEST });
 export const sendEnquirySuccess = () => ({ type: SEND_ENQUIRY_SUCCESS });
 export const sendEnquiryError = e => ({ type: SEND_ENQUIRY_ERROR, error: true, payload: e });
-export const initiateInquiryError = e => ({
-  type: INITIATE_INQUIRY_ERROR,
-  error: true,
-  payload: e,
-});
 
 // ================ Thunks ================ //
 
@@ -349,11 +330,8 @@ const fetchTimeSlotsDay = listingId => (dispatch, getState, sdk) => {
     });
 };
 
-export const fetchTimeSlotsTime = (listingId, start, end, timeZone) => (
-  dispatch,
-  getState,
-  sdk
-) => {
+
+export const fetchTimeSlotsTime = (listingId, start, end, timeZone) => (dispatch, getState, sdk) => {
   const monthId = monthIdStringInTimeZone(start, timeZone);
   dispatch(fetchTimeSlotsRequestTime(monthId));
 
@@ -379,8 +357,8 @@ const fetchMonthlyTimeSlots = (dispatch, listing) => {
   // Listing could be ownListing entity too, so we just check if attributes key exists
   const hasTimeZone =
     attributes && attributes.availabilityPlan && attributes.availabilityPlan.timezone;
-  // console.log(hasTimeZone, 'hasTimeZone')
-  // Fetch time-zones on client side only.
+// console.log(hasTimeZone, 'hasTimeZone')
+    // Fetch time-zones on client side only.
   if (hasWindow && listing.id && hasTimeZone) {
     const tz = listing.attributes.availabilityPlan.timezone;
     const nextBoundary = findNextBoundary(tz, new Date());
@@ -400,37 +378,27 @@ const fetchMonthlyTimeSlots = (dispatch, listing) => {
   return Promise.all([]);
 };
 
-export const fetchTimeslots = listing => (dispatch, getState, sdk) => {
-  const listingId = (listing && listing.id) || null;
+export const fetchTimeslots = (listing) => (dispatch, getState, sdk) => {
+  const listingId = listing && listing.id || null;
   fetchMonthlyTimeSlots(dispatch, listing);
-  dispatch(fetchTimeSlotsDay(listingId));
-};
+  dispatch(fetchTimeSlotsDay(listingId))
+}
 
-export const sendEnquiry = (listingId, message, unitType, protectedData) => (
-  dispatch,
-  getState,
-  sdk
-) => {
+export const sendEnquiry = (listingId, message, unitType) => (dispatch, getState, sdk) => {
   dispatch(sendEnquiryRequest());
 
   const processAlias = config.bookingProcessAlias;
 
-  // const protectedData = {
-  //   bookingStartTime: new Date().toISOString(),
-  //   bookingEndTime: new Date().toISOString(),
-  // };
-  console.log('protectedData', protectedData);
   const bodyParams = {
     transition: TRANSITION_ENQUIRE,
     processAlias,
-    params: { listingId, protectedData },
+    params: { listingId },
   };
   return sdk.transactions
     .initiate(bodyParams)
     .then(response => {
       const transactionId = response.data.data.id;
 
-      dispatch(initiateInquiryRequest());
       // Send the message to the created transaction
       return sdk.messages.send({ transactionId, content: message }).then(() => {
         dispatch(sendEnquirySuccess());
@@ -449,7 +417,6 @@ export const fetchTransactionLineItems = ({ bookingData, listingId, isOwnListing
   transactionLineItems({ bookingData, listingId, isOwnListing })
     .then(response => {
       const lineItems = response.data;
-      console.log('lineItems=>', lineItems);
       dispatch(fetchLineItemsSuccess(lineItems));
     })
     .catch(e => {
@@ -469,7 +436,10 @@ export const loadData = (params, search) => dispatch => {
     return dispatch(showListing(listingId, true));
   }
 
-  return Promise.all([dispatch(showListing(listingId)), dispatch(fetchReviews(listingId))]).then(
+  return Promise.all([
+    dispatch(showListing(listingId)),
+    dispatch(fetchReviews(listingId))
+  ]).then(
     responses => {
       if (responses[0] && responses[0].data && responses[0].data.data) {
         const listing = responses[0].data.data;

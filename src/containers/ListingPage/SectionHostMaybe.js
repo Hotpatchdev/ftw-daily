@@ -19,32 +19,6 @@ const SectionHostMaybe = props => {
     onSubmitEnquiry,
     currentUser,
     onManageDisableScrolling,
-
-    unitType,
-    updateDiscount,
-    promocode,
-    rootClassName,
-    className,
-    titleClassName,
-    isOwnListing,
-    onSubmit,
-    subTitle,
-    onFetchTimeSlots,
-    monthlyTimeSlots,
-    timeSlots,
-    fetchTimeSlotsError,
-    history,
-    location,
-    intl,
-    onFetchTransactionLineItems,
-    lineItems,
-    fetchLineItemsInProgress,
-    fetchLineItemsError,
-    bookingType,
-    toggleBookingType,
-    updateEnquiryDateTime,
-    planType,
-    enquiryDateTimeDataError,
   } = props;
 
   if (!listing.author) {
@@ -87,26 +61,6 @@ const SectionHostMaybe = props => {
           sendEnquiryError={sendEnquiryError}
           onSubmit={onSubmitEnquiry}
           inProgress={sendEnquiryInProgress}
-          updateDiscount={updateDiscount}
-          promocode={promocode}
-          isOwnListing={isOwnListing}
-          unitType={unitType}
-          // onSubmit={handleBookingSubmit}
-          subTitle={subTitle}
-          timeSlots={timeSlots}
-          fetchTimeSlotsError={fetchTimeSlotsError}
-          monthlyTimeSlots={monthlyTimeSlots}
-          onFetchTimeSlots={onFetchTimeSlots}
-          onFetchTransactionLineItems={onFetchTransactionLineItems}
-          lineItems={lineItems}
-          fetchLineItemsInProgress={fetchLineItemsInProgress}
-          fetchLineItemsError={fetchLineItemsError}
-          bookingType={bookingType}
-          toggleBookingType={toggleBookingType}
-          listing={listing}
-          updateEnquiryDateTime={updateEnquiryDateTime}
-          currentPlanType={planType}
-          enquiryDateTimeDataError={enquiryDateTimeDataError}
         />
       </Modal>
     </div>

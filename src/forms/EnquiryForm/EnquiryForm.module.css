@@ -20,7 +20,7 @@
   margin: 25px 0 24px 0;
 
   @media (--viewportMedium) {
-    margin: 12px 0 24px 0;
+    margin: 22px 0 24px 0;
   }
 }
 
@@ -36,46 +36,13 @@
 .containerWarningMessage {
   text-align: center;
   & p {
-    margin: 0;
-    font-family: var(--fontFamilySofiapro);
+  margin: 0;
+  font-family: var(--fontFamilySofiapro);
     font-size: 14px;
     font-weight: var(--fontWeightBold);
     line-height: 16px;
   }
-  & p:last-of-type {
-    margin-bottom: 20px;
-  }
-}
-
-.formRow {
-  display: flex;
-  margin: 10px 0;
-}
-.lineBetween {
-  display: flex;
-  justify-content: center;
-  align-items: end;
-  margin: 0 10px;
-}
-.fieldDate {
-  margin-top: 0px !important;
-  margin-bottom: 0px !important;
-  width: 100%;
-}
-.fieldTime {
-  width: 100%;
-}
-.radioButtonCircle {
-  height: 26px !important;
-}
-.radioButtonLabel {
-  font-size: 16px !important;
-}
-
-.bookingDates {
-  flex-shrink: 0;
-  margin-bottom: 38px;
-
-  /* Ensure that calendar dropdown gets some stacking context relative to other form items below */
-  z-index: 1;
+    & p:last-of-type {
+        margin-bottom: 20px;
+      }
 }

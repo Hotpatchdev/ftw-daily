@@ -12,13 +12,6 @@
   /* Ensure that calendar dropdown gets some stacking context relative to other form items below */
   z-index: 1;
 }
-.bookingDatesEnquiry {
-  flex-shrink: 0;
-  margin-bottom: 18px;
-
-  /* Ensure that calendar dropdown gets some stacking context relative to other form items below */
-  z-index: 1;
-}
 
 .priceBreakdownContainer {
   padding: 0 24px;
@@ -47,10 +40,6 @@
   flex-shrink: 0;
   margin: 0 0 24px 0;
 }
-.receiptEnquiry {
-  flex-shrink: 0;
-  margin: 0;
-}
 
 .error {
   color: var(--failColor);
@@ -69,23 +58,6 @@
 
   @media (--viewportMedium) {
     margin: 0 0 12px 0;
-  }
-}
-
-.smallPrintEnquiry {
-  @apply --marketplaceTinyFontStyles;
-  color: var(--matterColorAnti);
-  text-align: center;
-  margin: auto 24px 20px 24px;
-  flex-shrink: 0;
-
-  @media (--viewportMedium) {
-    margin-top: auto;
-    margin-bottom: 20px;
-  }
-
-  @media (--viewportLarge) {
-    margin: 0;
   }
 }
 

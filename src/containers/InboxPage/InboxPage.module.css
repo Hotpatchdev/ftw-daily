@@ -347,7 +347,7 @@
 
 .nameEmphasized {
   font-weight: var(--fontWeightBold);
-  font-size: 18px;
+
   /* baseline alignment fixes */
   margin-top: -1px;
   margin-bottom: 1px;

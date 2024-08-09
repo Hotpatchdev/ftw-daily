@@ -100,7 +100,6 @@ export class TransactionPanelComponent extends Component {
       sendMessageFormFocused: false,
       isReviewModalOpen: false,
       reviewSubmitted: false,
-      promocode: false,
       showContactHiddenModal: false,
     };
     this.isMobSaf = false;
@@ -117,9 +116,7 @@ export class TransactionPanelComponent extends Component {
   componentDidMount() {
     this.isMobSaf = isMobileSafari();
   }
-  updateDiscount = val => {
-    this.setState({ promocode: val });
-  };
+
   onOpenReviewModal() {
     this.setState({ isReviewModalOpen: true });
   }
@@ -254,7 +251,6 @@ export class TransactionPanelComponent extends Component {
       toggleBookingTypeOnPanel,
     } = this.props;
 
-    console.log('transactionPanel', transaction);
     const lastTrasaction = transaction.attributes.lastTransition || 'nil';
     const _bookingCompleted = lastTrasaction === 'transition/accept';
     const currentTransaction = ensureTransaction(transaction);
@@ -529,7 +525,7 @@ export class TransactionPanelComponent extends Component {
                 geolocation={geolocation}
                 showAddress={stateData.showAddress}
               />
-              {/* {stateData.showBookingPanel ? (
+              {stateData.showBookingPanel ? (
                 <BookingPanel
                   className={css.bookingPanel}
                   titleClassName={css.bookingTitle}
@@ -552,16 +548,12 @@ export class TransactionPanelComponent extends Component {
                   toggleBookingType={toggleBookingTypeOnPanel}
                   unitType={unitType}
                 />
-              ) : null} */}
+              ) : null}
               <BreakdownMaybe
                 className={css.breakdownContainer}
                 transaction={currentTransaction}
                 transactionRole={transactionRole}
                 unitType={unitType}
-                onSumbitBookingRequestEnquiry={onSubmitBookingRequest}
-                intl={intl}
-                updateDiscount={this.updateDiscount}
-                promocode={this.state.promocode}
               />
 
               {stateData.showSaleButtons ? (
