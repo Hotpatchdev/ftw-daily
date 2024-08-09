@@ -33,7 +33,7 @@ jobs:
   deploy_prod:
     name: "Deploy to production"
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/production'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/production-test'
     steps:
       - name: Configure SSH
         run: |
@@ -57,4 +57,4 @@ jobs:
           SSH_KNOWN_HOSTS: ${{ secrets.STAGING_SSH_KNOWN_HOSTS }}
 
       - name: Deploy
-        run: ssh staging -o ServerAliveInterval=60 'cd /home/sharetribe/web/staging.hotpatch.com/public_html && git checkout production && git pull && rvm 2.3.4 do cap production deploy'
+        run: ssh staging -o ServerAliveInterval=60 'cd /home/sharetribe/web/staging.hotpatch.com/public_html && git fetch && git checkout production-test && git pull && rvm 2.3.4 do cap production deploy'
