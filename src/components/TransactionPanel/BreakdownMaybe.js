@@ -73,11 +73,7 @@ const BreakdownMaybe = props => {
   const classes = classNames(rootClassName || css.breakdownMaybe, className);
   const breakdownClasses = classNames(breakdownClassName || css.breakdown);
 
-  // console.log(
-  //   'breakdown maybe',
-  //   Object.keys(transaction.attributes.protectedData),
-  //   transaction.attributes.protectedData
-  // );
+  console.log('breakdown maybe', transaction.attributes.protectedData);
 
   if (
     transaction?.attributes?.lastTransition &&
@@ -86,6 +82,8 @@ const BreakdownMaybe = props => {
     Object.keys(transaction.attributes.protectedData).length > 0
     // && transactionRole === 'provider'
   ) {
+    console.log('breakdown maybe inside if', transaction.attributes.protectedData);
+
     const formatDate = timestamp => {
       const date = new Date(timestamp);
       const options = { weekday: 'short', hour: 'numeric', minute: 'numeric', hour12: true };
@@ -228,7 +226,7 @@ const BreakdownMaybe = props => {
     _formattedDate.setDate(_formattedDate.getDate() - 1);
     let formattedDate1dayLessEndDate = _formattedDate.toISOString().split('T')[0];
 
-    // console.log('breakdown maybe =>', formattedDate1dayLessEndDate);
+    console.log('breakdown maybe =>', formattedDate1dayLessEndDate);
     const updateResult = data => {
       setResult(data);
     };
