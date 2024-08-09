@@ -219,8 +219,8 @@ const estimatedTransaction = (bookingStart, bookingEnd, lineItems, userRole, boo
         },
       ],
       protectedData: {
-        type: bookingType,
-      },
+        type: bookingType
+      }
     },
     booking: {
       id: new UUID('estimated-booking'),
@@ -235,16 +235,16 @@ const estimatedTransaction = (bookingStart, bookingEnd, lineItems, userRole, boo
 
 const EstimatedBreakdownMaybeComponent = props => {
   const { unitType, unitPrice, startDate, endDate, quantity, intl, promocode } = props.bookingData;
-  const { lineItems, bookingType, isFromEnquiry } = props;
+  const { lineItems, bookingType } = props;
   const isUnits = unitType === LINE_ITEM_UNITS;
   const quantityIfUsingUnits = !isUnits || Number.isInteger(quantity);
   const canEstimatePrice = startDate && endDate && quantityIfUsingUnits;
 
   const [result, setResult] = React.useState({
-    _sdkType: 'Money',
-    amount: 0,
-    currency: 'GBP',
-  });
+  _sdkType: 'Money',
+  amount: 0,
+  currency: 'GBP',
+});
   if (!canEstimatePrice) {
     return null;
   }
@@ -259,7 +259,9 @@ const EstimatedBreakdownMaybeComponent = props => {
       : null;
   const isCustomer = userRole === 'customer';
   const isProvider = userRole === 'provider';
-  const total = isProvider ? tx.attributes.payoutTotal : tx.attributes.payinTotal;
+  const total = isProvider
+    ? tx.attributes.payoutTotal
+    : tx.attributes.payinTotal;
 
   React.useEffect(() => {
     total && setResult(total);
@@ -268,29 +270,26 @@ const EstimatedBreakdownMaybeComponent = props => {
   const updateResult = data => {
     setResult(data);
   };
-  return tx ? (
-    <div>
-      <BookingBreakdown
-        promo={props.promo}
-        className={isFromEnquiry ? css.receiptEnquiry : css.receipt}
-        userRole={userRole}
-        unitType={unitType}
-        transaction={tx}
-        booking={tx.booking}
-        dateType={dateType}
-      />
-      {!isFromEnquiry && (
-        <FieldDiscount
-          promo={props.promo}
-          updateDiscount={props.updateDiscount}
-          updateResult={updateResult}
-          result={result}
-          transaction={tx}
-          intl={intl}
-          isProvider={isProvider}
-        />
-      )}
-    </div>
+  return tx ? (<div>
+    <BookingBreakdown
+      promo={props.promo}
+      className={css.receipt}
+      userRole={userRole}
+      unitType={unitType}
+      transaction={tx}
+      booking={tx.booking}
+      dateType={dateType}
+    />
+    <FieldDiscount
+      promo={props.promo}
+      updateDiscount={props.updateDiscount}
+      updateResult={updateResult}
+      result={result}
+      transaction={tx}
+      intl={intl}
+      isProvider={isProvider}
+    />
+  </div>
   ) : null;
 };
 const EstimatedBreakdownMaybe = injectIntl(EstimatedBreakdownMaybeComponent);

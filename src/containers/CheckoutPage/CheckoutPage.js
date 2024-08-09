@@ -29,7 +29,12 @@ import {
   ensureStripeCustomer,
   ensurePaymentMethodCard,
 } from '../../util/data';
-import { dateFromLocalToAPI, minutesBetween, hoursBetween, daysBetween } from '../../util/dates';
+import {
+  dateFromLocalToAPI,
+  minutesBetween,
+  hoursBetween,
+  daysBetween
+} from '../../util/dates';
 import { createSlug } from '../../util/urlHelpers';
 import {
   isTransactionInitiateAmountTooLowError,
@@ -86,8 +91,8 @@ const paymentFlow = (selectedPaymentMethod, saveAfterOnetimePayment) => {
   return selectedPaymentMethod === 'defaultCard'
     ? USE_SAVED_CARD
     : saveAfterOnetimePayment
-    ? PAY_AND_SAVE_FOR_LATER_USE
-    : ONETIME_PAYMENT;
+      ? PAY_AND_SAVE_FOR_LATER_USE
+      : ONETIME_PAYMENT;
 };
 
 const initializeOrderPage = (initialValues, routes, dispatch) => {
@@ -102,8 +107,8 @@ const checkIsPaymentExpired = existingTransaction => {
   return txIsPaymentExpired(existingTransaction)
     ? true
     : txIsPaymentPending(existingTransaction)
-    ? minutesBetween(existingTransaction.attributes.lastTransitionedAt, new Date()) >= 15
-    : false;
+      ? minutesBetween(existingTransaction.attributes.lastTransitionedAt, new Date()) >= 15
+      : false;
 };
 
 export class CheckoutPageComponent extends Component {
@@ -222,7 +227,7 @@ export class CheckoutPageComponent extends Component {
           promocode: pageData.bookingData.promocode,
           bookingStart: bookingStartForAPI,
           bookingEnd: bookingEndForAPI,
-          type: pageData.bookingData.bookingType,
+          type: pageData.bookingData.bookingType
         },
         transactionId
       );
@@ -280,9 +285,7 @@ export class CheckoutPageComponent extends Component {
       const { unitType } = publicData;
 
       // If paymentIntent exists, order has been initiated previously.
-      return hasPaymentIntents
-        ? Promise.resolve(storedTx)
-        : onInitiateOrder(fnParams, storedTx.id, unitType);
+      return hasPaymentIntents ? Promise.resolve(storedTx) : onInitiateOrder(fnParams, storedTx.id, unitType);
     };
 
     // Step 2: pay using Stripe SDK
@@ -319,11 +322,11 @@ export class CheckoutPageComponent extends Component {
       const paymentParams =
         selectedPaymentFlow !== USE_SAVED_CARD
           ? {
-              payment_method: {
-                billing_details: billingDetails,
-                card: card,
-              },
-            }
+            payment_method: {
+              billing_details: billingDetails,
+              card: card,
+            },
+          }
           : {};
 
       const params = {
@@ -403,8 +406,8 @@ export class CheckoutPageComponent extends Component {
       selectedPaymentFlow === USE_SAVED_CARD && hasDefaultPaymentMethod
         ? { paymentMethod: stripePaymentMethodId }
         : selectedPaymentFlow === PAY_AND_SAVE_FOR_LATER_USE
-        ? { setupPaymentMethodForSaving: true }
-        : {};
+          ? { setupPaymentMethodForSaving: true }
+          : {};
 
     // const orderParams = this.customPricingParams({
     //   listing: pageData.listing,
@@ -414,11 +417,9 @@ export class CheckoutPageComponent extends Component {
     // });
 
     const { bookingType, promocode } = pageData.bookingData;
-    const seats =
-      (pageData.listing.attributes &&
-        pageData.listing.attributes.publicData &&
-        pageData.listing.attributes.publicData.seats) ||
-      1;
+    const seats = pageData.listing.attributes &&
+      pageData.listing.attributes.publicData &&
+      pageData.listing.attributes.publicData.seats || 1;
 
     const orderParams = {
       listingId: pageData.listing.id,
@@ -460,15 +461,15 @@ export class CheckoutPageComponent extends Component {
     const addressMaybe =
       addressLine1 && postal
         ? {
-            address: {
-              city: city,
-              country: country,
-              line1: addressLine1,
-              line2: addressLine2,
-              postal_code: postal,
-              state: state,
-            },
-          }
+          address: {
+            city: city,
+            country: country,
+            line1: addressLine1,
+            line2: addressLine2,
+            postal_code: postal,
+            state: state,
+          },
+        }
         : {};
     const billingDetails = {
       name,
@@ -565,7 +566,7 @@ export class CheckoutPageComponent extends Component {
           code: unitType,
           unitPrice: new Money(priceAmount, currency),
           quantity,
-        },
+        }
       ],
       ...rest,
     };
@@ -580,13 +581,13 @@ export class CheckoutPageComponent extends Component {
         code: LINE_ITEM_DISCOUNT,
         includeFor: ['customer', 'provider'],
         unitPrice: new Money(discountBase, currency),
-        percentage: parseInt(discountPercentage) * -1,
+        percentage: parseInt(discountPercentage) * -1
       });
 
       tx.protectedData = {
         ...tx.protectedData,
-        discountReason: `${discountPercentage}% off above ${discountBreakpoint}`,
-      };
+        discountReason: `${discountPercentage}% off above ${discountBreakpoint}`
+      }
     }
 
     return tx;
@@ -826,8 +827,7 @@ export class CheckoutPageComponent extends Component {
     // const isDaily = unitType === LINE_ITEM_DAY;
 
     const price = currentListing.attributes.price;
-    const { amount, currency } =
-      bookingType !== HOURLY_PRICE && publicData[bookingType] ? publicData[bookingType] : price;
+    const { amount, currency } = bookingType !== HOURLY_PRICE && publicData[bookingType] ? publicData[bookingType] : price;
     let key = 'perHour';
     switch (bookingType) {
       case DAILY_PRICE:
@@ -840,10 +840,7 @@ export class CheckoutPageComponent extends Component {
         key = 'perMonth';
         break;
     }
-    const detailsSubTitle = `${formatMoney(
-      intl,
-      new Money(amount, currency)
-    )} ${intl.formatMessage({ id: `CheckoutPage.${key}` })}`;
+    const detailsSubTitle = `${formatMoney(intl, new Money(amount, currency))} ${intl.formatMessage({ id: `CheckoutPage.${key}` })}`;
 
     const showInitialMessageInput = !(
       existingTransaction && existingTransaction.attributes.lastTransition === TRANSITION_ENQUIRE
@@ -1059,13 +1056,11 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
   dispatch,
-  fetchSpeculatedTransaction: (params, unitType) =>
-    dispatch(speculateTransaction(params, unitType)),
+  fetchSpeculatedTransaction: (params, unitType) => dispatch(speculateTransaction(params, unitType)),
   // fetchSpeculatedTransaction: (params, transactionId) =>
   //   dispatch(speculateTransaction(params, transactionId)),
   fetchStripeCustomer: () => dispatch(stripeCustomer()),
-  onInitiateOrder: (params, transactionId, unitType) =>
-    dispatch(initiateOrder(params, transactionId, unitType)),
+  onInitiateOrder: (params, transactionId, unitType) => dispatch(initiateOrder(params, transactionId, unitType)),
   onRetrievePaymentIntent: params => dispatch(retrievePaymentIntent(params)),
   onConfirmCardPayment: params => dispatch(confirmCardPayment(params)),
   onConfirmPayment: params => dispatch(confirmPayment(params)),
@@ -1076,7 +1071,10 @@ const mapDispatchToProps = dispatch => ({
 
 const CheckoutPage = compose(
   withRouter,
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
   injectIntl
 )(CheckoutPageComponent);
 
