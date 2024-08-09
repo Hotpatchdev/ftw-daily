@@ -43,8 +43,6 @@ yarn.lock
 
 
 hotpatch-dev
-<<<<<<< HEAD
 hotpatch-live
-=======
-hotpatch-live
->>>>>>> eb2edd1e (fix: old enquiry error fixed)
+
+

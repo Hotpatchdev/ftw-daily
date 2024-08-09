@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { DATE_TYPE_DATE, DATE_TYPE_DATETIME, LINE_ITEM_DAY, HOURLY_PRICE } from '../../util/types';
 import { ensureListing } from '../../util/data';
-import { BookingBreakdown } from '../../components';
-
+import { BookingBreakdown, PrimaryButton } from '../../components';
+import { types as sdkTypes } from '../../util/sdkLoader';
 import css from './TransactionPanel.module.css';
+import { FormattedMessage } from 'react-intl';
+import LineItemDiscountMaybe from '../BookingBreakdown/LineItemDiscountMaybe';
+import FieldDiscount from '../../forms/BookingTimeForm/FiledDiscount';
 
 // Functional component as a helper to build BookingBreakdown
 const BreakdownMaybe = props => {
@@ -16,7 +19,43 @@ const BreakdownMaybe = props => {
     transactionRole,
     unitType,
     promocode,
+    intl,
+    onSumbitBookingRequestEnquiry,
   } = props;
+  const [planType, setPlanType] = useState(null);
+  const [result, setResult] = React.useState({
+    _sdkType: 'Money',
+    amount: 0,
+    currency: 'GBP',
+  });
+  var dataToSend = {};
+
+  useEffect(() => {
+    const _publicDataPlan = transaction?.attributes?.protectedData.planType || null;
+    setPlanType(_publicDataPlan);
+    if (_publicDataPlan !== 'price') {
+      dataToSend = {
+        bookingDates: {
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+        },
+        enquirybookingType: _publicDataPlan,
+        fromWhere: 'enquiry',
+      };
+    } else if (_publicDataPlan === 'price') {
+      dataToSend = {
+        enquirybookingType: _publicDataPlan,
+        fromWhere: 'enquiry',
+        bookingStartDate: { date: new Date(startDate) },
+        bookingEndDate: { date: new Date(endDate) },
+        bookingStartTime: startTime?.toString(),
+        bookingEndTime: endTime?.toString(),
+      };
+    }
+  }, [transaction]);
+
+  const { startTime, endTime, displayStartDate, displayEndDate, startDate, endDate } =
+    transaction?.attributes?.protectedData || {};
   const loaded = transaction && transaction.id && transaction.booking && transaction.booking.id;
   const listingAttributes = ensureListing(transaction.listing).attributes;
   const timeZone =
@@ -34,11 +73,7 @@ const BreakdownMaybe = props => {
   const classes = classNames(rootClassName || css.breakdownMaybe, className);
   const breakdownClasses = classNames(breakdownClassName || css.breakdown);
 
-  // console.log(
-  //   'breakdown maybe',
-  //   Object.keys(transaction.attributes.protectedData),
-  //   transaction.attributes.protectedData
-  // );
+  console.log('breakdown maybe', transaction.attributes.protectedData);
 
   if (
     transaction?.attributes?.lastTransition &&
@@ -47,6 +82,8 @@ const BreakdownMaybe = props => {
     Object.keys(transaction.attributes.protectedData).length > 0
     // && transactionRole === 'provider'
   ) {
+    console.log('breakdown maybe inside if', transaction.attributes.protectedData);
+
     const formatDate = timestamp => {
       const date = new Date(timestamp);
       const options = { weekday: 'short', hour: 'numeric', minute: 'numeric', hour12: true };
@@ -189,7 +226,7 @@ const BreakdownMaybe = props => {
     _formattedDate.setDate(_formattedDate.getDate() - 1);
     let formattedDate1dayLessEndDate = _formattedDate.toISOString().split('T')[0];
 
-    // console.log('breakdown maybe =>', formattedDate1dayLessEndDate);
+    console.log('breakdown maybe =>', formattedDate1dayLessEndDate);
     const updateResult = data => {
       setResult(data);
     };
