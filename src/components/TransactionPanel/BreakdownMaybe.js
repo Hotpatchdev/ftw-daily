@@ -8,23 +8,33 @@ import css from './TransactionPanel.module.css';
 
 // Functional component as a helper to build BookingBreakdown
 const BreakdownMaybe = props => {
-  const { className, rootClassName, breakdownClassName, transaction, transactionRole, unitType, promocode } = props;
+  const {
+    className,
+    rootClassName,
+    breakdownClassName,
+    transaction,
+    transactionRole,
+    unitType,
+    promocode,
+  } = props;
   const loaded = transaction && transaction.id && transaction.booking && transaction.booking.id;
   const listingAttributes = ensureListing(transaction.listing).attributes;
   const timeZone =
     loaded && listingAttributes.availabilityPlan
       ? listingAttributes.availabilityPlan.timezone
       : 'Etc/UTC';
-  const bookingType = transaction &&
-                  transaction.attributes &&
-                  transaction.attributes.protectedData &&
-                  transaction.attributes.protectedData.type || HOURLY_PRICE;
+  const bookingType =
+    (transaction &&
+      transaction.attributes &&
+      transaction.attributes.protectedData &&
+      transaction.attributes.protectedData.type) ||
+    HOURLY_PRICE;
   const dateType = bookingType === HOURLY_PRICE ? DATE_TYPE_DATETIME : DATE_TYPE_DATE;
-  
+
   const classes = classNames(rootClassName || css.breakdownMaybe, className);
   const breakdownClasses = classNames(breakdownClassName || css.breakdown);
 
-    // console.log(
+  // console.log(
   //   'breakdown maybe',
   //   Object.keys(transaction.attributes.protectedData),
   //   transaction.attributes.protectedData
@@ -32,9 +42,6 @@ const BreakdownMaybe = props => {
 
   if (
     transaction?.attributes?.lastTransition &&
-    transaction.attributes.lastTransition === 'transition/enquire' &&
-    transaction?.attributes?.protectedData &&
-    Object.keys(transaction.attributes.protectedData).length > 0
     transaction.attributes.lastTransition === 'transition/enquire' &&
     transaction?.attributes?.protectedData &&
     Object.keys(transaction.attributes.protectedData).length > 0
@@ -317,7 +324,6 @@ const BreakdownMaybe = props => {
       </div>
     );
   }
-
 
   return loaded ? (
     <div className={classes}>
