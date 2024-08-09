@@ -228,7 +228,7 @@ const BreakdownMaybe = props => {
     _formattedDate.setDate(_formattedDate.getDate() - 1);
     let formattedDate1dayLessEndDate = _formattedDate.toISOString().split('T')[0];
 
-    // console.log('breakdown maybe =>', formattedDate1dayLessEndDate);
+    console.log('breakdown maybe =>', formattedDate1dayLessEndDate);
     const updateResult = data => {
       setResult(data);
     };
