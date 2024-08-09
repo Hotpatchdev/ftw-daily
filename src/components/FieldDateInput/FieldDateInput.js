@@ -43,7 +43,6 @@ class FieldDateInputComponent extends Component {
       useMobileMargins,
       showErrorMessage,
       onChange,
-      minDate,
       ...rest
     } = this.props;
 
@@ -73,7 +72,6 @@ class FieldDateInputComponent extends Component {
       useMobileMargins,
       id,
       readOnly: typeof window !== 'undefined' && window.innerWidth < MAX_MOBILE_SCREEN_WIDTH,
-      minDate,
       ...restOfInput,
       ...rest,
     };
@@ -124,7 +122,6 @@ FieldDateInputComponent.propTypes = {
   input: object.isRequired,
   meta: object.isRequired,
   onChange: func,
-  minDate: object,
 };
 
 const FieldDateInput = props => {

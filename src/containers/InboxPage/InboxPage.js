@@ -14,13 +14,7 @@ import {
   txIsPaymentExpired,
   txIsPaymentPending,
 } from '../../util/transaction';
-import {
-  propTypes,
-  DATE_TYPE_DATE,
-  DATE_TYPE_DATETIME,
-  LINE_ITEM_DAY,
-  HOURLY_PRICE,
-} from '../../util/types';
+import { propTypes, DATE_TYPE_DATE, DATE_TYPE_DATETIME, LINE_ITEM_DAY, HOURLY_PRICE } from '../../util/types';
 import { ensureCurrentUser } from '../../util/data';
 import { getMarketplaceEntities } from '../../ducks/marketplaceData.duck';
 import { isScrollingDisabled } from '../../ducks/UI.duck';
@@ -59,7 +53,6 @@ const formatDate = (intl, date) => {
 // Translated name of the state of the given transaction
 export const txState = (intl, tx, type) => {
   const isOrder = type === 'order';
-  console.log('IB PAGE: ', intl, tx, type);
 
   if (txIsEnquired(tx)) {
     return {
@@ -178,8 +171,8 @@ const BookingInfoMaybe = props => {
   // Remember to also add formatMoney function from 'util/currency.js' and add this after BookingTimeInfo:
   // <div className={css.itemPrice}>{price}</div>
 
-  // console.log(tx);
-  const { type } = (tx && tx.attributes && tx.attributes.protectedData) || {};
+  console.log(tx)
+  const { type } = tx && tx.attributes && tx.attributes.protectedData || {};
   const dateType = type !== HOURLY_PRICE ? DATE_TYPE_DATE : DATE_TYPE_DATETIME;
 
   return (
@@ -446,6 +439,9 @@ const mapStateToProps = state => {
   };
 };
 
-const InboxPage = compose(connect(mapStateToProps), injectIntl)(InboxPageComponent);
+const InboxPage = compose(
+  connect(mapStateToProps),
+  injectIntl
+)(InboxPageComponent);
 
 export default InboxPage;

@@ -12,7 +12,7 @@ import { ensureListing, ensureTransaction } from '../../util/data';
 import {
   // dateFromAPIToLocalNoon,
   timestampToDate,
-  calculateQuantityFromHours,
+  calculateQuantityFromHours
 } from '../../util/dates';
 import { createSlug } from '../../util/urlHelpers';
 import { txIsPaymentPending } from '../../util/transaction';
@@ -90,7 +90,7 @@ export const TransactionPageComponent = props => {
     lineItems,
     fetchLineItemsInProgress,
     fetchLineItemsError,
-    addDiscount,
+    addDiscount
   } = props;
 
   const currentTransaction = ensureTransaction(transaction);
@@ -103,7 +103,7 @@ export const TransactionPageComponent = props => {
     // Customize checkout page state with current listing and selected bookingDates
     const { setInitialValues } = findRouteByRouteName('CheckoutPage', routes);
     callSetInitialValues(setInitialValues, initialValues);
-    console.log('checkiut,,', initialValues);
+
     // Clear previous Stripe errors from store if there is any
     onInitializeCardPaymentData();
 
@@ -166,51 +166,17 @@ export const TransactionPageComponent = props => {
 
   // Customer can create a booking, if the tx is in "enquiry" state.
   const handleSubmitBookingRequest = values => {
-    const {
-      bookingStartTime,
-      bookingEndTime,
-      bookingDates,
-      fromWhere,
-      enquirybookingType,
-      ...restOfValues
-    } = values;
-
-    const bookingStart =
-      fromWhere === 'enquiry'
-        ? enquirybookingType === HOURLY_PRICE
-          ? timestampToDate(bookingStartTime)
-          : moment(bookingDates.startDate)
-              .tz('UTC')
-              .startOf('day')
-              .toDate()
-        : bookingType === HOURLY_PRICE
-        ? timestampToDate(bookingStartTime)
-        : moment(bookingDates.startDate)
-            .tz('UTC')
-            .startOf('day')
-            .toDate();
-    const bookingEnd =
-      fromWhere === 'enquiry'
-        ? enquirybookingType === HOURLY_PRICE
-          ? timestampToDate(bookingEndTime)
-          : moment(bookingDates.endDate)
-              .tz('UTC')
-              .startOf('day')
-              .toDate()
-        : bookingType === HOURLY_PRICE
-        ? timestampToDate(bookingEndTime)
-        : moment(bookingDates.endDate)
-            .tz('UTC')
-            .startOf('day')
-            .toDate();
-    console.log(restOfValues, 'restOfValues');
-
+    
+    const { bookingStartTime, bookingEndTime, bookingDates, ...restOfValues } = values;
+    const bookingStart = bookingType === HOURLY_PRICE ? timestampToDate(bookingStartTime) : moment(bookingDates.startDate).tz('UTC').startOf('day').toDate();
+    const bookingEnd = bookingType === HOURLY_PRICE ? timestampToDate(bookingEndTime) : moment(bookingDates.endDate).tz('UTC').startOf('day').toDate();
+console.log(restOfValues, 'restOfValues')
     const bookingData = {
       // quantity: calculateQuantityFromHours(bookingStart, bookingEnd),
-      bookingType: fromWhere === 'enquiry' ? enquirybookingType : bookingType,
+      bookingType,
       ...restOfValues,
     };
-
+  
     const initialValues = {
       listing: currentListing,
       // enquired transaction should be passed to CheckoutPage
@@ -222,7 +188,6 @@ export const TransactionPageComponent = props => {
       },
       confirmPaymentError: null,
     };
-    console.log('booking =>', values, initialValues, currentListing);
 
     redirectToCheckoutPageWithInitialValues(initialValues, currentListing);
   };
@@ -498,15 +463,17 @@ const mapDispatchToProps = dispatch => {
     onInitializeCardPaymentData: () => dispatch(initializeCardPaymentData()),
     onFetchTimeSlots: (listingId, start, end, timeZone) =>
       dispatch(fetchTimeSlotsTime(listingId, start, end, timeZone)),
-    onFetchTransactionLineItems: (bookingData, listingId, isOwnListing) => {
-      return dispatch(fetchTransactionLineItems(bookingData, listingId, isOwnListing));
-    },
+      onFetchTransactionLineItems: (bookingData, listingId, isOwnListing) =>{
+      return (dispatch(fetchTransactionLineItems(bookingData, listingId, isOwnListing)))},
   };
 };
 
 const TransactionPage = compose(
   withRouter,
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
   injectIntl
 )(TransactionPageComponent);
 
