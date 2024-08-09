@@ -35,6 +35,9 @@ const BreakdownMaybe = props => {
     transaction.attributes.lastTransition === 'transition/enquire' &&
     transaction?.attributes?.protectedData &&
     Object.keys(transaction.attributes.protectedData).length > 0
+    transaction.attributes.lastTransition === 'transition/enquire' &&
+    transaction?.attributes?.protectedData &&
+    Object.keys(transaction.attributes.protectedData).length > 0
     // && transactionRole === 'provider'
   ) {
     const formatDate = timestamp => {
