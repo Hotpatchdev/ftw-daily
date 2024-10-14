@@ -197,7 +197,7 @@ export const EditListingPricingFormComponent = props => (
           form.change('minBookingCount', 1);
         }
         if (values.minBookingType === MONTHLY_BOOKING) {
-          setMaxStep(12);
+          setMaxStep(2);
           form.change('minBookingCount', 1);
         }
       }, [values.minBookingType]);
