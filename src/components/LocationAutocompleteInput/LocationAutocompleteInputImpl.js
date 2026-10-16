@@ -489,6 +489,7 @@ class LocationAutocompleteInputImpl extends Component {
           )}
         </div>
         <input
+          id={this.props.id}
           className={
             isFromLandingPageSearch
               ? `${inputClass} ${css.inputClassLandingPlaceHolder}`

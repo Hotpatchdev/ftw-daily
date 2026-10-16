@@ -25,35 +25,6 @@
 .heroContainer {
   display: flex;
   flex-direction: column;
-  min-height: auto;
-  height: calc(100vh - 145px);
-
-  @media (--viewportSmall) {
-    /* height: 454px; */
-    height: calc(100vh - 368px);
-    min-height: 350px;
-  }
-
-  @media screen and (min-width: 720px) and (min-width: 720px) {
-    height: calc(100vh - 780px);
-  }
-
-  @media (--viewportMedium) {
-    height: calc(100vh - 360px);
-  }
-
-  @media (--viewportLarge) {
-    height: calc(100vh - 235px);
-  }
-
-  @media (--viewportMLarge) {
-    min-height: 480px;
-  }
-
-  @media (--viewportLargeForHero) {
-    height: calc(100vh - 300px);
-    min-height: 450px;
-  }
 }
 
 .hero {
@@ -136,8 +107,8 @@
   width: 109px;
   height: 6px; */
 
-  /* Place the bar on top of .sectionContent top margin */
-  /* position: relative;
+/* Place the bar on top of .sectionContent top margin */
+/* position: relative;
   top: calc(-1 * var(--LandingPage_sectionMarginTop));
 
   @media (--viewportMedium) {

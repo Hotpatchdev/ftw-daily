@@ -274,3 +274,9 @@
     margin: 0;
   }
 }
+
+/* Navigation colours from the search and discovery prototype. */
+.container { background: #1d1c2e; }
+.menu, .searchMenu { color: #fff; }
+.menuIcon { fill: #fff; }
+.searchMenuIcon { stroke: #fff; }

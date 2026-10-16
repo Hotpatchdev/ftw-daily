@@ -17,7 +17,7 @@ class SearchFiltersMobileComponent extends Component {
     this.state = {
       isFiltersOpenOnMobile: false,
       initialQueryParams: null,
-      isCategoryFiltersOpenOnMobile: true,
+      isCategoryFiltersOpenOnMobile: false,
     };
 
     this.openFilters = this.openFilters.bind(this);
@@ -93,8 +93,15 @@ class SearchFiltersMobileComponent extends Component {
     const classes = classNames(rootClassName || css.root, className);
     const categoryChildren = children.filter(c => c.props.isCategory);
 
+    const priorityIds = ['keyword', 'dates', 'price'];
+    const priorityChildren = priorityIds
+      .map(id => children.find(c => c.props.filterConfig.id === id))
+      .filter(Boolean);
     const nonCategoryChildren = children.filter(
-      c => !c.props.isCategory && !c.props.isCategoryAmenities
+      c =>
+        !c.props.isCategory &&
+        !c.props.isCategoryAmenities &&
+        !priorityIds.includes(c.props.filterConfig.id)
     );
 
     const resultsFound = (
@@ -164,14 +171,19 @@ class SearchFiltersMobileComponent extends Component {
 
           {this.state.isFiltersOpenOnMobile ? (
             <>
-              <div
+              <div className={css.priorityFilters}>
+                {!isFromLandingPageSearch && priorityChildren}
+              </div>
+              <button
+                type="button"
+                aria-expanded={this.state.isCategoryFiltersOpenOnMobile}
                 className={classNames(css.filtersWrapperTitle, {
                   [css.filtersWrapperTitleActive]: this.state.isCategoryFiltersOpenOnMobile,
                 })}
                 onClick={this.openCategoryFilters}
               >
                 <FormattedMessage id={'FilterForm.patchCategoryMobile'} />
-              </div>
+              </button>
               <div className={css.filtersWrapper}>
                 {this.state.isCategoryFiltersOpenOnMobile && (
                   <div className={css.categoryItemsHolder}>

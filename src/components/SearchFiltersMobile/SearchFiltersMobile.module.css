@@ -1,7 +1,6 @@
 @import '../../styles/customMediaQueries.css';
 @import '../../styles/propertySets.css';
 
-
 .root {
   display: flex;
   flex-direction: column;
@@ -84,7 +83,7 @@
   /* margin: 0 24px; */
   margin: 0 40px;
 
-  & [class*="ModalInMobile_modalContent"] {
+  & [class*='ModalInMobile_modalContent'] {
     position: relative;
   }
 }
@@ -134,7 +133,7 @@
     order: 1;
   }
 
-  & [class*="FilterPlain_generalAmenitiesItem"] {
+  & [class*='FilterPlain_generalAmenitiesItem'] {
     order: 2;
   }
 
@@ -180,7 +179,6 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-
 }
 
 .categoryItemsHolderOpen {
@@ -194,7 +192,7 @@
   flex-direction: column;
   width: calc(50% - 12px);
 
-  & [class*="categoryItemAmenities"] {
+  & [class*='categoryItemAmenities'] {
     display: none;
   }
 }
@@ -202,18 +200,18 @@
 .categoryItemActive {
   width: 100%;
 
-  & [class*="categoryItemAmenities"] {
+  & [class*='categoryItemAmenities'] {
     display: block;
     order: 2;
   }
 
-  & [class*="categorypPlain"] {
+  & [class*='categorypPlain'] {
     display: block;
     border-bottom: 1px solid var(--matterColorNegative);
   }
 
-  & [class*="FilterPlain_labelButtonWithImg"] img {
-    height: 218px;    
+  & [class*='FilterPlain_labelButtonWithImg'] img {
+    height: 218px;
   }
 }
 
@@ -221,10 +219,8 @@
   display: none;
 }
 
-
 .generalAmenitiesFilterActive {
-
-  & [class*="filterAmenitiesNotSelected"] {
+  & [class*='filterAmenitiesNotSelected'] {
     opacity: 1;
     cursor: default;
 
@@ -233,4 +229,43 @@
       pointer-events: all;
     }
   }
+}
+
+/* Calmer, higher-contrast filter surfaces from the discovery prototype. */
+.filtersWrapper {
+  background: #faf6f0;
+  border-radius: 14px;
+  padding: 20px;
+}
+.filtersButton,
+.filtersButtonSelected {
+  background: #ac2858;
+  color: #fff;
+  border-color: #ac2858;
+  border-radius: 8px;
+}
+.resetAllButton {
+  color: #086c75;
+}
+
+.priorityFilters {
+  padding: 0 20px;
+  background: #faf6f0;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+.filtersWrapperTitle {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: #1d1c2e;
+}
+.showListingsButton {
+  background: #ac2858;
+  color: #fff;
+  border-radius: 8px;
+}
+.showListingsButton:hover {
+  background: #8a1d45;
 }

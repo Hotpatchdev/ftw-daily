@@ -159,3 +159,22 @@
     }
   }
 }
+
+.amenityGroup {
+  border-bottom: 1px solid #e7e0da;
+  margin-bottom: 8px;
+}
+.amenityGroup summary {
+  cursor: pointer;
+  padding: 14px 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1d1c2e;
+}
+.amenityGroup summary:focus-visible {
+  outline: 2px solid #ac2858;
+  outline-offset: 2px;
+}
+.amenityGroup ul {
+  padding: 0 0 16px;
+}

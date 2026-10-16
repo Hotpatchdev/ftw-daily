@@ -7,55 +7,52 @@ import { FieldCheckbox } from '../../components';
 
 import { FilterPopup, FilterPlain } from '../../components';
 import css from './SelectMultipleFilter.module.css';
+import { groupAmenities } from '../../util/amenityGroups';
 
 // SelectMultipleFilter doesn't need array mutators since it doesn't require validation.
 // TODO: Live edit didn't work with FieldCheckboxGroup
 //       There's a mutation problem: formstate.dirty is not reliable with it.
 const GroupOfFieldCheckboxes = props => {
-  const { id, className, name, options, isCategory, subCategoryImage } = props;
-
-  //NOTE v2s1 filterupdate -- customizations removed in v5 update
-  // const item = option => {
-  //   const fieldId = `${id}.${option.key}`;
-  //
-  //   return (
-  //     <li key={fieldId} className={css.item}>
-  //       <FieldCheckbox id={fieldId} name={name} label={option.label} value={option.key} />
-  //     </li>
-  //   );
-  // };
-
+  const {
+    id,
+    className,
+    name,
+    options,
+    isCategory,
+    subCategoryImage,
+    isAmenity,
+    amenityCategory,
+  } = props;
+  const items = items => (
+    <ul className={classNames(css.list, { [css.listWithImages]: isCategory })}>
+      {items.map(option => {
+        const fieldId = `${id}.${option.key || option.value}`;
+        return (
+          <li key={fieldId} className={css.item}>
+            <FieldCheckbox
+              id={fieldId}
+              name={name}
+              label={option.label}
+              labelImg={option.labelImg}
+              value={option.key || option.value}
+              isCategory={isCategory}
+              subCategoryImage={subCategoryImage}
+            />
+          </li>
+        );
+      })}
+    </ul>
+  );
   return (
     <fieldset className={className}>
-      <ul className={classNames(css.list, { [css.listWithImages]: isCategory })}>
-        {options.map((option, index) => {
-          //NOTE v2s1 filterupdate -- customizations removed in v5 update
-          // if (option.children && option.children.length) return (
-          //   <ul className={css.item} key={`${id}.${option.label}`}>
-          //     <li><h3>{option.label}</h3></li>
-          //     {option.children.map((c, i) => (item(c)))}
-          //   </ul>
-          // );
-          //
-          // if (option.key) return item(option)
-          // return null
-
-          const fieldId = `${id}.${option.key || option.value}`;
-          return (
-            <li key={fieldId} className={css.item}>
-              <FieldCheckbox
-                id={fieldId}
-                name={name}
-                label={option.label}
-                labelImg={option.labelImg}
-                value={option.key || option.value}
-                isCategory={isCategory}
-                subCategoryImage={subCategoryImage}
-              />
-            </li>
-          );
-        })}
-      </ul>
+      {isAmenity
+        ? groupAmenities(options, amenityCategory).map((group, index) => (
+            <details key={group.label} className={css.amenityGroup} open={index === 0}>
+              <summary>{group.label}</summary>
+              {items(group.options)}
+            </details>
+          ))
+        : items(options)}
     </fieldset>
   );
 };
@@ -237,6 +234,8 @@ class SelectMultipleFilter extends Component {
           name={name}
           id={`${id}-checkbox-group`}
           options={options}
+          isAmenity={queryParamName === 'pub_amenities'}
+          amenityCategory={filterConfig.id}
           isCategory={isCategory}
           subCategoryImage={subCategoriesImages}
         />
@@ -274,6 +273,8 @@ class SelectMultipleFilter extends Component {
           name={name}
           id={`${id}-checkbox-group`}
           options={options}
+          isAmenity={queryParamName === 'pub_amenities'}
+          amenityCategory={filterConfig.id}
           isCategory={isCategory}
           subCategoryImage={subCategoriesImages}
         />

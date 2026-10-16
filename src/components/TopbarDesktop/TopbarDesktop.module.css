@@ -466,3 +466,9 @@
     width: 125px;
   }
 }
+
+.root { background: #1d1c2e; }
+.inboxLink, .loginLink, .createListingLink { color: #fff; }
+.signup { background: #ac2858; color: #fff; border-radius: 6px; }
+.categoriesBtn { background: #ac2858; color: #fff; border-radius: 6px; }
+.categoriesBtn:hover, .categoriesBtn:focus { background: #8a1d45; color: #fff; }

@@ -68,3 +68,20 @@
     color: var(--marketplaceColorDark);
   }
 }
+
+/* Calmer, higher-contrast filter surfaces from the discovery prototype. */
+.filtersWrapper {
+  background: #faf6f0;
+  border-radius: 14px;
+  padding: 20px;
+}
+.filtersButton,
+.filtersButtonSelected {
+  background: #ac2858;
+  color: #fff;
+  border-color: #ac2858;
+  border-radius: 8px;
+}
+.resetAllButton {
+  color: #086c75;
+}

@@ -128,3 +128,56 @@
   word-break: break-word;
   hyphens: auto;
 }
+
+/* Discovery card layout: title first, consistent pricing beneath. */
+.root {
+  border: 1px solid #eee8e4;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 20px #1d1c2e08;
+}
+.root:focus-visible {
+  outline: 3px solid #ac2858;
+  outline-offset: 4px;
+}
+.threeToTwoWrapper {
+  overflow: hidden;
+}
+.threeToTwoWrapper:hover {
+  transform: none;
+  box-shadow: none;
+}
+.rootForImage {
+  border-radius: 0;
+}
+.info {
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+}
+.mainInfo {
+  order: -1;
+}
+.title {
+  color: #1d1c2e;
+  font-size: 18px;
+  line-height: 1.4;
+}
+.authorInfo {
+  color: #625d68;
+  margin-top: 6px;
+}
+.price {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid #eee8e4;
+}
+.priceValue {
+  color: #ac2858;
+  font-size: 22px;
+}
