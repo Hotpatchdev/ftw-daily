@@ -34,6 +34,7 @@ const PrivacyPolicyPage = loadable(() => import(/* webpackChunkName: "PrivacyPol
 const ProfilePage = loadable(() => import(/* webpackChunkName: "ProfilePage" */ './containers/ProfilePage/ProfilePage'));
 const ProfileSettingsPage = loadable(() => import(/* webpackChunkName: "ProfileSettingsPage" */ './containers/ProfileSettingsPage/ProfileSettingsPage'));
 const SearchPage = loadable(() => import(/* webpackChunkName: "SearchPage" */ /* webpackPrefetch: true */  './containers/SearchPage/SearchPage'));
+const WishlistPage = loadable(() => import(/* webpackChunkName: "WishlistPage" */ './containers/WishlistPage/WishlistPage'));
 const StripePayoutPage = loadable(() => import(/* webpackChunkName: "StripePayoutPage" */ './containers/StripePayoutPage/StripePayoutPage'));
 const TermsOfServicePage = loadable(() => import(/* webpackChunkName: "TermsOfServicePage" */ './containers/TermsOfServicePage/TermsOfServicePage'));
 const TransactionPage = loadable(() => import(/* webpackChunkName: "TransactionPage" */ './containers/TransactionPage/TransactionPage'));
@@ -106,6 +107,14 @@ const routeConfiguration = () => {
       name: 'SearchPage',
       component: SearchPage,
       loadData: pageDataLoadingAPI.SearchPage.loadData,
+    },
+    {
+      path: '/wishlist',
+      name: 'WishlistPage',
+      auth: true,
+      authPage: 'LoginPage',
+      component: WishlistPage,
+      loadData: pageDataLoadingAPI.WishlistPage.loadData,
     },
     {
       path: '/l',

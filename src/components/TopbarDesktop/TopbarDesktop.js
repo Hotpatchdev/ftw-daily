@@ -6,6 +6,7 @@ import { ACCOUNT_SETTINGS_PAGES } from '../../routeConfiguration';
 import { propTypes } from '../../util/types';
 import config from '../../config';
 import TopbarDropDown from './TopbarDropDown';
+import WishlistLink from '../WishlistLink/WishlistLink';
 import { withRouter } from 'react-router-dom';
 
 import {
@@ -256,6 +257,7 @@ const TopbarDesktop = props => {
       </NamedLink>
       {history.location.pathname === '/' ? <div style={{ width: '60%' }} /> : search}
       {categoriesBtn}
+      <WishlistLink />
       <NamedLink className={css.createListingLink} name="NewListingPage">
         <span className={css.createListing}>
           <FormattedMessage id="TopbarDesktop.createListing" />

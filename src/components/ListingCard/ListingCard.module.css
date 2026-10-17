@@ -1,6 +1,7 @@
 @import '../../styles/propertySets.css';
 
 .root {
+  position: relative;
   /* Layout */
   display: flex;
   flex-direction: column;
@@ -10,6 +11,11 @@
     text-decoration: none;
   }
 }
+
+.link { display: flex; flex-direction: column; flex-grow: 1; color: inherit; }
+.link:hover { text-decoration: none; }
+.link:focus-visible { outline: 3px solid #ac2858; outline-offset: -3px; }
+.save { position: absolute; right: 12px; top: 12px; z-index: 1; }
 
 .threeToTwoWrapper {
   /* Layout */

@@ -1,0 +1,29 @@
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-width: 44px;
+  height: 100%;
+  padding: 0 12px;
+  color: #fff;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.link:hover {
+  color: #f4bed0;
+  text-decoration: none;
+}
+.link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -4px;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}

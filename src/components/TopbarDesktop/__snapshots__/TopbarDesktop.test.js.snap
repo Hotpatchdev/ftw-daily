@@ -16,66 +16,244 @@ exports[`TopbarDesktop data matches snapshot 1`] = `
     <img
       alt="TopbarDesktop.logo"
       className="logo"
-      src="saunatime-logo.png"
+      src="hotpatch-logo-new.svg"
     />
   </a>
-  <form
-    action="/"
-    className="searchLink"
-    method="post"
-    onMouseOver={[Function]}
-    onSubmit={[Function]}
-    onTouchStart={[Function]}
+  <div
+    style={
+      Object {
+        "width": "60%",
+      }
+    }
+  />
+  <div
+    className="root"
+    onBlur={[Function]}
+    onKeyDown={[Function]}
+    tabIndex={0}
   >
-    <div
-      className="root topbarSearchWithLeftPadding"
+    <button
+      className="root categoriesBtn"
+      onBlur={[Function]}
+      onClick={[Function]}
     >
-      <div
-        className="desktopIcon"
+      <span>
+        TopbarDesktop.categories
+      </span>
+    </button>
+    <div
+      className="root categoriesMenuContent isClosed"
+      style={
+        Object {
+          "left": "-10000px",
+        }
+      }
+    >
+      <ul
+        className="content"
       >
-        <svg
-          className="iconSvg"
-          height="22"
-          viewBox="0 0 21 22"
-          width="21"
-          xmlns="http://www.w3.org/2000/svg"
+        <li
+          className="root"
+          role="menuitem"
         >
-          <g
-            className="iconSvgGroup"
-            fill="none"
-            fillRule="evenodd"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            transform="matrix(-1 0 0 1 20 1)"
+          <a
+            className="categoriesLink"
+            href="/s?address=&bounds=59.49417013%2C4.15978193%2C49.54972301%2C-10.51994741&pub_category=has_any%3Ahair-stylist%2Cbarber%2Cmakeup-artist%2Cnail-technician%2Ccosmetics%2Caesthetics%2Ctattoo-and-piercing"
+            onClick={[Function]}
+            onMouseOver={[Function]}
+            onTouchStart={[Function]}
+            style={Object {}}
+            title={null}
           >
-            <path
-              d="M13 14l5.241 5.241"
+            <span
+              className="menuItemBorder"
             />
-            <circle
-              cx="7.5"
-              cy="7.5"
-              r="7.5"
+            <span>
+              TopbarDesktop.hairBeauty
+            </span>
+          </a>
+        </li>
+        <li
+          className="root"
+          role="menuitem"
+        >
+          <a
+            className="categoriesLink"
+            href="/s?address=&bounds=59.49417013%2C4.15978193%2C49.54972301%2C-10.51994741&pub_category=has_any%3Atherapy-room%2Cmassage-room%2Cclinical-room"
+            onClick={[Function]}
+            onMouseOver={[Function]}
+            onTouchStart={[Function]}
+            style={Object {}}
+            title={null}
+          >
+            <span
+              className="menuItemBorder"
             />
-          </g>
-        </svg>
-      </div>
-      <input
-        autoComplete="off"
-        autoFocus={false}
-        className="desktopInput"
-        disabled={false}
-        name="location"
-        onBlur={[Function]}
-        onChange={[Function]}
-        onFocus={[Function]}
-        onKeyDown={[Function]}
-        placeholder="TopbarSearchForm.placeholder"
-        type="search"
-        value=""
-      />
+            <span>
+              TopbarDesktop.wellness
+            </span>
+          </a>
+        </li>
+        <li
+          className="root"
+          role="menuitem"
+        >
+          <a
+            className="categoriesLink"
+            href="/s?address=&bounds=59.49417013%2C4.15978193%2C49.54972301%2C-10.51994741&pub_category=has_any%3Afitness%2Cyoga-studio%2Cdance-studio%2Csports-hall%2Coutdoor-sport-space%2Cactivity-room"
+            onClick={[Function]}
+            onMouseOver={[Function]}
+            onTouchStart={[Function]}
+            style={Object {}}
+            title={null}
+          >
+            <span
+              className="menuItemBorder"
+            />
+            <span>
+              TopbarDesktop.fitness
+            </span>
+          </a>
+        </li>
+        <li
+          className="root"
+          role="menuitem"
+        >
+          <a
+            className="categoriesLink"
+            href="/s?address=&bounds=59.49417013%2C4.15978193%2C49.54972301%2C-10.51994741&pub_category=has_any%3Alocation-shoot%2Coutdoor-site%2Cphotography"
+            onClick={[Function]}
+            onMouseOver={[Function]}
+            onTouchStart={[Function]}
+            style={Object {}}
+            title={null}
+          >
+            <span
+              className="menuItemBorder"
+            />
+            <span>
+              TopbarDesktop.photographyAndFilm
+            </span>
+          </a>
+        </li>
+        <li
+          className="root"
+          role="menuitem"
+        >
+          <a
+            className="categoriesLink"
+            href="/s?address=&bounds=59.49417013%2C4.15978193%2C49.54972301%2C-10.51994741&pub_category=has_any%3Adesk-space%2Coffice-space%2Cmeeting-room-space%2Cconference-room%2Cclassroom"
+            onClick={[Function]}
+            onMouseOver={[Function]}
+            onTouchStart={[Function]}
+            style={Object {}}
+            title={null}
+          >
+            <span
+              className="menuItemBorder"
+            />
+            <span>
+              TopbarDesktop.coworking
+            </span>
+          </a>
+        </li>
+        <li
+          className="root"
+          role="menuitem"
+        >
+          <a
+            className="categoriesLink"
+            href="/s?address=&bounds=59.49417013%2C4.15978193%2C49.54972301%2C-10.51994741&pub_category=has_any%3Amusic-studio%2Crecording-studio%2Cgallery-space%2Cart-studio%2Crehearsal-space%2Cdrama-studio%2Ctheatre-space"
+            onClick={[Function]}
+            onMouseOver={[Function]}
+            onTouchStart={[Function]}
+            style={Object {}}
+            title={null}
+          >
+            <span
+              className="menuItemBorder"
+            />
+            <span>
+              TopbarDesktop.musicAndArts
+            </span>
+          </a>
+        </li>
+        <li
+          className="root"
+          role="menuitem"
+        >
+          <a
+            className="categoriesLink"
+            href="/s?address=&bounds=59.49417013%2C4.15978193%2C49.54972301%2C-10.51994741&pub_category=has_any%3Amusic-venue%2Cprivate-event-space%2Csports-venue%2Cconference-exhibition%2Coutdoor-events%2Cprivate-dining"
+            onClick={[Function]}
+            onMouseOver={[Function]}
+            onTouchStart={[Function]}
+            style={Object {}}
+            title={null}
+          >
+            <span
+              className="menuItemBorder"
+            />
+            <span>
+              TopbarDesktop.eventsAndVenues
+            </span>
+          </a>
+        </li>
+        <li
+          className="root"
+          role="menuitem"
+        >
+          <a
+            className="categoriesLink"
+            href="/s?address=&bounds=59.49417013%2C4.15978193%2C49.54972301%2C-10.51994741&pub_category=has_any%3Akitchen-space%2Cpop-up-space"
+            onClick={[Function]}
+            onMouseOver={[Function]}
+            onTouchStart={[Function]}
+            style={Object {}}
+            title={null}
+          >
+            <span
+              className="menuItemBorder"
+            />
+            <span>
+              TopbarDesktop.kitchensAndPopUps
+            </span>
+          </a>
+        </li>
+      </ul>
     </div>
-  </form>
+  </div>
+  <a
+    className="link"
+    href="/wishlist"
+    onClick={[Function]}
+    onMouseOver={[Function]}
+    onTouchStart={[Function]}
+    style={Object {}}
+    title="Your wishlist"
+  >
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height="22"
+      viewBox="0 0 24 24"
+      width="22"
+    >
+      <path
+        d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"
+        fill="currentColor"
+        fillOpacity=".12"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+    <span
+      className="label"
+    >
+      Saved spaces
+    </span>
+  </a>
   <a
     className="createListingLink"
     href="/l/new"
@@ -90,6 +268,20 @@ exports[`TopbarDesktop data matches snapshot 1`] = `
     >
       <span>
         TopbarDesktop.createListing
+      </span>
+    </span>
+  </a>
+  <a
+    className="inboxLink"
+    href="https://www.hotpatch.com/blog/"
+    rel="noopener noreferrer"
+    target="_blank"
+  >
+    <span
+      className="inbox"
+    >
+      <span>
+        Footer.toBlogPage
       </span>
     </span>
   </a>

@@ -1,0 +1,58 @@
+.root {
+  position: relative;
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid #e7e0da;
+  border-radius: 50%;
+  color: #4b4654;
+  background: #fff;
+  box-shadow: 0 2px 8px #1d1c2e14;
+  cursor: pointer;
+}
+.button:hover {
+  background: #fff3f7;
+  border-color: #ac2858;
+}
+.button:focus-visible {
+  outline: 3px solid #ac2858;
+  outline-offset: 3px;
+}
+.button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.saved {
+  color: #ac2858;
+  background: #fff3f7;
+}
+.saved svg path {
+  fill-opacity: 1;
+}
+.textButton {
+  width: auto;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.error {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 5;
+  width: 230px;
+  padding: 12px;
+  background: white;
+  color: #9c1742;
+  border: 1px solid #9c1742;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px #0002;
+  font-size: 13px;
+  line-height: 1.5;
+}

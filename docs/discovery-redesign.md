@@ -1,6 +1,6 @@
 # Search and discovery staging preview
 
-First implementation of the March 2026 HotPatch presentation, based on the existing staging branch. The supplied amenities reorganisation and usability report inform the filter layout. This is an incremental preview, not the complete prototype.
+First implementation of the March 2026 HotPatch presentation, based on the existing staging branch. The supplied amenities reorganisation and usability report inform the filter layout. This is an incremental preview, not the complete prototype. The wishlist iteration is documented below.
 
 ## Included
 
@@ -14,7 +14,7 @@ First implementation of the March 2026 HotPatch presentation, based on the exist
 
 ## Remaining prototype work
 
-Time-of-day search with listing-timezone handling; account-backed wishlists; booking-count/popularity aggregation and ranking; verified ratings/host response statistics; price totals including fees; the detailed map, listing and messaging flows. The annotations PDF and FigJam upload exceeded the workspace's 32 MiB transfer limit. The Figma archive, presentation, amenities documents, and usability report were received.
+Time-of-day search with listing-timezone handling; booking-count/popularity aggregation and ranking; verified ratings/host response statistics; price totals including fees; the detailed map, listing and messaging flows. The annotations PDF and FigJam upload exceeded the workspace's 32 MiB transfer limit. The Figma archive, presentation, amenities documents, and usability report were received.
 
 ## Validation
 
@@ -35,3 +35,25 @@ Browser checks cover mobile/desktop layout without overflow, keyword/date naviga
 Only the `staging` branch triggers the staging deployment job in `.github/workflows/ssh-deploy-workflow.yml`. Production deploys from a separate `production` branch. Do not push this preview to production.
 
 The existing Capistrano pipeline builds before switching releases and restarts PM2. Neither deployment scripts nor credentials were changed. A successful Git push alone is not evidence of a successful deployment: check the GitHub Actions run and staging homepage/search afterward. The original staging base for this preview was `4d95d2c195612c762cceaa763af6f2e65b719994`.
+
+## Wishlist iteration
+
+The second iteration adds a Save heart beside each search card, a Saved spaces link in desktop/mobile navigation, and an authenticated `/wishlist` page. The card link and Save button are siblings so saving does not navigate to the listing.
+
+Saved IDs live in `currentUser.attributes.profile.privateData.hotpatchSavedListingIds`, with a 100-space limit. The client reads fresh account data before a change and updates only that private-data key. Existing profile data is preserved by Sharetribe's field merge. Save requests are serialized within the client. Request identifiers discard stale reads/writes after logout or a new session. Simultaneous writes from different browsers remain subject to the API's normal last-write behaviour for a profile field.
+
+Guests are sent through the existing login flow with an idempotent pending save. Failed writes retain the previous heart state and offer a retry. An unavailable listing stays saved and can be removed from an unavailable-spaces section. An API failure is shown as an error, not an empty wishlist. No database migration, deployment-script change, or new credential is required.
+
+Focused tests cover validation, private-data handling, failed saves, rapid clicks, logout/relogin races, empty/unavailable lists, guest-save completion, and the accessible Save control. Existing card/navigation snapshots were updated intentionally. Browser checks use isolated account/API fixtures to exercise save, reload, failed removal, retry, guest redirect, post-login saving, and desktop/mobile layout. They do not validate real account writes; a signed-in staging account check remains required after deployment.
+
+Run the focused checks with the same Jest mapper above and include:
+
+```
+src/util/wishlist.test.js
+src/ducks/Wishlist.duck.test.js
+src/components/SaveListingButton/SaveListingButton.test.js
+src/components/ListingCard/ListingCard.test.js
+src/components/TopbarDesktop/TopbarDesktop.test.js
+```
+
+Visual refinements are deferred at the user's request. Time-of-day search, ranking, fee-inclusive comparison totals, and booking/messaging changes remain for later iterations.

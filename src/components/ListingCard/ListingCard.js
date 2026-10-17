@@ -10,6 +10,7 @@ import { richText } from '../../util/richText';
 import { createSlug } from '../../util/urlHelpers';
 import config from '../../config';
 import { NamedLink, ResponsiveImage } from '../../components';
+import SaveListingButton from '../SaveListingButton/SaveListingButton';
 
 import css from './ListingCard.module.css';
 import { types as sdkTypes } from '../../util/sdkLoader';
@@ -18,7 +19,10 @@ const { Money } = sdkTypes;
 const MIN_LENGTH_FOR_LONG_WORDS = 10;
 
 const priceData = (price, intl) => {
-  if (price && (price.currency === config.currency || price.currency === config.additionalCurrency)) {
+  if (
+    price &&
+    (price.currency === config.currency || price.currency === config.additionalCurrency)
+  ) {
     const formattedPrice = formatMoney(intl, price);
     return { formattedPrice, priceTitle: formattedPrice };
   } else if (price) {
@@ -44,7 +48,15 @@ class ListingImage extends Component {
 const LazyImage = lazyLoadWithDimensions(ListingImage, { loadAfterInitialRendering: 3000 });
 
 export const ListingCardComponent = props => {
-  const { className, rootClassName, intl, listing, renderSizes, setActiveListing, activePrice = null } = props;
+  const {
+    className,
+    rootClassName,
+    intl,
+    listing,
+    renderSizes,
+    setActiveListing,
+    activePrice = null,
+  } = props;
   const classes = classNames(rootClassName || css.root, className);
   const currentListing = ensureListing(listing);
   const id = currentListing.id.uuid;
@@ -55,9 +67,15 @@ export const ListingCardComponent = props => {
   const firstImage =
     currentListing.images && currentListing.images.length > 0 ? currentListing.images[0] : null;
 
-  const {key: priceType, value: {amount, currency}} = getLowestPrice(listing, activePrice);
+  const {
+    key: priceType,
+    value: { amount, currency },
+  } = getLowestPrice(listing, activePrice);
 
-  const { formattedPrice, priceTitle } = priceData(amount && currency ? new Money(amount, currency) : null, intl);
+  const { formattedPrice, priceTitle } = priceData(
+    amount && currency ? new Money(amount, currency) : null,
+    intl
+  );
 
   // const unitType = publicData.unitType || config.fallbackUnitType;
 
@@ -72,45 +90,48 @@ export const ListingCardComponent = props => {
   //   : 'ListingCard.perUnit';
 
   return (
-    <NamedLink className={classes} name="ListingPage" params={{ id, slug }}>
-      <div
-        className={css.threeToTwoWrapper}
-        onMouseEnter={() => setActiveListing(currentListing.id)}
-        onMouseLeave={() => setActiveListing(null)}
-      >
-        <div className={css.aspectWrapper}>
-          <LazyImage
-            rootClassName={css.rootForImage}
-            alt={title}
-            image={firstImage}
-            variants={['landscape-crop', 'landscape-crop2x']}
-            sizes={renderSizes}
-          />
-        </div>
-      </div>
-      <div className={css.info}>
-        <div className={css.price}>
-        <div className={css.perUnit}>from</div>
-          <div className={css.priceValue} title={priceTitle}>
-            {formattedPrice}
-          </div>
-          <div className={css.perUnit}>
-            <FormattedMessage id={unitTranslationKey} />
+    <div className={classes}>
+      <NamedLink className={css.link} name="ListingPage" params={{ id, slug }}>
+        <div
+          className={css.threeToTwoWrapper}
+          onMouseEnter={() => setActiveListing(currentListing.id)}
+          onMouseLeave={() => setActiveListing(null)}
+        >
+          <div className={css.aspectWrapper}>
+            <LazyImage
+              rootClassName={css.rootForImage}
+              alt={title}
+              image={firstImage}
+              variants={['landscape-crop', 'landscape-crop2x']}
+              sizes={renderSizes}
+            />
           </div>
         </div>
-        <div className={css.mainInfo}>
-          <div className={css.title}>
-            {richText(title, {
-              longWordMinLength: MIN_LENGTH_FOR_LONG_WORDS,
-              longWordClass: css.longWord,
-            })}
+        <div className={css.info}>
+          <div className={css.price}>
+            <div className={css.perUnit}>from</div>
+            <div className={css.priceValue} title={priceTitle}>
+              {formattedPrice}
+            </div>
+            <div className={css.perUnit}>
+              <FormattedMessage id={unitTranslationKey} />
+            </div>
           </div>
-          <div className={css.authorInfo}>
-            <FormattedMessage id="ListingCard.hostedBy" values={{ authorName }} />
+          <div className={css.mainInfo}>
+            <div className={css.title}>
+              {richText(title, {
+                longWordMinLength: MIN_LENGTH_FOR_LONG_WORDS,
+                longWordClass: css.longWord,
+              })}
+            </div>
+            <div className={css.authorInfo}>
+              <FormattedMessage id="ListingCard.hostedBy" values={{ authorName }} />
+            </div>
           </div>
         </div>
-      </div>
-    </NamedLink>
+      </NamedLink>
+      <SaveListingButton className={css.save} id={id} title={title} />
+    </div>
   );
 };
 

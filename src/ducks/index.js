@@ -17,9 +17,11 @@ import stripe from './stripe.duck';
 import stripeConnectAccount from './stripeConnectAccount.duck';
 import user from './user.duck';
 import Promocode from './Promocode.duck';
+import Wishlist from './Wishlist.duck';
 
 export {
   Auth,
+  Wishlist,
   Promocode,
   EmailVerification,
   LocationFilter,
