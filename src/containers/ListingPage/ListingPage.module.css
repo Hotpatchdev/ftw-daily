@@ -435,6 +435,16 @@
   }
 }
 
+.amenityGroup {
+  margin-top: 20px;
+}
+
+.amenityGroupTitle {
+  @apply --marketplaceH4FontStyles;
+  margin: 0 0 8px;
+  overflow-wrap: break-word;
+}
+
 .capacity {
   word-wrap: break-word;
 }

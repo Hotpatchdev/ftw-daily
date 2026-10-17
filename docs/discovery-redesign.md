@@ -57,3 +57,9 @@ src/components/TopbarDesktop/TopbarDesktop.test.js
 ```
 
 Visual refinements are deferred at the user's request. Time-of-day search, ranking, fee-inclusive comparison totals, and booking/messaging changes remain for later iterations.
+
+## Listing-page amenities
+
+Listing pages now reuse the common amenity headings from search, with alphabetical items inside each group. Only the listing's existing selected amenities appear, once each; an empty amenity section is hidden. The existing two-column desktop layout and single-column mobile layout are retained. No listing data or booking behaviour changes.
+
+Validation: the two existing amenity-group tests and the full web/server build passed. Local browser checks with a fixture listing at 390px and 1440px confirmed selected amenities appear once, unselected amenities are absent, and the page has no horizontal overflow.
