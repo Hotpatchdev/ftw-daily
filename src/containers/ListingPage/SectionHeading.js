@@ -4,6 +4,7 @@ import { UserCard, Modal, InlineTextButton } from '../../components';
 import { EnquiryForm } from '../../forms';
 
 import css from './ListingPage.module.css';
+import ListingKeyDetails from './ListingKeyDetails';
 
 const SectionHeading = props => {
   const {
@@ -61,17 +62,24 @@ const SectionHeading = props => {
 
   return (
     <div className={css.sectionHeading}>
-      <div className={css.desktopPriceContainer}>
-        <p className={css.desktopPerUnit}>from</p>
-        <div className={css.desktopPriceValue} title={priceTitle}>
-          {formattedPrice}
-        </div>
-        <div className={css.desktopPerUnit}>
-          <FormattedMessage id={unitTranslationKey} />
-        </div>
-      </div>
       <div className={css.heading}>
         <h1 className={css.title}>{richTitle}</h1>
+        <div className={css.headingPrice}>
+          <p className={css.desktopPerUnit}>from</p>
+          <div className={css.desktopPriceValue} title={priceTitle}>
+            {formattedPrice}
+          </div>
+          <div className={css.desktopPerUnit}>
+            <FormattedMessage id={unitTranslationKey} />
+          </div>
+        </div>
+        <ListingKeyDetails
+          listingId={id}
+          title={title}
+          publicData={props.publicData}
+          geolocation={props.geolocation}
+          published={props.published}
+        />
         <div className={css.author}>
           {category}
           <FormattedMessage id="ListingPage.hostedBy" values={{ name: hostLink }} />

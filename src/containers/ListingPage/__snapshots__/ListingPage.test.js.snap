@@ -162,6 +162,13 @@ exports[`ListingPage matches snapshot 1`] = `
                 }
               }
               formattedPrice={55}
+              geolocation={
+                LatLng {
+                  "_sdkType": "LatLng",
+                  "lat": 40,
+                  "lng": 60,
+                }
+              }
               hostLink={
                 <NamedLink
                   className="authorNameLink"
@@ -188,6 +195,8 @@ exports[`ListingPage matches snapshot 1`] = `
               onSubmitEnquiry={[Function]}
               priceTitle={55}
               priceType="price"
+              publicData={Object {}}
+              published={true}
               richTitle={
                 <span>
                   
@@ -230,9 +239,6 @@ exports[`ListingPage matches snapshot 1`] = `
               />
             </div>
             <p />
-            <SectionCapacity
-              publicData={Object {}}
-            />
             <SectionDescriptionMaybe
               description="listing1 description"
             />

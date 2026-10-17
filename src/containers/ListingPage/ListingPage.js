@@ -637,6 +637,9 @@ export class ListingPageComponent extends Component {
                 <SectionAvatar user={currentAuthor} params={params} />
                 <div className={css.mainContent}>
                   <SectionHeading
+                    publicData={publicData}
+                    geolocation={geolocation}
+                    published={currentListing.attributes.state === 'published'}
                     priceTitle={priceTitle}
                     formattedPrice={formattedPrice}
                     richTitle={richTitle}
@@ -678,7 +681,6 @@ export class ListingPageComponent extends Component {
                     />
                   </div>
                   <p></p>
-                  <SectionCapacity publicData={publicData} />
                   {/* <SectionSeats publicData={publicData} /> */}
                   <SectionDescriptionMaybe description={description} />
 

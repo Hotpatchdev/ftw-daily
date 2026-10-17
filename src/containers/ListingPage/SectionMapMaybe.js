@@ -32,7 +32,7 @@ class SectionMapMaybe extends Component {
     const map = <Map {...mapProps} useStaticMap={this.state.isStatic} />;
 
     return (
-      <div className={classes}>
+      <div id="listing-location" className={classes}>
         <h2 className={css.locationTitle}>
           <FormattedMessage id="ListingPage.locationTitle" />
         </h2>

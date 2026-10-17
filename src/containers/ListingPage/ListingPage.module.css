@@ -362,6 +362,41 @@
     margin-bottom: 31px;
   }
 }
+
+.headingPrice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin: 12px 0;
+
+  & p { margin: 0; }
+}
+
+.keyDetails {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  margin: 16px 0;
+}
+
+.headingPrice .desktopPriceValue {
+  color: var(--matterColor);
+  font-size: 24px;
+}
+
+.headingPrice .desktopPerUnit {
+  margin: 0;
+}
+
+.keyDetail {
+  color: var(--matterColor);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+a.keyDetail { text-decoration: underline; }
 .desktopPriceContainer {
   display: none;
 
@@ -549,6 +584,7 @@
 }
 
 .sectionMap {
+  scroll-margin-top: 100px;
   padding: 0 24px;
   margin-bottom: 35px;
 

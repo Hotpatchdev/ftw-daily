@@ -1,5 +1,15 @@
 # Search and discovery staging preview
 
+## Deferred Sharetribe upgrade review
+
+After the current design work, identify the template's upstream repository and version, compare it with Sharetribe's maintained template and release guidance, review security fixes and available features, and assess compatibility with Hotpatch customisations and the existing runtime. This is an assessment first; no dependency or template upgrade is part of the current design changes. Any implementation should be tested on staging. Production deployment remains reserved for the user.
+
+## Listing key details
+
+The individual listing heading groups the title, existing starting price and actual pricing unit, valid capacity, location-map link, and public review summary. Capacity now includes single-person spaces and is no longer repeated below the heading. Approximate-location configuration is respected without revealing the street address. Ratings reuse the complete, validated card summary loader and are omitted on failure or unsupported datasets; the Reviews link remains available. Booking calculations and controls are unchanged.
+
+Validation: 18 tests across key-detail, listing-page and review-summary suites; the listing snapshot was intentionally updated for new heading inputs and the moved capacity. Local fixtures at 390px and 1440px checked pricing units, capacity, genuine summary calculation, review navigation, location scrolling, and page overflow. Live staging page access remains unavailable from this environment.
+
 ## Return to search
 
 Listing links from `/s` retain the complete committed search query in browser history state. Listing pages offer Back to search results, preserving dates, keywords, filters, sorting, pagination, and map bounds. The context also travels through the all-reviews page and survives reloading the current tab. Only the internal `/s` destination is accepted. Direct links, new tabs, and wishlist arrivals without search context show Search spaces; this does not attempt to recover an unrelated previous search or persist browsing data to an account.
