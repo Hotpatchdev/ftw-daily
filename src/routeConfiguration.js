@@ -25,6 +25,7 @@ const EmailVerificationPage = loadable(() => import(/* webpackChunkName: "EmailV
 const InboxPage = loadable(() => import(/* webpackChunkName: "InboxPage" */ './containers/InboxPage/InboxPage'));
 const LandingPage = loadable(() => import(/* webpackChunkName: "LandingPage" */ './containers/LandingPage/LandingPage'));
 const ListingPage = loadable(() => import(/* webpackChunkName: "ListingPage" */ /* webpackPrefetch: true */ './containers/ListingPage/ListingPage'));
+const ListingReviewsPage = loadable(() => import(/* webpackChunkName: "ListingReviewsPage" */ './containers/ListingReviewsPage/ListingReviewsPage'));
 const ManageListingsPage = loadable(() => import(/* webpackChunkName: "ManageListingsPage" */ './containers/ManageListingsPage/ManageListingsPage'));
 const PasswordChangePage = loadable(() => import(/* webpackChunkName: "PasswordChangePage" */ './containers/PasswordChangePage/PasswordChangePage'));
 const PasswordRecoveryPage = loadable(() => import(/* webpackChunkName: "PasswordRecoveryPage" */ './containers/PasswordRecoveryPage/PasswordRecoveryPage'));
@@ -126,6 +127,12 @@ const routeConfiguration = () => {
       name: 'ListingPage',
       component: ListingPage,
       loadData: pageDataLoadingAPI.ListingPage.loadData,
+    },
+    {
+      path: '/l/:slug/:id/reviews',
+      name: 'ListingReviewsPage',
+      component: ListingReviewsPage,
+      loadData: pageDataLoadingAPI.ListingReviewsPage.loadData,
     },
     {
       path: '/l/:slug/:id/checkout',

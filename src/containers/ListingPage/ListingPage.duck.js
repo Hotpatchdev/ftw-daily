@@ -280,11 +280,14 @@ export const fetchReviews = listingId => (dispatch, getState, sdk) => {
     .query({
       listing_id: listingId,
       state: 'public',
+      type: 'ofProvider',
       include: ['author', 'author.profileImage'],
       'fields.image': ['variants.square-small', 'variants.square-small2x'],
     })
     .then(response => {
-      const reviews = denormalisedResponseEntities(response);
+      const reviews = denormalisedResponseEntities(response).filter(
+        review => review.attributes.state === 'public' && review.attributes.type === 'ofProvider'
+      );
       dispatch(fetchReviewsSuccess(reviews));
     })
     .catch(e => {

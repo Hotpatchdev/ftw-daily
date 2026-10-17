@@ -682,7 +682,12 @@ export class ListingPageComponent extends Component {
                     publicData={publicData}
                     listingId={currentListing.id}
                   />
-                  <SectionReviews reviews={reviews} fetchReviewsError={fetchReviewsError} />
+                  <SectionReviews
+                    reviews={reviews}
+                    fetchReviewsError={fetchReviewsError}
+                    listingId={currentListing.attributes.state === 'published' ? listingId.uuid : null}
+                    listingTitle={title}
+                  />
                   <SectionHostMaybe
                     title={title}
                     id={listingId.uuid}

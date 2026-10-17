@@ -485,6 +485,7 @@
 }
 
 .sectionReviews {
+  scroll-margin-top: 100px;
   padding: 0 24px;
   margin-bottom: 5px;
 

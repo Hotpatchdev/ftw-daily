@@ -125,6 +125,27 @@ exports[`ListingPage matches snapshot 1`] = `
           >
             <SectionHeading
               category={null}
+              currentUser={
+                Object {
+                  "attributes": Object {
+                    "banned": false,
+                    "deleted": false,
+                    "email": "user-2@example.com",
+                    "emailVerified": true,
+                    "profile": Object {
+                      "abbreviatedName": "user-2 abbreviated name",
+                      "displayName": "user-2 display name",
+                      "firstName": "user-2 first name",
+                      "lastName": "user-2 last name",
+                    },
+                  },
+                  "id": UUID {
+                    "_sdkType": "UUID",
+                    "uuid": "user-2",
+                  },
+                  "type": "currentUser",
+                }
+              }
               formattedPrice={55}
               hostLink={
                 <NamedLink
@@ -145,8 +166,13 @@ exports[`ListingPage matches snapshot 1`] = `
                   user-1 display name
                 </NamedLink>
               }
+              id="listing1"
+              onCloseEnquiryModal={[Function]}
               onContactUser={[Function]}
+              onManageDisableScrolling={[Function]}
+              onSubmitEnquiry={[Function]}
               priceTitle={55}
+              priceType="price"
               richTitle={
                 <span>
                   
@@ -156,28 +182,57 @@ exports[`ListingPage matches snapshot 1`] = `
                   
                 </span>
               }
+              sendEnquiryError={null}
+              sendEnquiryInProgress={false}
               showContactUser={true}
+              title="listing1 title"
+              unitType="line-item/night"
+            />
+            <div
+              className="shareButtons"
+            >
+              <InlineShareButtons
+                config={
+                  Object {
+                    "alignment": "left",
+                    "color": "social",
+                    "enabled": true,
+                    "image": null,
+                    "message": "ListingPage.emailMessageForSharing",
+                    "networks": Array [
+                      "twitter",
+                      "facebook",
+                      "whatsapp",
+                      "email",
+                    ],
+                    "radius": 4,
+                    "servicePopup": true,
+                    "size": 45,
+                    "subject": "Check out this listing on HotPatch!",
+                    "title": "Check out this listing on HotPatch!",
+                  }
+                }
+              />
+            </div>
+            <p />
+            <SectionCapacity
+              publicData={Object {}}
             />
             <SectionDescriptionMaybe
               description="listing1 description"
             />
+            <SectionMiscMaybe
+              className={null}
+              publicData={Object {}}
+              rootClassName={null}
+            />
+            <SectionEquipmentMaybe
+              className={null}
+              publicData={Object {}}
+              rootClassName={null}
+            />
             <SectionFeaturesMaybe
-              options={
-                Array [
-                  Object {
-                    "key": "feat1",
-                    "label": "Feat 1",
-                  },
-                  Object {
-                    "key": "feat2",
-                    "label": "Feat 2",
-                  },
-                  Object {
-                    "key": "feat3",
-                    "label": "Feat 3",
-                  },
-                ]
-              }
+              options={Array []}
               publicData={Object {}}
             />
             <SectionRulesMaybe
@@ -205,10 +260,14 @@ exports[`ListingPage matches snapshot 1`] = `
             />
             <SectionReviews
               fetchReviewsError={null}
+              listingId="listing1"
+              listingTitle="listing1 title"
               reviews={Array []}
             />
             <SectionHostMaybe
               authorDisplayName="user-1 display name"
+              bookingType={null}
+              className="bookingPanel"
               currentUser={
                 Object {
                   "attributes": Object {
@@ -230,7 +289,14 @@ exports[`ListingPage matches snapshot 1`] = `
                   "type": "currentUser",
                 }
               }
+              enquiryDateTimeDataError={false}
+              fetchLineItemsError={null}
+              fetchLineItemsInProgress={false}
+              fetchTimeSlotsError={null}
+              id="listing1"
               isEnquiryModalOpen={false}
+              isOwnListing={false}
+              lineItems={null}
               listing={
                 Object {
                   "attributes": Object {
@@ -273,17 +339,29 @@ exports[`ListingPage matches snapshot 1`] = `
                   "type": "listing",
                 }
               }
+              monthlyTimeSlots={null}
               onCloseEnquiryModal={[Function]}
               onContactUser={[Function]}
+              onFetchTransactionLineItems={[Function]}
               onManageDisableScrolling={[Function]}
+              onSubmit={[Function]}
               onSubmitEnquiry={[Function]}
+              planType=""
+              promocode={false}
               sendEnquiryError={null}
               sendEnquiryInProgress={false}
+              subTitle="ListingPage.bookingSubTitle"
+              timeSlots={null}
               title="listing1 title"
+              toggleBookingType={[Function]}
+              unitType="line-item/night"
+              updateDiscount={[Function]}
+              updateEnquiryDateTime={[Function]}
             />
           </div>
           <withRouter(injectIntl(BookingPanel))
             authorDisplayName="user-1 display name"
+            bookingType={null}
             className="bookingPanel"
             fetchLineItemsError={null}
             fetchLineItemsInProgress={false}
@@ -332,9 +410,11 @@ exports[`ListingPage matches snapshot 1`] = `
                 "type": "listing",
               }
             }
+            monthlyTimeSlots={null}
             onFetchTransactionLineItems={[Function]}
             onManageDisableScrolling={[Function]}
             onSubmit={[Function]}
+            promocode={false}
             subTitle="ListingPage.bookingSubTitle"
             timeSlots={null}
             title={
@@ -353,7 +433,9 @@ exports[`ListingPage matches snapshot 1`] = `
                 }
               />
             }
+            toggleBookingType={[Function]}
             unitType="line-item/night"
+            updateDiscount={[Function]}
           />
         </div>
       </div>
