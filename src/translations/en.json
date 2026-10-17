@@ -991,6 +991,12 @@
   "SearchPage.schemaTitleEventsVenues": "Music, Sports, Exhibition & Dining Venue for hire in {searchAddress} - {siteTitle}",
   "SearchPage.schemaTitleKitchensandPopUps": "Kitchen & Pop-up Space to rent in {searchAddress} - {siteTitle}",
 
+  "SearchPage.appliedFilters": "Applied filters",
+  "SearchPage.removeFilter": "Remove {filter}",
+  "SearchPage.clearFilters": "Clear filters",
+  "SearchPage.keywordTag": "Keyword: {keyword}",
+  "SearchPage.dateTag": "Dates: {start} – {end}",
+  "SearchPage.priceTag": "{min}–{max} {unit}",
   "SearchPage.searchError": "Search failed. Please try again.",
   "SearchResultsPanel.nextPage": "Next page",
   "SearchResultsPanel.previousPage": "Previous page",

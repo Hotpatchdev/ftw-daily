@@ -1,0 +1,55 @@
+.root {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding: 0 24px;
+  margin: 0 0 24px;
+}
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  max-width: 100%;
+}
+.list li {
+  max-width: 100%;
+}
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  max-width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e4c4d0;
+  border-radius: 20px;
+  color: #72203e;
+  background: #fff5f8;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+}
+.tag span {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.tag svg {
+  flex-shrink: 0;
+}
+.clear {
+  padding: 10px 4px;
+  border: 0;
+  background: transparent;
+  color: #72203e;
+  font-size: 14px;
+  text-decoration: underline;
+}
+.tag:focus-visible,
+.clear:focus-visible {
+  outline: 3px solid #1d1c2e;
+  outline-offset: 3px;
+}

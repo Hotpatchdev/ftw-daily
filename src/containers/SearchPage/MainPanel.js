@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { array, bool, func, number, object, shape, string } from 'prop-types';
 import classNames from 'classnames';
 import omit from 'lodash/omit';
+import isEqual from 'lodash/isEqual';
 import config from '../../config';
 import routeConfiguration from '../../routeConfiguration';
 import { FormattedMessage } from '../../util/reactIntl';
@@ -17,6 +18,8 @@ import {
 } from '../../components';
 
 import FilterComponent from './FilterComponent';
+import ActiveFilterTags from '../../components/ActiveFilterTags/ActiveFilterTags';
+import { removeFilterTag } from '../../util/activeFilters';
 import { validFilterParams } from './SearchPage.helpers';
 
 import css from './SearchPage.module.css';
@@ -68,6 +71,24 @@ class MainPanel extends Component {
 
     // SortBy
     this.handleSortBy = this.handleSortBy.bind(this);
+    this.removeActiveFilter = this.removeActiveFilter.bind(this);
+    this.searchHeading = React.createRef();
+  }
+
+  componentDidUpdate(previous) {
+    if (!isEqual(previous.urlQueryParams, this.props.urlQueryParams)) {
+      this.setState({ currentQueryParams: this.props.urlQueryParams, selectedCategoriesLength: null });
+      if (this.context && this.context.setSelectedPubCat) {
+        this.context.setSelectedPubCat(this.props.urlQueryParams.pub_category || '');
+      }
+    }
+  }
+
+  removeActiveFilter(tag) {
+    const { urlQueryParams, filterConfig, history } = this.props;
+    const next = removeFilterTag(urlQueryParams, tag, filterConfig);
+    this.setState({ currentQueryParams: next, selectedCategoriesLength: null });
+    history.push(createResourceLocatorString('SearchPage', routeConfiguration(), {}, next));
   }
 
   // Apply the filters by redirecting to SearchPage with new filters.
@@ -421,7 +442,7 @@ class MainPanel extends Component {
 
     return (
       <div className={classes}>
-        <h1 className={css.h1}>{h1}</h1>
+        <h1 className={css.h1} ref={this.searchHeading} tabIndex={-1}>{h1}</h1>
         <SearchFiltersMobile
           className={css.searchFiltersMobile}
           urlQueryParams={urlQueryParams}
@@ -505,6 +526,9 @@ class MainPanel extends Component {
             );
           })}
         </SearchFiltersPrimary>
+        <ActiveFilterTags params={urlQueryParams} filters={filterConfig}
+          onRemove={this.removeActiveFilter} onClear={() => this.removeActiveFilter(null)}
+          onEmpty={() => { if (this.searchHeading.current) this.searchHeading.current.focus(); }} />
         {isSecondaryFiltersOpen ? (
           <div className={classNames(css.searchFiltersPanel)}>
             <SearchFiltersSecondary
