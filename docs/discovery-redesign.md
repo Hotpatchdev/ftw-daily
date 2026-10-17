@@ -1,5 +1,11 @@
 # Search and discovery staging preview
 
+## Listing description layout
+
+Long listing descriptions now start with a word-boundary preview and an accessible Read more control, following the PDP annotation. The complete host text remains available through expansion; short descriptions stay complete. The existing fixed mobile booking bar is retained. This is a focused layout improvement; the gallery and return-to-search navigation remain separate work.
+
+Validation: 10 tests across the description and listing-page suites, including expansion/collapse, unchanged full text, and reset between spaces. Local browser fixtures at 390px and 1440px verified keyboard activation, complete text, no page overflow, and no account writes. Direct live staging access is unavailable from this environment.
+
 First implementation of the March 2026 HotPatch presentation, based on the existing staging branch. The supplied amenities reorganisation and usability report inform the filter layout. This is an incremental preview, not the complete prototype. The wishlist iteration is documented below.
 
 ## Included
