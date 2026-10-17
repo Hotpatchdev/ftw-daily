@@ -24,6 +24,62 @@
 .sectionImages {
 }
 
+.galleryMainButton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  @media (--viewportMedium) {
+    position: static;
+    height: auto;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--matterColor);
+    outline-offset: -4px;
+  }
+}
+
+.galleryWithThumbnails {
+  padding-bottom: 40px;
+}
+
+.galleryThumbnails {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 4px;
+}
+
+.galleryThumbnail {
+  flex: 0 0 104px;
+  height: 76px;
+  padding: 3px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+
+  &[aria-pressed='true'], &:focus-visible {
+    border-color: var(--matterColor);
+    outline: none;
+  }
+}
+
+.galleryThumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
 .threeToTwoWrapper {
   /* Layout */
   display: block;

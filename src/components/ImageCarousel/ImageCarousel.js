@@ -13,7 +13,12 @@ const KEY_CODE_RIGHT_ARROW = 39;
 class ImageCarousel extends Component {
   constructor(props) {
     super(props);
-    this.state = { selectedImageIndex: 0, selectedImageLoaded: false };
+    const index = props.initialImageIndex;
+    this.state = {
+      selectedImageIndex:
+        Number.isInteger(index) && index >= 0 && index < props.images.length ? index : 0,
+      selectedImageLoaded: false,
+    };
     this.onKeyUp = this.onKeyUp.bind(this);
     this.prev = this.prev.bind(this);
     this.next = this.next.bind(this);
@@ -63,9 +68,18 @@ class ImageCarousel extends Component {
         </span>
       ) : null;
     const prevButton =
-      images.length > 1 ? <button className={css.prev} onClick={this.prev} /> : null;
+      images.length > 1 ? (
+        <button
+          type="button"
+          aria-label="Previous photo"
+          className={css.prev}
+          onClick={this.prev}
+        />
+      ) : null;
     const nextButton =
-      images.length > 1 ? <button className={css.next} onClick={this.next} /> : null;
+      images.length > 1 ? (
+        <button type="button" aria-label="Next photo" className={css.next} onClick={this.next} />
+      ) : null;
 
     const imageAltText = intl.formatMessage(
       {
@@ -124,12 +138,13 @@ ImageCarousel.defaultProps = {
   className: null,
 };
 
-const { string, arrayOf } = PropTypes;
+const { string, arrayOf, number } = PropTypes;
 
 ImageCarousel.propTypes = {
   rootClassName: string,
   className: string,
   images: arrayOf(propTypes.image).isRequired,
+  initialImageIndex: number,
 
   // from injectIntl
   intl: intlShape.isRequired,

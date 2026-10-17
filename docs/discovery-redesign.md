@@ -1,5 +1,11 @@
 # Search and discovery staging preview
 
+## Listing gallery
+
+Listing pages show a scrollable strip of image previews beneath the main photo. Native buttons expose the selected photo, support keyboard selection, and open the existing full-screen gallery at the selected photo. Full-screen previous/next controls now have accessible labels. Single-photo and empty listings omit the strip; thumbnail requests use small variants and lazy loading. This follows the PDP photo-browsing annotation without changing image order or booking behavior.
+
+Validation: 10 tests in the gallery and listing-page suites; local browser fixtures at 390px and 1440px exercised thumbnail keyboard selection, opening at the selected image, previous/next navigation, closing, and page overflow. The production build passed. Staging deployment is checked separately; direct live staging access remains unavailable from this environment.
+
 ## Listing description layout
 
 Long listing descriptions now start with a word-boundary preview and an accessible Read more control, following the PDP annotation. The complete host text remains available through expansion; short descriptions stay complete. The existing fixed mobile booking bar is retained. This is a focused layout improvement; the gallery and return-to-search navigation remain separate work.
