@@ -24,6 +24,19 @@
 .sectionImages {
 }
 
+.searchBreadcrumb {
+  max-width: 1128px;
+  margin: 0 auto;
+  padding: 12px 24px;
+
+  & a {
+    display: inline-block;
+    padding: 8px 0;
+    color: var(--matterColor);
+    text-decoration: underline;
+  }
+}
+
 .galleryMainButton {
   position: absolute;
   top: 0;

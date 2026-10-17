@@ -23,6 +23,7 @@ import { Link, withRouter } from 'react-router-dom';
 import classNames from 'classnames';
 import routeConfiguration from '../../routeConfiguration';
 import { pathByRouteName, findRouteByRouteName } from '../../util/routes';
+import { listingLinkDestination } from '../../util/searchReturn';
 
 export const NamedLinkComponent = props => {
   const { name, params, title } = props;
@@ -51,7 +52,12 @@ export const NamedLinkComponent = props => {
   };
 
   return (
-    <Link onMouseOver={onOver} onTouchStart={onOver} to={{ pathname, ...to }} {...aElemProps}>
+    <Link
+      onMouseOver={onOver}
+      onTouchStart={onOver}
+      to={{ pathname, ...listingLinkDestination(name, to, props.location) }}
+      {...aElemProps}
+    >
       {children}
     </Link>
   );

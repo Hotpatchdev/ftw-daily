@@ -1,5 +1,11 @@
 # Search and discovery staging preview
 
+## Return to search
+
+Listing links from `/s` retain the complete committed search query in browser history state. Listing pages offer Back to search results, preserving dates, keywords, filters, sorting, pagination, and map bounds. The context also travels through the all-reviews page and survives reloading the current tab. Only the internal `/s` destination is accepted. Direct links, new tabs, and wishlist arrivals without search context show Search spaces; this does not attempt to recover an unrelated previous search or persist browsing data to an account.
+
+Validation: 15 tests across search-context, NamedLink, gallery and listing-page suites. The listing snapshot was intentionally updated for the breadcrumb. Local desktop/mobile fixtures verified search-to-listing navigation, exact query preservation, reload, reviews round trip, return navigation, and direct-entry fallback.
+
 ## Listing gallery
 
 Listing pages show a scrollable strip of image previews beneath the main photo. Native buttons expose the selected photo, support keyboard selection, and open the existing full-screen gallery at the selected photo. Full-screen previous/next controls now have accessible labels. Single-photo and empty listings omit the strip; thumbnail requests use small variants and lazy loading. This follows the PDP photo-browsing annotation without changing image order or booking behavior.

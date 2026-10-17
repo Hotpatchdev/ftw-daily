@@ -6,6 +6,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import config from '../../config';
+import { searchReturnLocation } from '../../util/searchReturn';
 import routeConfiguration from '../../routeConfiguration';
 import { findOptionsForSelectFilter } from '../../util/search';
 import {
@@ -609,6 +610,14 @@ export class ListingPageComponent extends Component {
           <LayoutWrapperTopbar>{topbar}</LayoutWrapperTopbar>
           <LayoutWrapperMain>
             <div>
+              <nav className={css.searchBreadcrumb} aria-label="Search navigation">
+                <NamedLink
+                  name="SearchPage"
+                  to={{ search: (searchReturnLocation(location) || {}).search || '' }}
+                >
+                  {searchReturnLocation(location) ? 'Back to search results' : 'Search spaces'}
+                </NamedLink>
+              </nav>
               <SectionImages
                 title={title}
                 listing={currentListing}
@@ -685,7 +694,9 @@ export class ListingPageComponent extends Component {
                   <SectionReviews
                     reviews={reviews}
                     fetchReviewsError={fetchReviewsError}
-                    listingId={currentListing.attributes.state === 'published' ? listingId.uuid : null}
+                    listingId={
+                      currentListing.attributes.state === 'published' ? listingId.uuid : null
+                    }
                     listingTitle={title}
                   />
                   <SectionHostMaybe

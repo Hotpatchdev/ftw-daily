@@ -34,6 +34,21 @@ exports[`ListingPage matches snapshot 1`] = `
       rootClassName={null}
     >
       <div>
+        <nav
+          aria-label="Search navigation"
+          className="searchBreadcrumb"
+        >
+          <NamedLink
+            name="SearchPage"
+            to={
+              Object {
+                "search": "",
+              }
+            }
+          >
+            Search spaces
+          </NamedLink>
+        </nav>
         <SectionImages
           editParams={
             Object {
