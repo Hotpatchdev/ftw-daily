@@ -530,6 +530,8 @@
   "LayoutWrapperAccountSettingsSideNav.paymentMethodsTabTitle": "Payment methods",
   "LimitedAccessBanner.message": "Your are logged in as {firstName} {lastName}. You have limited rights for actions.",
   "LimitedAccessBanner.logout": "Log out",
+  "ListingCard.reviewSummary": "{rating} out of 5 · {count, plural, one {# review} other {# reviews}}",
+  "ListingCard.noReviews": "Not yet reviewed",
   "ListingCard.hostedBy": "Hosted by {authorName}.",
   "ListingCard.price": "per hour",
   "ListingCard.pricePerDay": "per day",

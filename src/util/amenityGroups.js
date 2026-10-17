@@ -2,7 +2,7 @@
 const groups = [
   [
     'Space & layout',
-    /private.space|shared.space|common.area|lounge|reception|room|ceiling|cove|stage|desk|chair|station|mirror|bench|table/,
+    /private.space|shared.space|common.area|lounge|reception|(?:^|-)(?:room|chair)(?:-|$)|ceiling|cove|stage|desk|styling.station|work.station|mirror|bench|table/,
   ],
   ['Access & accessibility', /access|drive.in|floor|lift|loading|ramp/],
   ['Parking & transport', /parking/],

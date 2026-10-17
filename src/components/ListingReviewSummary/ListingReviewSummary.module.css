@@ -1,0 +1,17 @@
+.root {
+  min-height: 1px;
+  color: #625d68;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.root > span {
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.star {
+  color: #ac2858;
+  vertical-align: -1px;
+  margin-right: 5px;
+}

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { Form as FinalForm } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import { intlShape, injectIntl, FormattedMessage } from '../../util/reactIntl';
-import { findOptionsForSelectFilter } from '../../util/search';
+import { groupAmenities } from '../../util/amenityGroups';
 import { propTypes } from '../../util/types';
 import config from '../../config';
 import { Button, FieldCheckboxGroup, Form, FieldTextInput } from '../../components';
@@ -29,10 +29,8 @@ const EditListingFeaturesFormComponent = props => (
         updated,
         updateInProgress,
         fetchErrors,
-        filterConfig,
         category,
       } = formRenderProps;
-
 
       const miscLabel = intl.formatMessage({
         id: 'EditListingFeaturesForm.miscLabel',
@@ -69,32 +67,32 @@ const EditListingFeaturesFormComponent = props => (
       ) : null;
 
       const amenities = config.custom.amenities || [];
-      // const isCategory = [];
+      const categories = Array.isArray(category) ? category : category ? [category] : [];
 
-      const amenitiesCheckboxGroups = amenities.map((amen, i) => {
+      const amenitiesCheckboxGroups = amenities.map(amen => {
         const catGroupForThisAmen = amen.config.catKeys.split(',');
+        const shouldDisplayTheseAmenities =
+          amen.config.catKeys === 'all' || categories.some(c => catGroupForThisAmen.includes(c));
 
-        // const arrayCategory = category.map(a => a.value);
-
-        const shouldDisplayTheseAmenties = catGroupForThisAmen.includes(category) || category?.some(o => catGroupForThisAmen.includes(o)) || amen.config.catKeys === 'all';
-
-        return shouldDisplayTheseAmenties
-          ? (
-            <details>
-            {/* <span key={`${i}.${name}`}> */}
-            <summary><h3>{amen.label}</h3></summary>
+        return shouldDisplayTheseAmenities ? (
+          <details
+            key={amen.id}
+            className={css.amenitySection}
+            open={amen.config.catKeys === 'all'}
+          >
+            <summary className={css.amenitySectionTitle}>{amen.label}</summary>
+            {groupAmenities(amen.config.options, amen.id).map((group, index) => (
               <FieldCheckboxGroup
-                className={css.features}
-                id={name}
+                key={group.label}
+                className={css.amenityGroup}
+                id={`${name}.${amen.id}.${index}`}
                 name={name}
-                options={amen.config.options}
+                label={group.label}
+                options={group.options}
               />
-
-            {/* </span> */}
-
-            </details>
-          )
-          : null
+            ))}
+          </details>
+        ) : null;
       });
 
       return (
@@ -102,10 +100,10 @@ const EditListingFeaturesFormComponent = props => (
           {errorMessage}
           {errorMessageShowListing}
 
-          { amenitiesCheckboxGroups }
+          {amenitiesCheckboxGroups}
 
           <p className={css.note}>
-            <FormattedMessage id ="EditListingFeaturesForm.equipmentProvidedNote"/>
+            <FormattedMessage id="EditListingFeaturesForm.equipmentProvidedNote" />
           </p>
 
           <FieldTextInput

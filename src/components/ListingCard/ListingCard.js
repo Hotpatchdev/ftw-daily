@@ -11,6 +11,7 @@ import { createSlug } from '../../util/urlHelpers';
 import config from '../../config';
 import { NamedLink, ResponsiveImage } from '../../components';
 import SaveListingButton from '../SaveListingButton/SaveListingButton';
+import ListingReviewSummary from '../ListingReviewSummary/ListingReviewSummary';
 
 import css from './ListingCard.module.css';
 import { types as sdkTypes } from '../../util/sdkLoader';
@@ -127,6 +128,7 @@ export const ListingCardComponent = props => {
             <div className={css.authorInfo}>
               <FormattedMessage id="ListingCard.hostedBy" values={{ authorName }} />
             </div>
+            <ListingReviewSummary listingId={id} />
           </div>
         </div>
       </NamedLink>

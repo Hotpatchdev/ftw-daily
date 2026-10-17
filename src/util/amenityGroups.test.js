@@ -20,5 +20,11 @@ describe('amenity presentation groups', () => {
     expect(
       groups.find(g => g.label === 'Access & accessibility').options.map(o => o.key)
     ).toContain('step-free-access');
+    expect(
+      groups.find(g => g.label === 'Access & accessibility').options.map(o => o.key)
+    ).toContain('wheelchair-access');
+    const facilities = groups.find(g => g.label === 'Facilities & hygiene').options.map(o => o.key);
+    expect(facilities).toContain('toilet');
+    expect(facilities).toContain('handwash-station');
   });
 });

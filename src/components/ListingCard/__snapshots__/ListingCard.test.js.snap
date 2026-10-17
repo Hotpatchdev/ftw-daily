@@ -82,6 +82,9 @@ exports[`ListingCard matches snapshot 1`] = `
             }
           />
         </div>
+        <ListingReviewSummary
+          listingId="listing1"
+        />
       </div>
     </div>
   </NamedLink>
