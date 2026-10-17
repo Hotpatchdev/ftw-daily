@@ -1,5 +1,11 @@
 # Search and discovery staging preview
 
+## Amenity and rule readability
+
+Listing amenity groups use darker headings, separated panels, and more room between items while retaining the existing selected options, ordering, and category groups. House rules longer than three lines or 400 characters have a word-boundary preview and a keyboard-accessible Read all house rules control. Expansion preserves the complete host text; short rules remain visible and blank sections stay hidden. Booking behavior and host data are unchanged.
+
+Validation: 13 tests across house rules, amenity grouping, and listing-page suites; the existing snapshot passed. Local fixtures at 390px and 1440px verified keyboard expansion/collapse, full text preservation, selected-only amenities without duplicates, and no page overflow. Staging is verified through workflow status; direct live-page access is unavailable from this environment.
+
 ## Deferred Sharetribe upgrade review
 
 After the current design work, identify the template's upstream repository and version, compare it with Sharetribe's maintained template and release guidance, review security fixes and available features, and assess compatibility with Hotpatch customisations and the existing runtime. This is an assessment first; no dependency or template upgrade is part of the current design changes. Any implementation should be tested on staging. Production deployment remains reserved for the user.

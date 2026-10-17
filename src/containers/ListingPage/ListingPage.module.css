@@ -529,7 +529,7 @@ a.keyDetail { text-decoration: underline; }
 .featuresTitle {
   /* Font */
   @apply --marketplaceH3FontStyles;
-  color: var(--matterColorAnti);
+  color: var(--matterColor);
 
   margin-top: 0;
   margin-bottom: 16px;
@@ -541,11 +541,22 @@ a.keyDetail { text-decoration: underline; }
 
 .amenityGroup {
   margin-top: 20px;
+  padding: 16px;
+  border: 1px solid #dedde2;
+  border-radius: 8px;
+  background-color: #faf9fb;
+  overflow-wrap: anywhere;
+
+  & li {
+    break-inside: avoid;
+    padding: 6px 0;
+  }
 }
 
 .amenityGroupTitle {
   @apply --marketplaceH4FontStyles;
-  margin: 0 0 8px;
+  margin: 0 0 12px;
+  color: var(--matterColor);
   overflow-wrap: break-word;
 }
 

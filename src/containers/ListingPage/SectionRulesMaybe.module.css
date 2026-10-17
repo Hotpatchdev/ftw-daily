@@ -13,7 +13,7 @@
 .title {
   /* Font */
   @apply --marketplaceH3FontStyles;
-  color: var(--matterColorAnti);
+  color: var(--matterColor);
 
   margin-top: 0;
   margin-bottom: 13px;
@@ -24,6 +24,7 @@
 }
 
 .rules {
+  overflow-wrap: anywhere;
   margin-top: 0;
   margin-bottom: 0;
 
@@ -33,5 +34,23 @@
   @media (--viewportMedium) {
     margin-top: 0;
     margin-bottom: 0;
+  }
+}
+
+.toggle {
+  @apply --marketplaceLinkStyles;
+  color: var(--matterColor);
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
   }
 }
