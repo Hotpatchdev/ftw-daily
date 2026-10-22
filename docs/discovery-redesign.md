@@ -1,5 +1,13 @@
 # Search and discovery staging preview
 
+## PDP gallery correction — 22 October 2026
+
+Source: supplied Figma Final Prototype → PDP → Hero Section, cross-checked visually against Prototype & Annotations.pdf, Flow 4: Evaluate and book. The thumbnail strip below the main photo was an implementation choice and did not match this design. It is replaced by gallery-position dots centred over the bottom of one large photo and an All photos button at the bottom right. Horizontal touch swipes select the adjacent image; the existing full-screen viewer opens at the selected photo.
+
+Implementation choices: arrow keys also browse while the main photo is focused; horizontal gestures must exceed 40 pixels and dominate vertical movement. Vertical scrolling and pinch zoom remain available. At most five dots surround the selected photo to prevent overlap on listings with many images; every image remains reachable by swiping or arrow keys and through the full-screen viewer. Empty/single-photo listings omit dots. Existing image variants, image order, desktop/mobile photo proportions, host controls and booking behaviour are retained.
+
+Validation: 14 tests across gallery and listing-page suites, with the existing listing snapshot passing. Web and server production builds passed. An isolated browser fixture using the actual gallery component and processed stylesheet checked 320px, 390px and 1440px widths, no overlapping controls or page overflow, dot selection, arrow-key navigation, and passing the selected photo to the viewer. Image/viewer components were fixture substitutes in that browser check; the automated listing suite uses the application components. These are local checks, not a live staging verification. Deployment status is checked separately.
+
 ## Amenity and rule readability
 
 Listing amenity groups use darker headings, separated panels, and more room between items while retaining the existing selected options, ordering, and category groups. House rules longer than three lines or 400 characters have a word-boundary preview and a keyboard-accessible Read all house rules control. Expansion preserves the complete host text; short rules remain visible and blank sections stay hidden. Booking behavior and host data are unchanged.
