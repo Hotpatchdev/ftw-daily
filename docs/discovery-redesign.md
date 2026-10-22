@@ -134,6 +134,14 @@ Filter-panel state and category context are synchronized with committed URL chan
 
 Validation: 44 tests passed across nine suites and the full web/server build passed. Controlled browser checks at 390px and 1440px covered individual removal, preservation of location and other selections, daily price labels, pagination reset, Back/Forward, reopening the mobile panel, Clear filters, keyboard focus and long-label overflow. External map services remain unavailable in this cloud browser; map error UI there is not a successful live-map check.
 
+## Unified filters
+
+The filter panel follows presentation page 32: location and date summaries, price histogram and range, essential amenities, expandable amenity groups, Reset and Show spaces. Changes apply together; closing discards the draft. Existing search and booking semantics are retained, with specific times chosen during booking.
+
+Prices use the complete matching listing collection for the selected rate unit and configured currency, excluding the current price range. Incomplete collections show an error rather than a partial average (5,000-listing limit; five-minute cache). Currency/geography switching is deferred for later refinement.
+
+Validation: 30 focused tests passed; desktop and narrow-screen browser checks covered the panel, dates, price units and applying selections.
+
 ## All-reviews view
 
 The “Flow and Annotations” page in the Figma file calls for a View all reviews link, rating/recent sorting, and a breadcrumb back to the listing. Published listings now link from their reviews section to the public `/l/:slug/:id/reviews` route. The page shows public reviews of the provider/space, the complete collection's average and count, Most recent / Highest rated / Lowest rated ordering, and ten reviews per display page. A link returns to the listing's reviews anchor, with spacing for the fixed header. The existing inline preview also excludes reviews of customers.

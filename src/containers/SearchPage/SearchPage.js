@@ -128,8 +128,16 @@ export class SearchPageComponent extends Component {
   componentDidMount() {
     const { setSelectedPubCat } = this.context;
 
-    setSelectedPubCat(this.props.searchParams.pub_category);
+    if (setSelectedPubCat) setSelectedPubCat(this.props.searchParams.pub_category);
     // console.log('listing: ', this.props.searchParams.pub_category);
+  }
+  componentDidUpdate(previous) {
+    if (
+      previous.searchParams.pub_category !== this.props.searchParams.pub_category &&
+      this.context.setSelectedPubCat
+    ) {
+      this.context.setSelectedPubCat(this.props.searchParams.pub_category || '');
+    }
   }
   render() {
     const {

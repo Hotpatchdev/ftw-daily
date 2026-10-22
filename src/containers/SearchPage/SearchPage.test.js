@@ -1,40 +1,47 @@
 import React from 'react';
-import { renderShallow } from '../../util/test-helpers';
+import { shallow } from 'enzyme';
+import '../../util/test-helpers';
 import { fakeIntl } from '../../util/test-data';
 import { SearchPageComponent } from './SearchPage';
+import MainPanel from './MainPanel';
 
 const noop = () => null;
+const props = {
+  location: { search: '?keywords=salon&dates=2026-11-01%2C2026-11-02' },
+  history: { push: jest.fn() },
+  pagination: { page: 1, perPage: 24, totalItems: 22, totalPages: 1 },
+  searchParams: { keywords: 'salon', dates: '2026-11-01,2026-11-02' },
+  tab: 'listings',
+  scrollingDisabled: false,
+  searchInProgress: false,
+  intl: fakeIntl,
+  onActivateListing: noop,
+  onManageDisableScrolling: noop,
+  onSearchMapListings: noop,
+};
 
-describe('SearchPageComponent', () => {
-  it('matches snapshot', () => {
-    const props = {
-      location: { search: '' },
-      history: {
-        push: () => console.log('HistoryPush called'),
-      },
-      pagination: {
-        page: 1,
-        perPage: 12,
-        totalItems: 22,
-        totalPages: 2,
-      },
-      tab: 'listings',
-      scrollingDisabled: false,
-      searchInProgress: false,
-      authInProgress: false,
-      currentUserHasListings: false,
-      intl: fakeIntl,
-      isAuthenticated: false,
-      onActivateListing: noop,
-      onLogout: noop,
-      onManageDisableScrolling: noop,
-      onSearchMapListings: noop,
-      sendVerificationEmailInProgress: false,
-      onResendVerificationEmail: noop,
-      categories: [{ key: 'cat1', label: 'Cat 1' }, { key: 'cat2', label: 'Cat 2' }],
-      amenities: [{ key: 'dog1', label: 'Dog 1' }, { key: 'dog2', label: 'Dog 2' }],
-    };
-    const tree = renderShallow(<SearchPageComponent {...props} />);
-    expect(tree).toMatchSnapshot();
+it('passes the originating search and result state to the filter/results panel', () => {
+  const tree = shallow(<SearchPageComponent {...props} />);
+  const panel = tree.find(MainPanel);
+  expect(panel.prop('searchParamsForPagination')).toEqual({
+    keywords: 'salon',
+    dates: '2026-11-01,2026-11-02',
   });
+  expect(panel.prop('pagination')).toEqual(props.pagination);
+  expect(panel.prop('searchParamsAreInSync')).toBe(true);
+  expect(panel.prop('onManageDisableScrolling')).toBe(noop);
+});
+
+it('synchronizes category context after navigation, including clearing the selection', () => {
+  const page = new SearchPageComponent(props);
+  const setSelectedPubCat = jest.fn();
+  page.context = { setSelectedPubCat };
+  page.componentDidMount();
+  page.props = { ...props, searchParams: { pub_category: 'has_any:barber' } };
+  page.componentDidUpdate(props);
+  expect(setSelectedPubCat).toHaveBeenLastCalledWith('has_any:barber');
+  const previous = page.props;
+  page.props = props;
+  page.componentDidUpdate(previous);
+  expect(setSelectedPubCat).toHaveBeenLastCalledWith('');
 });

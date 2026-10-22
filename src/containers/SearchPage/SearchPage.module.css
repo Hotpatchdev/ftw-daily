@@ -106,6 +106,25 @@
   }
 }
 
+.discoveryToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+}
+.discoveryMapButton {
+  min-height: 40px;
+  padding: 8px 18px;
+  border: 1px solid #ccc8c4;
+  border-radius: 8px;
+  background: white;
+  color: #1d1c2e;
+  cursor: pointer;
+  @media (--viewportMedium) { display: none; }
+}
+.discoveryResultCount { padding: 0 24px; margin: 0 0 12px; font-size: 13px; color: #605b57; }
+
 .searchFiltersPanel {
   flex-grow: 1;
   display: flex;
