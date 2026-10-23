@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Booking schedule preview | HotPatch staging</title>
+    <link rel="stylesheet" href="./booking-schedule.css" />
+    <script defer src="./booking-schedule-rules.js"></script>
+    <script defer src="./booking-schedule.js"></script>
+  </head>
+  <body>
+    <div id="hp-schedule-preview">
+      <div class="hp-window" aria-label="HotPatch booking schedule mockup">
+        <header class="hp-header">
+          <a class="hp-wordmark" href="/">HotPatch</a
+          ><span class="hp-prototype">Booking schedule · Preview</span>
+        </header>
+        <main class="hp-content">
+          <div class="hp-title">
+            <h2>When do you need your space?</h2>
+            <span class="hp-step">Interactive preview · Example dates</span>
+            <p class="hp-preview-note">
+              Try the schedule below. This preview does not check availability, create bookings or
+              take payments.
+            </p>
+          </div>
+          <fieldset class="hp-unit">
+            <legend>Book by</legend>
+            <div class="hp-switch">
+              <button type="button" data-unit="hourly" aria-pressed="true">The hour</button
+              ><button type="button" data-unit="daily" aria-pressed="false">The day</button>
+            </div>
+          </fieldset>
+          <section class="hp-minimum" aria-label="Minimum booking requirement">
+            <label
+              >Example host rule (preview)
+              <select id="hp-minimum"
+                ><option value="0">No additional minimum</option
+                ><option value="2">2 hours per session</option
+                ><option value="5" selected>5 hours per session</option></select
+              >
+            </label>
+            <p id="hp-minimum-label" role="status"></p>
+          </section>
+          <div class="hp-columns">
+            <section class="hp-calendar" aria-label="Choose booking dates">
+              <div class="hp-switch hp-date-mode">
+                <button type="button" data-dates="range" aria-pressed="false">Date range</button
+                ><button type="button" data-dates="selected" aria-pressed="true">
+                  Select dates
+                </button>
+              </div>
+              <div class="hp-month"><h3>November 2026</h3></div>
+              <div class="hp-week" aria-hidden="true">
+                <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span
+                ><span>S</span>
+              </div>
+              <div class="hp-days" role="group" aria-label="November 2026"></div>
+              <p class="hp-date-hint">Choose any dates, including days that aren’t consecutive.</p>
+            </section>
+            <section class="hp-time" aria-label="Choose booking times">
+              <div class="hp-hourly">
+                <h3>What time works?</h3>
+                <div class="hp-time-fields">
+                  <label>From<input type="time" id="hp-start" value="09:00" step="1800"/></label
+                  ><label>To<input type="time" id="hp-end" value="15:00" step="1800"/></label>
+                </div>
+                <span class="hp-overline">Quick select</span>
+                <div class="hp-quick">
+                  <button type="button" data-quick="08:00,12:00">
+                    Morning <span>8am–12pm</span></button
+                  ><button type="button" data-quick="13:00,17:00">
+                    Afternoon <span>1pm–5pm</span></button
+                  ><button type="button" data-quick="18:00,22:00">
+                    Evening <span>6pm–10pm</span></button
+                  ><button type="button" data-quick="09:00,17:00">
+                    Working Day <span>9am–5pm</span>
+                  </button>
+                </div>
+                <label class="hp-same"
+                  ><input type="checkbox" id="hp-same" checked />Same hours on every selected
+                  day</label
+                >
+              </div>
+              <div class="hp-daily" hidden>
+                <h3>Daily booking</h3>
+                <p>Each selected date is one daily booking unit.</p>
+                <p class="hp-secondary">
+                  Access hours and the daily rate are set by each host and shown on the space’s
+                  listing.
+                </p>
+              </div>
+              <label class="hp-zone"
+                >Time zone<select id="hp-zone"
+                  ><option value="Europe/London">London · UK time</option
+                  ><option value="America/New_York">New York · Eastern time</option
+                  ><option value="Europe/Paris">Paris · Central European time</option></select
+                ></label
+              >
+            </section>
+          </div>
+          <section class="hp-sessions" aria-label="Selected sessions">
+            <div class="hp-session-heading">
+              <h3>Your schedule</h3>
+              <button type="button" id="hp-clear" class="hp-text-button">Clear dates</button>
+            </div>
+            <div class="hp-session-list"></div>
+          </section>
+          <p class="hp-error" role="alert" hidden></p>
+          <div class="hp-total" aria-live="polite">
+            <strong id="hp-summary"></strong><span id="hp-total-detail"></span>
+          </div>
+          <footer class="hp-footer">
+            <button type="button" id="hp-reset" class="hp-text-button">Reset</button
+            ><button type="button" id="hp-review" class="hp-primary">
+              Review schedule <span aria-hidden="true">→</span>
+            </button>
+          </footer>
+          <section class="hp-review" aria-label="Review selected schedule" hidden>
+            <h3>Review your schedule</h3>
+            <div id="hp-review-list"></div>
+            <p class="hp-secondary">
+              Schedule review only. Availability, pricing and checkout are not connected in this
+              preview.
+            </p>
+            <button type="button" id="hp-back" class="hp-text-button">Back to editing</button>
+          </section>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

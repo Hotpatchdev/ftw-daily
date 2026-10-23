@@ -134,6 +134,14 @@ Filter-panel state and category context are synchronized with committed URL chan
 
 Validation: 44 tests passed across nine suites and the full web/server build passed. Controlled browser checks at 390px and 1440px covered individual removal, preservation of location and other selections, daily price labels, pagination reset, Back/Forward, reopening the mobile panel, Clear filters, keyboard focus and long-label overflow. External map services remain unavailable in this cloud browser; map error UI there is not a successful live-map check.
 
+## Booking schedule preview
+
+The approved scheduling mockup is available at `/static/previews/booking-schedule/`: hourly/daily units, date ranges or individual dates, shared/per-day hours, quick choices and schedule review. This is a standalone, non-indexed preview; it makes no API calls or booking/payment changes. The current checkout and server pricing accept one continuous interval. Multi-session availability, booking creation and charging remain separate integration work.
+
+Example minimums (none, two or five units) are explicitly labelled as sample host rules. Hourly minimums apply to each session; daily minimums apply to each consecutive date group. Short selections are flagged, unsuitable time shortcuts are disabled and review is blocked. Existing host settings are `publicData.minBooking.minBookingType/minBookingCount`; mapping and enforcing those real rules in search and checkout remains integration work.
+
+Validation: nine minimum-rule tests and the web/server builds passed. Browser checks covered per-day edits, minimums, daily date groups, reset and mobile layout. Broader server checks passed 38/39 tests; the failure is an existing `lineItemHelpers` expectation in unchanged pricing code.
+
 ## Unified filters
 
 The filter panel follows presentation page 32: location and date summaries, price histogram and range, essential amenities, expandable amenity groups, Reset and Show spaces. Changes apply together; closing discards the draft. Existing search and booking semantics are retained, with specific times chosen during booking.
