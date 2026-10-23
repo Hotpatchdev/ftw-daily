@@ -1,0 +1,195 @@
+.root {
+  color: #1d1c2e;
+  min-width: 0;
+}
+.root h3 {
+  font-size: 16px;
+  margin: 12px 0;
+}
+.units {
+  border: 0;
+  padding: 0;
+  margin: 0 0 20px;
+}
+.units legend {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.switch {
+  display: flex;
+  padding: 4px;
+  gap: 4px;
+  background: #f5f1ee;
+  border-radius: 12px;
+}
+.switch button {
+  flex: 1;
+  padding: 10px 6px;
+  font-size: 13px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #1d1c2e;
+  cursor: pointer;
+}
+.switch button[aria-pressed='true'] {
+  background: white;
+  color: #a12455;
+  box-shadow: 0 2px 5px #29142214;
+}
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+.month {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+.month button {
+  border: 0;
+  background: transparent;
+  font-size: 24px;
+  padding: 8px 12px;
+  color: #1d1c2e;
+}
+.week,
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.week span {
+  padding: 8px 0;
+  text-align: center;
+  font-size: 11px;
+}
+.days button {
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: #1d1c2e;
+  font-size: 13px;
+  cursor: pointer;
+}
+.days button[aria-pressed='true'] {
+  background: #b42059;
+  color: white;
+}
+.root button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.hint {
+  font-size: 12px;
+  color: #655e67;
+  line-height: 1.6;
+  margin: 12px 0;
+}
+.same {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  margin-top: 8px;
+}
+.same input {
+  width: auto;
+  margin-top: 3px;
+}
+.sessions {
+  border-top: 1px solid #e8e1e4;
+  margin-top: 20px;
+  padding-top: 12px;
+}
+.sessionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.sessionHeader button {
+  border: 0;
+  padding: 8px 0;
+  background: transparent;
+  color: #286a72;
+  text-decoration: underline;
+  font-size: 12px;
+}
+.session {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #e8e1e4;
+  padding: 12px 0;
+  font-size: 13px;
+}
+.session > span:first-child {
+  flex: 1;
+}
+.session > button {
+  border: 0;
+  padding: 6px;
+  background: transparent;
+  color: #655e67;
+}
+.customTimes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+.customTimes label {
+  min-width: 0;
+  font-size: 12px;
+}
+.customTimes input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #d8d4d0;
+  padding: 10px 6px;
+  border-radius: 8px;
+  color: #1d1c2e;
+  background: white;
+}
+.error {
+  font-size: 13px;
+  color: #af243f;
+}
+.total {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 16px 0 0;
+}
+.root button:focus-visible,
+.root input:focus-visible {
+  outline: 2px solid #286a72;
+  outline-offset: 2px;
+}
+@media (min-width: 700px) {
+  .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
+  }
+  .compact .columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (pointer: coarse) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .days button {
+    min-height: 44px;
+  }
+  .root input {
+    font-size: 16px;
+  }
+}

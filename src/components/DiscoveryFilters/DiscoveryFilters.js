@@ -4,6 +4,10 @@ import { Modal, LocationAutocompleteInput } from '../../components';
 import config from '../../config';
 import { groupAmenities } from '../../util/amenityGroups';
 import { removeFilterTag } from '../../util/activeFilters';
+import { normaliseSchedule, scheduleSummary } from '../../util/bookingSchedule';
+import BookingSchedulePicker, {
+  scheduleDraft,
+} from '../BookingSchedulePicker/BookingSchedulePicker';
 import {
   priceUnits,
   selectedValues,
@@ -123,7 +127,7 @@ export const DiscoveryFiltersComponent = ({
   const [draft, setDraft] = useState(params);
   const [editor, setEditor] = useState(null);
   const [location, setLocation] = useState({ search: '' });
-  const [dates, setDates] = useState(['', '']);
+  const [schedule, setSchedule] = useState(() => scheduleDraft(params));
   const [error, setError] = useState(null);
   const [population, setPopulation] = useState(null);
   const [priceError, setPriceError] = useState(false);
@@ -140,7 +144,13 @@ export const DiscoveryFiltersComponent = ({
       currency,
       maximumFractionDigits: 2,
     }).format(value);
-  const activeUnit = priceUnits.find(unit => draft[unit.param]) || priceUnits[0];
+  const activeUnit =
+    priceUnits.find(unit => draft[unit.param]) ||
+    (draft.schedule &&
+      priceUnits.find(
+        unit => unit.field === (scheduleDraft(draft).unit === 'daily' ? 'pricePerDay' : 'price')
+      )) ||
+    priceUnits[0];
   const summary = population ? priceSummary(population, activeUnit.field, currency) : null;
   const range =
     typeof draft[activeUnit.param] === 'string'
@@ -212,8 +222,7 @@ export const DiscoveryFiltersComponent = ({
   };
   const launch = () => {
     setDraft(params);
-    const [start = '', end = ''] = typeof params.dates === 'string' ? params.dates.split(',') : [];
-    setDates([start, end]);
+    setSchedule(scheduleDraft(params));
     setLocation({
       search: params.address || '',
       selectedPlace: params.bounds
@@ -233,6 +242,14 @@ export const DiscoveryFiltersComponent = ({
     setDraft(next);
   };
   const changeUnit = param => {
+    if (draft.schedule && !['price', 'pub_pricePerDayFilter'].includes(param)) {
+      setError('Clear the selected schedule to use weekly or monthly pricing.');
+      return;
+    }
+    if (draft.schedule && (param === 'price') !== (scheduleDraft(draft).unit === 'hourly')) {
+      setError('Change the booking unit in Date & Time to update this schedule.');
+      return;
+    }
     const next = { ...draft };
     priceUnits.forEach(unit => delete next[unit.param]);
     // A unit change must not reinterpret a previous hourly amount as a daily rate.
@@ -271,11 +288,21 @@ export const DiscoveryFiltersComponent = ({
     if (locationButton.current) locationButton.current.focus();
   };
   const saveDates = () => {
-    if ((dates[0] || dates[1]) && (!dates.every(validDate) || dates[0] > dates[1])) {
-      setError('Choose a valid start and end date, or clear both.');
+    let selected;
+    try {
+      selected = schedule.days.length ? normaliseSchedule(schedule) : null;
+    } catch (e) {
+      setError(e.message);
       return;
     }
-    setDraft({ ...draft, dates: dates[0] ? dates.join(',') : undefined });
+    const next = { ...draft };
+    delete next.dates;
+    if (selected) next.schedule = JSON.stringify(selected);
+    else delete next.schedule;
+    // Never reinterpret an hourly price range as a daily amount.
+    if (selected && activeUnit.field !== (selected.unit === 'daily' ? 'pricePerDay' : 'price'))
+      priceUnits.forEach(unit => delete next[unit.param]);
+    setDraft(next);
     setError(null);
     setEditor(null);
     if (dateButton.current) dateButton.current.focus();
@@ -290,7 +317,7 @@ export const DiscoveryFiltersComponent = ({
   const reset = () => {
     const next = removeFilterTag(draft, null, filters);
     setDraft(next);
-    setDates(['', '']);
+    setSchedule(scheduleDraft(next));
     setError(null);
     setEditor(null);
   };
@@ -409,7 +436,7 @@ export const DiscoveryFiltersComponent = ({
                 </span>
                 <div>
                   <h3>Date &amp; Time</h3>
-                  <p>{datesLabel}</p>
+                  <p>{draft.schedule ? scheduleSummary(draft.schedule) : datesLabel}</p>
                 </div>
                 <button
                   type="button"
@@ -425,38 +452,14 @@ export const DiscoveryFiltersComponent = ({
               </div>
               {editor === 'dates' ? (
                 <div className={css.editor}>
-                  <div className={css.dateFields}>
-                    <label>
-                      From
-                      <input
-                        type="date"
-                        value={dates[0]}
-                        max={dates[1] || undefined}
-                        onInput={event => setDates([event.target.value, dates[1]])}
-                        onChange={event => setDates([event.target.value, dates[1]])}
-                      />
-                    </label>
-                    <label>
-                      To
-                      <input
-                        type="date"
-                        value={dates[1]}
-                        min={dates[0] || undefined}
-                        onInput={event => setDates([dates[0], event.target.value])}
-                        onChange={event => setDates([dates[0], event.target.value])}
-                      />
-                    </label>
-                  </div>
-                  <p className={css.hint}>Choose specific times when booking a space.</p>
-                  <button
-                    type="button"
-                    className={css.textButton}
-                    onClick={() => setDates(['', ''])}
-                  >
-                    Any dates
-                  </button>
+                  <BookingSchedulePicker
+                    value={schedule}
+                    onChange={setSchedule}
+                    compact
+                    idPrefix="filter-schedule"
+                  />
                   <button type="button" className={css.save} onClick={saveDates}>
-                    Save dates
+                    Save dates &amp; times
                   </button>
                 </div>
               ) : null}

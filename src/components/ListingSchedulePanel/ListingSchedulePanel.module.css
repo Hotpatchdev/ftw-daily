@@ -1,0 +1,68 @@
+.root {
+  color: #1d1c2e;
+  min-width: 0;
+  padding: 24px;
+  border-top: 1px solid #e8e1e4;
+}
+.root h2 {
+  font-size: 22px;
+  margin: 0 0 12px;
+}
+.root h3 {
+  font-size: 15px;
+  margin: 0 0 8px;
+}
+.root p {
+  margin: 8px 0;
+}
+.minimum {
+  font-size: 13px;
+  font-weight: 600;
+}
+.hint {
+  color: #655e67;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.group {
+  padding: 18px 0;
+  border-bottom: 1px solid #e8e1e4;
+  margin-bottom: 12px;
+}
+.group p {
+  font-size: 14px;
+}
+.group button {
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #b42059;
+  color: white;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.group button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.root a {
+  font-size: 13px;
+  color: #286a72;
+  text-decoration: underline;
+}
+.error {
+  color: #af243f;
+  font-size: 13px;
+  line-height: 1.6;
+}
+@media (min-width: 1024px) {
+  .root {
+    width: 330px;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin: 79px 0 0 40px;
+    border-top: 0;
+    border-left: 1px solid #e8e1e4;
+  }
+}

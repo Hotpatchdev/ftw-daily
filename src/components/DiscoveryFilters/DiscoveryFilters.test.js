@@ -3,6 +3,7 @@ import { shallow } from 'enzyme';
 import '../../util/test-helpers';
 import config from '../../config';
 import { DiscoveryFiltersComponent } from './DiscoveryFilters';
+import BookingSchedulePicker from '../BookingSchedulePicker/BookingSchedulePicker';
 
 const initial = {
   address: 'Manchester',
@@ -32,7 +33,7 @@ const setup = () => {
 const button = (wrapper, label) =>
   wrapper.find('button').filterWhere(node => node.text() === label);
 
-it('commits native date input events and preserves location and existing selections', () => {
+it('commits the selected schedule and preserves location and existing selections', () => {
   const { wrapper, onApply } = setup();
   wrapper
     .find('.summaryCard')
@@ -40,28 +41,23 @@ it('commits native date input events and preserves location and existing selecti
     .find('button')
     .simulate('click');
   expect(wrapper.find('.footer button').prop('disabled')).toBe(true);
-  wrapper
-    .find('input[type="date"]')
-    .at(1)
-    .simulate('input', { target: { value: '2026-11-06' } });
-  button(wrapper, 'Save dates').simulate('click');
+  wrapper.find(BookingSchedulePicker).prop('onChange')({ unit: 'daily', days: ['2026-11-01', '2026-11-06'] });
+  button(wrapper, 'Save dates & times').simulate('click');
   wrapper.find('.footer button').simulate('click');
-  expect(onApply).toHaveBeenCalledWith({ ...initial, dates: '2026-11-01,2026-11-06' });
+  const { dates, ...rest } = initial;
+  expect(onApply).toHaveBeenCalledWith({ ...rest, schedule: JSON.stringify({ unit: 'daily', days: ['2026-11-01', '2026-11-06'] }) });
 });
 
-it('rejects incomplete/reversed dates and leaves the editor open', () => {
+it('rejects invalid schedules and leaves the editor open', () => {
   const { wrapper, onApply } = setup();
   wrapper
     .find('.summaryCard')
     .at(1)
     .find('button')
     .simulate('click');
-  wrapper
-    .find('input[type="date"]')
-    .first()
-    .simulate('input', { target: { value: '2026-11-05' } });
-  button(wrapper, 'Save dates').simulate('click');
-  expect(wrapper.find('[role="alert"]').text()).toContain('valid start and end date');
+  wrapper.find(BookingSchedulePicker).prop('onChange')({ unit: 'hourly', days: ['2026-11-01'], start: '15:00', end: '09:00', timeZone: 'Europe/London' });
+  button(wrapper, 'Save dates & times').simulate('click');
+  expect(wrapper.find('[role="alert"]').text()).toContain('end time later');
   expect(wrapper.find('.footer button').prop('disabled')).toBe(true);
   expect(onApply).not.toHaveBeenCalled();
 });

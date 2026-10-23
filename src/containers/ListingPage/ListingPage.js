@@ -22,6 +22,7 @@ import {
   LISTING_PAGE_PARAM_TYPE_DRAFT,
   LISTING_PAGE_PARAM_TYPE_EDIT,
   createSlug,
+  parse,
 } from '../../util/urlHelpers';
 import { formatMoney } from '../../util/currency';
 import { createResourceLocatorString, findRouteByRouteName } from '../../util/routes';
@@ -72,6 +73,7 @@ import SectionRulesMaybe from './SectionRulesMaybe';
 import SectionMapMaybe from './SectionMapMaybe';
 import SectionCapacity from './SectionCapacity';
 import SectionSeats from './SectionSeats';
+import ListingSchedulePanel from '../../components/ListingSchedulePanel/ListingSchedulePanel';
 import css from './ListingPage.module.css';
 import Swal from 'sweetalert2';
 
@@ -366,6 +368,7 @@ export class ListingPageComponent extends Component {
     } = this.props;
 
     const listingId = new UUID(rawParams.id);
+    const selectedSchedule = parse((location && location.search) || '').schedule || parse((searchReturnLocation(location) || {}).search || '').schedule;
     const isPendingApprovalVariant = rawParams.variant === LISTING_PAGE_PENDING_APPROVAL_VARIANT;
     const isDraftVariant = rawParams.variant === LISTING_PAGE_DRAFT_VARIANT;
     const currentListing =
@@ -740,7 +743,13 @@ export class ListingPageComponent extends Component {
                     enquiryDateTimeDataError={this.state.enquiryDateTimeDataError}
                   />
                 </div>
-                <BookingPanel
+                {selectedSchedule ? <ListingSchedulePanel
+                  listing={currentListing}
+                  value={selectedSchedule}
+                  searchReturnTo={searchReturnLocation(location)}
+                  disabled={isOwnListing || currentListing.attributes.state === LISTING_STATE_CLOSED}
+                  onReview={(unit, group) => this.setState({ bookingType: unit === 'hourly' ? 'price' : 'pricePerDay' }, () => this.handleSubmit(unit === 'hourly' ? { bookingStartTime: String(group.start.getTime()), bookingEndTime: String(group.end.getTime()) } : { bookingDates: { startDate: group.start, endDate: group.end } }))}
+                /> : <BookingPanel
                   updateDiscount={this.updateDiscount}
                   promocode={this.state.promocode}
                   className={css.bookingPanel}
@@ -762,7 +771,7 @@ export class ListingPageComponent extends Component {
                   fetchLineItemsError={fetchLineItemsError}
                   bookingType={this.state.bookingType}
                   toggleBookingType={this.toggleBookingType}
-                />
+                />}
               </div>
             </div>
           </LayoutWrapperMain>

@@ -1,6 +1,7 @@
 import config from '../config';
 import { formatDateStringToUTC, getExclusiveEndDate } from './dates';
 import { unitDivisor } from './currency';
+import { queryScheduledListings } from './scheduleSearch';
 
 export const priceUnits = [
   { param: 'price', field: 'price', label: 'hour', adjective: 'hourly' },
@@ -46,6 +47,7 @@ export const pricePopulationQuery = params => {
     if (params[key]) query[key] = params[key];
   });
   if (config.sortSearchByDistance && params.origin) query.origin = params.origin;
+  if (params.schedule) return { ...query, schedule: params.schedule };
   const dates = typeof params.dates === 'string' ? params.dates.split(',') : [];
   if (dates.length === 2 && dates.every(validDate) && dates[0] <= dates[1]) {
     query.start = formatDateStringToUTC(dates[0]);
@@ -64,12 +66,15 @@ export const fetchPricePopulation = async (sdk, params, active = () => true) => 
   let pages = 1;
   for (let page = 1; page <= pages; page += 1) {
     if (!active()) throw new Error('Price request superseded');
-    const response = await sdk.listings.query({
+    const request = {
       ...pricePopulationQuery(params),
       page,
       per_page: 100,
       'fields.listing': ['price', 'publicData'],
-    });
+    };
+    const response = await (params.schedule
+      ? queryScheduledListings(sdk, request, active, [config.currency, config.additionalCurrency])
+      : sdk.listings.query(request));
     if (!active()) throw new Error('Price request superseded');
     const { data, meta } = response.data;
     if (

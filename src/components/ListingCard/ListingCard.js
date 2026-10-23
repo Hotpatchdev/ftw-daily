@@ -12,6 +12,8 @@ import config from '../../config';
 import { NamedLink, ResponsiveImage } from '../../components';
 import SaveListingButton from '../SaveListingButton/SaveListingButton';
 import ListingReviewSummary from '../ListingReviewSummary/ListingReviewSummary';
+import { minimumBookingLabel } from '../../util/bookingSchedule';
+import { stringify } from '../../util/urlHelpers';
 
 import css from './ListingCard.module.css';
 import { types as sdkTypes } from '../../util/sdkLoader';
@@ -57,6 +59,7 @@ export const ListingCardComponent = props => {
     renderSizes,
     setActiveListing,
     activePrice = null,
+    schedule,
   } = props;
   const classes = classNames(rootClassName || css.root, className);
   const currentListing = ensureListing(listing);
@@ -92,7 +95,7 @@ export const ListingCardComponent = props => {
 
   return (
     <div className={classes}>
-      <NamedLink className={css.link} name="ListingPage" params={{ id, slug }}>
+      <NamedLink className={css.link} name="ListingPage" params={{ id, slug }} {...(schedule ? { to: { search: `?${stringify({ schedule })}` } } : {})}>
         <div
           className={css.threeToTwoWrapper}
           onMouseEnter={() => setActiveListing(currentListing.id)}
@@ -119,6 +122,7 @@ export const ListingCardComponent = props => {
             </div>
           </div>
           <div className={css.mainInfo}>
+            {minimumBookingLabel(listing) ? <p className={css.minimum}>{minimumBookingLabel(listing)}</p> : null}
             <div className={css.title}>
               {richText(title, {
                 longWordMinLength: MIN_LENGTH_FOR_LONG_WORDS,

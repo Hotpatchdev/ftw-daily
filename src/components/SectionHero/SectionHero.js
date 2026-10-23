@@ -6,6 +6,8 @@ import { LocationAutocompleteInput, NamedLink } from '../../components';
 import { createResourceLocatorString } from '../../util/routes';
 import routeConfiguration from '../../routeConfiguration';
 import { discoverySearchParams, validateDiscoverySearch } from '../../util/discoverySearch';
+import { scheduleSummary } from '../../util/bookingSchedule';
+import BookingSchedulePicker from '../BookingSchedulePicker/BookingSchedulePicker';
 import heroImage from './images/newSlider/Hero 44.jpg';
 import css from './SectionHero.module.css';
 
@@ -40,7 +42,7 @@ const SectionHero = ({ rootClassName, className, history }) => {
         <FinalForm
           onSubmit={submit}
           validate={validateDiscoverySearch}
-          render={({ handleSubmit, values, errors, submitFailed }) => (
+          render={({ handleSubmit, values, errors, submitFailed, form }) => (
             <form className={css.search} onSubmit={handleSubmit} aria-label="Find a Patch">
               <label className={css.field}>
                 <span className={css.label}>01 &nbsp; What</span>
@@ -88,39 +90,33 @@ const SectionHero = ({ rootClassName, className, history }) => {
                 >
                   <span className={css.label}>03 &nbsp; When</span>
                   <span>
-                    {values.startDate
-                      ? `${values.startDate} — ${values.endDate || 'Choose end date'}`
-                      : 'Choose your dates (optional)'}
+                    {values.schedule && values.schedule.days.length
+                      ? scheduleSummary(values.schedule)
+                      : 'Choose your dates & times (optional)'}
                   </span>
                 </button>
-                {showDates ? (
-                  <div id="discovery-dates" className={css.dates}>
-                    <label>
-                      From
-                      <Field
-                        name="startDate"
-                        component="input"
-                        type="date"
-                        max={values.endDate || undefined}
-                      />
-                    </label>
-                    <label>
-                      To
-                      <Field
-                        name="endDate"
-                        component="input"
-                        type="date"
-                        min={values.startDate || undefined}
-                      />
-                    </label>
-                  </div>
-                ) : null}
                 {submitFailed && errors.dates ? (
                   <span role="alert" className={css.error}>
                     {errors.dates}
                   </span>
                 ) : null}
               </div>
+              {showDates ? (
+                <div id="discovery-dates" className={css.scheduleEditor}>
+                  <BookingSchedulePicker
+                    value={values.schedule}
+                    onChange={schedule => form.change('schedule', schedule)}
+                    idPrefix="homepage-schedule"
+                  />
+                  <button
+                    type="button"
+                    className={css.doneDates}
+                    onClick={() => setShowDates(false)}
+                  >
+                    Done
+                  </button>
+                </div>
+              ) : null}
               <button className={css.submit} type="submit">
                 Search Patches<span aria-hidden="true">→</span>
               </button>

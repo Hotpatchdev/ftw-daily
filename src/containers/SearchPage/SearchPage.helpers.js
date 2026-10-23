@@ -87,12 +87,13 @@ export const validURLParamForExtendedData = (queryParamName, paramValueRaw, filt
  * @param {Object} filters Filters configuration
  */
 export const validFilterParams = (params, filters) => {
-  const filterParamNames = filters.map(f => f.queryParamNames).reduce(flatten, []);
+  const filterParamNames = filters.map(f => f.queryParamNames).reduce(flatten, []).concat('schedule');
   const paramEntries = Object.entries(params);
 
   return paramEntries.reduce((validParams, entry) => {
     const [paramName, paramValue] = entry;
 
+    if (paramName === 'schedule') return { ...validParams, schedule: paramValue };
     return filterParamNames.includes(paramName)
       ? {
           ...validParams,

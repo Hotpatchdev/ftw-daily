@@ -1,3 +1,5 @@
+import { normaliseSchedule, scheduleSummary } from './bookingSchedule';
+
 export const PRICE_FILTER_PARAMS = {
   price: 'price',
   pub_pricePerDayFilter: 'pricePerDay',
@@ -35,6 +37,14 @@ export const activeFilterTags = (params, filters) => {
     tags.push({ param: 'keywords', type: 'keyword', value: params.keywords });
   }
   const dates = typeof params.dates === 'string' ? params.dates.split(',') : [];
+  if (params.schedule) {
+    try {
+      const schedule = normaliseSchedule(params.schedule);
+      tags.push({ param: 'schedule', type: 'schedule', label: scheduleSummary(schedule) });
+    } catch (e) {
+      /* Invalid schedules are reported by the search loader. */
+    }
+  }
   if (dates.length === 2 && dates.every(validDate) && dates[0] <= dates[1]) {
     tags.push({ param: 'dates', type: 'dates', start: dates[0], end: dates[1] });
   }
@@ -84,6 +94,7 @@ export const removeFilterTag = (params, tag, filters) => {
   const next = { ...params };
   delete next.page;
   if (!tag) {
+    delete next.schedule;
     filters.forEach(filter => {
       const names = Array.isArray(filter.queryParamNames)
         ? filter.queryParamNames

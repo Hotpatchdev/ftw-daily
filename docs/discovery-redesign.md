@@ -98,7 +98,7 @@ src/components/ListingCard/ListingCard.test.js
 src/components/TopbarDesktop/TopbarDesktop.test.js
 ```
 
-Visual refinements are deferred at the user's request. Time-of-day search, ranking, fee-inclusive comparison totals, and booking/messaging changes remain for later iterations.
+Visual refinements are deferred at the user's request. Ranking, fee-inclusive comparison totals, and messaging changes remain for later iterations. Scheduling integration is described below.
 
 ## Listing-page amenities
 
@@ -136,15 +136,15 @@ Validation: 44 tests passed across nine suites and the full web/server build pas
 
 ## Booking schedule preview
 
-The approved scheduling mockup is available at `/static/previews/booking-schedule/`: hourly/daily units, date ranges or individual dates, shared/per-day hours, quick choices and schedule review. This is a standalone, non-indexed preview; it makes no API calls or booking/payment changes. The current checkout and server pricing accept one continuous interval. Multi-session availability, booking creation and charging remain separate integration work.
+The approved scheduling mockup is available at `/static/previews/booking-schedule/`: hourly/daily units, date ranges or individual dates, shared/per-day hours, quick choices and schedule review. This is a standalone, non-indexed preview; it makes no API calls or booking/payment changes. The current checkout and server pricing accept one continuous interval. The integrated flow below now checks multi-session availability and sends each booking group through that existing checkout.
 
-Example minimums (none, two or five units) are explicitly labelled as sample host rules. Hourly minimums apply to each session; daily minimums apply to each consecutive date group. Short selections are flagged, unsuitable time shortcuts are disabled and review is blocked. Existing host settings are `publicData.minBooking.minBookingType/minBookingCount`; mapping and enforcing those real rules in search and checkout remains integration work.
+Example minimums (none, two or five units) are explicitly labelled as sample host rules. Hourly minimums apply to each session; daily minimums apply to each consecutive date group. Short selections are flagged, unsuitable time shortcuts are disabled and review is blocked. Existing host settings are `publicData.minBooking.minBookingType/minBookingCount`; the integrated flow below reads and enforces those real rules.
 
 Validation: nine minimum-rule tests and the web/server builds passed. Browser checks covered per-day edits, minimums, daily date groups, reset and mobile layout. Broader server checks passed 38/39 tests; the failure is an existing `lineItemHelpers` expectation in unchanged pricing code.
 
 ## Unified filters
 
-The filter panel follows presentation page 32: location and date summaries, price histogram and range, essential amenities, expandable amenity groups, Reset and Show spaces. Changes apply together; closing discards the draft. Existing search and booking semantics are retained, with specific times chosen during booking.
+The filter panel follows presentation page 32: location and date summaries, price histogram and range, essential amenities, expandable amenity groups, Reset and Show spaces. Changes apply together; closing discards the draft. The schedule picker below now supplies specific dates and times within the panel.
 
 Prices use the complete matching listing collection for the selected rate unit and configured currency, excluding the current price range. Incomplete collections show an error rather than a partial average (5,000-listing limit; five-minute cache). Currency/geography switching is deferred for later refinement.
 
@@ -157,3 +157,11 @@ The “Flow and Annotations” page in the Figma file calls for a View all revie
 Read-only API probes accepted both real and deliberately invalid sort values, so a 200 response was insufficient evidence of server sorting. The loader instead fetches all review pages before sorting locally. It validates pagination totals and duplicate IDs, and never treats a failed or changing collection as an empty result. A five-minute cache avoids repeating all API reads when changing sort or display page; request IDs prevent an older listing response from overwriting a newer one. Loading is bounded at 100 API pages / 10,000 reviews and reports an error rather than displaying a partial collection if that limit is exceeded. Larger datasets need a verified backend sorting/indexing source.
 
 Validation: 66 tests passed across twelve suites, with two snapshots. The ListingPage snapshot was refreshed for the new review-link props and pre-existing staging markup that its older snapshot no longer reflected. Controlled browser checks at 390px and 1440px covered full-collection ordering across API pages, pagination, cache reuse, URL reload/back navigation, the return anchor, empty reviews, failed later-page loads, retry, not-found handling, and no account writes. Guest fixtures use the SDK's `public-read` scope. No live reviews, bookings, payments or account data were created or changed.
+
+## Integrated booking schedules
+
+Homepage When and search Date & Time now share the hourly/daily calendar, individual dates or ranges, shared/per-day hours and time shortcuts. Search checks each requested interval against real availability and the listing’s existing minimum, shows that minimum on cards, and carries the schedule to the listing. Consecutive daily dates form one booking group; hourly sessions and separate daily groups use separate existing checkouts, payments and host confirmations. No combined-charge flow is introduced. Trusted server pricing rechecks the host minimum and matching booking/pricing dates.
+
+Search is bounded to 31 dates within 12 weeks, during the next year. Up to 200 candidate listings are checked completely before pagination; broader searches ask for narrower filters. Availability and result caches last one minute, with availability checked again at checkout. Daily bookings retain the existing UTC-midnight/exclusive-end convention. Currency/geography switching remains deferred.
+
+Validation: 54 focused client tests and five server minimum/request tests pass; web/server production builds pass. Read-only staging API checks returned 56 hourly matches and 42 daily matches for two separate sample dates. Browser checks cover homepage → search → listing → guest checkout handoff, minimum labels, filter editing and mobile. A signed-in payment has not been submitted. The older unrelated server quantity-helper expectation remains failing.

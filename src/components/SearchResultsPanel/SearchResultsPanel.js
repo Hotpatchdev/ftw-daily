@@ -41,6 +41,7 @@ const SearchResultsPanel = props => {
             renderSizes={cardRenderSizes}
             setActiveListing={setActiveListing}
             activePrice={currentSearchPrice(search)}
+            schedule={search && search.schedule}
           />
         ))}
         {props.children}

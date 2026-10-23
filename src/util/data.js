@@ -522,6 +522,10 @@ export const currentSearchFilter = search => {
 }
 
 export const currentSearchPrice = search => {
+  if (search && search.schedule) {
+    try { return JSON.parse(search.schedule).unit === 'daily' ? DAILY_PRICE : HOURLY_PRICE; }
+    catch (e) { /* Keep the legacy price selection for malformed URLs. */ }
+  }
   const equalFilterPrice = {
     pub_pricePerDayFilter: 'pricePerDay',
     pub_pricePerWeekFilter: 'pricePerWeek',

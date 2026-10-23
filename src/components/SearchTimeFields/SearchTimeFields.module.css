@@ -1,0 +1,74 @@
+.root {
+  min-width: 0;
+  color: #1d1c2e;
+}
+.root h3 {
+  margin: 12px 0;
+  font-size: 18px;
+}
+.fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.fields label,
+.zone {
+  display: block;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+.fields input,
+.zone select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 12px 8px;
+  border: 1px solid #d8d4d0;
+  border-radius: 10px;
+  background: #fff;
+  color: #1d1c2e;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+.label {
+  margin: 20px 0 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 600;
+}
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.choices button {
+  padding: 10px 12px;
+  border-radius: 24px;
+  border: 1px solid transparent;
+  background: #faf2ed;
+  color: #a12455;
+  font-size: 12px;
+  cursor: pointer;
+}
+.choices button[aria-pressed='true'] {
+  border-color: #a12455;
+  background: #f7e3ed;
+}
+.reset {
+  padding: 10px 0;
+  background: transparent;
+  border: 0;
+  color: #286a72;
+  text-decoration: underline;
+  font-size: 13px;
+  cursor: pointer;
+}
+.root button:focus-visible,
+.root input:focus-visible,
+.root select:focus-visible {
+  outline: 2px solid #286a72;
+  outline-offset: 2px;
+}

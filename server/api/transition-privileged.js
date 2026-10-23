@@ -1,4 +1,5 @@
 const { transactionLineItems } = require('../api-util/lineItems');
+const { validateBookingRequest } = require('../../src/util/bookingMinimum');
 const { getSdk, getTrustedSdk, handleError, serialize } = require('../api-util/sdk');
 
 module.exports = (req, res) => {
@@ -13,6 +14,7 @@ module.exports = (req, res) => {
     .show({ id: listingId })
     .then(listingResponse => {
       const listing = listingResponse.data.data;
+      validateBookingRequest(bookingData, bodyParams);
       lineItems = transactionLineItems(listing, bookingData);
 
       return getTrustedSdk(req);

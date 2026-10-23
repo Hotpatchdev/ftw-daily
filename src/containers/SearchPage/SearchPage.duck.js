@@ -5,6 +5,7 @@ import { convertUnitToSubUnit, unitDivisor } from '../../util/currency';
 import { formatDateStringToUTC, getExclusiveEndDate } from '../../util/dates';
 import { parse } from '../../util/urlHelpers';
 import config from '../../config';
+import { queryScheduledListings } from '../../util/scheduleSearch';
 
 // Pagination page size might need to be dynamic on responsive page layouts
 // Current design has max 3 columns 12 is divisible by 2 and 3
@@ -165,14 +166,19 @@ export const searchListings = searchParams => (dispatch, getState, sdk) => {
     per_page: perPage,
   };
 
-  return sdk.listings
-    .query(params)
+  const active = () => !params.schedule || getState().SearchPage.searchParams === searchParams;
+  const query = params.schedule
+    ? queryScheduledListings(sdk, params, active, [config.currency, config.additionalCurrency])
+    : sdk.listings.query(params);
+  return query
     .then(response => {
+      if (!active()) return response;
       dispatch(addMarketplaceEntities(response));
       dispatch(searchListingsSuccess(response));
       return response;
     })
     .catch(e => {
+      if (!active()) return;
       dispatch(searchListingsError(storableError(e)));
       throw e;
     });
@@ -192,8 +198,10 @@ export const searchMapListings = searchParams => (dispatch, getState, sdk) => {
     per_page: perPage,
   };
 
-  return sdk.listings
-    .query(params)
+  const query = params.schedule
+    ? queryScheduledListings(sdk, params, undefined, [config.currency, config.additionalCurrency])
+    : sdk.listings.query(params);
+  return query
     .then(response => {
       dispatch(addMarketplaceEntities(response));
       dispatch(searchMapListingsSuccess(response));

@@ -103,7 +103,7 @@ const MainPanel = props => {
       <div className={classNames(css.listings, { [css.newSearchInProgress]: !listingsAreLoaded })}>
         {searchListingsError ? (
           <h2 className={css.error}>
-            <FormattedMessage id="SearchPage.searchError" />
+            {params.schedule && searchListingsError.message ? searchListingsError.message : <FormattedMessage id="SearchPage.searchError" />}
           </h2>
         ) : null}
         <SearchResultsPanel
