@@ -17,12 +17,12 @@ export default class BookingTypes extends Component {
   }
 
   render() {
-    const { listing, intl } = this.props;
+    const { listing, intl, initialBookingType } = this.props;
 
     const prices = getAvailablePrices(listing);
 
     const { key } = getLowestPrice(listing);
-    const initialValues = { bookingType: key || null };
+    const initialValues = { bookingType: initialBookingType || key || null };
 
     return (
       <div>

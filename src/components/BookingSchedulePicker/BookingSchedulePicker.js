@@ -49,6 +49,8 @@ const BookingSchedulePicker = ({
   onChange,
   compact = false,
   idPrefix = 'booking-schedule',
+  showUnits = true,
+  required = false,
 }) => {
   const schedule = { ...emptySchedule(), ...value };
   const [month, setMonth] = useState(() =>
@@ -116,7 +118,7 @@ const BookingSchedulePicker = ({
       className={`${css.root} ${compact ? css.compact : ''}`}
       aria-label="Booking dates and times"
     >
-      <fieldset className={css.units}>
+      {showUnits ? <fieldset className={css.units}>
         <legend>Book by</legend>
         <div className={css.switch}>
           {['hourly', 'daily'].map(unit => (
@@ -130,7 +132,7 @@ const BookingSchedulePicker = ({
             </button>
           ))}
         </div>
-      </fieldset>
+      </fieldset> : null}
       <div className={css.columns}>
         <div>
           <div className={css.switch}>
@@ -346,7 +348,7 @@ const BookingSchedulePicker = ({
           );
         })}
         {!schedule.days.length ? (
-          <p className={css.hint}>Dates are optional. Select dates to check your schedule.</p>
+          <p className={css.hint}>{required ? 'Choose your booking dates.' : 'Dates are optional. Select dates to check your schedule.'}</p>
         ) : null}
       </div>
       {error ? (

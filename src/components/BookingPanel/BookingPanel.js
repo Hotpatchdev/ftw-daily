@@ -15,14 +15,15 @@ import {
   WEEKLY_PRICE,
   MONTHLY_PRICE,
 } from '../../util/types';
-import { getTypeDuration, getLowestPrice } from '../../util/data';
+import { getTypeDuration, getLowestPrice, getAvailablePrices } from '../../util/data';
 import { formatMoney } from '../../util/currency';
 import { parse, stringify } from '../../util/urlHelpers';
 import config from '../../config';
 import { ModalInMobile, Button, BookingTypes } from '../../components';
-import { BookingDatesForm, BookingTimeForm } from '../../forms';
+import { BookingDatesForm } from '../../forms';
 import { types as sdkTypes } from '../../util/sdkLoader';
 
+import BookingScheduleForm from '../BookingScheduleForm/BookingScheduleForm';
 import css from './BookingPanel.module.css';
 
 // This defines when ModalInMobile shows content as Modal
@@ -93,6 +94,9 @@ const BookingPanel = props => {
     fetchLineItemsError,
     bookingType,
     toggleBookingType,
+    initialSchedule,
+    searchDates,
+    onScheduleReview,
   } = props;
 
   const { price, availabilityPlan, state, publicData } = listing.attributes;
@@ -115,10 +119,16 @@ const BookingPanel = props => {
   );
   const unitTranslationKey = `BookingPanel.${priceType}`;
   const isBook = !!parse(location.search).book;
+  let initialUnit;
+  try { initialUnit = JSON.parse(initialSchedule || '{}').unit; } catch (e) { initialUnit = null; }
+  const rates = getAvailablePrices(listing).map(rate => rate.key);
+  const preferred = initialUnit === 'daily' || (!initialUnit && searchDates) ? DAILY_PRICE : HOURLY_PRICE;
+  const initialBookingType = rates.includes(preferred) ? preferred : rates.includes(HOURLY_PRICE)
+    ? HOURLY_PRICE : rates.includes(DAILY_PRICE) ? DAILY_PRICE : priceType;
 
   const showBookingForm = !!state && !isClosed;
-  const showBookingTimeForm = showBookingForm && availabilityPlan && bookingType === HOURLY_PRICE;
-  const showBookingDatesForm = showBookingForm && availabilityPlan && !showBookingTimeForm;
+  const showScheduleForm = showBookingForm && availabilityPlan && [HOURLY_PRICE, DAILY_PRICE].includes(bookingType);
+  const showBookingDatesForm = showBookingForm && availabilityPlan && [WEEKLY_PRICE, MONTHLY_PRICE].includes(bookingType);
 
   // const subTitleMinLengthText = (
   //   showBookingDatesForm &&
@@ -126,7 +136,9 @@ const BookingPanel = props => {
   //   minimumLength > 1
   // ) ? ` Minimum booking length is ${minimumLength} days.` : '';
 
-  const subTitleText = !!subTitle
+  const subTitleText = showScheduleForm
+    ? 'Choose your dates and review the price before checkout.'
+    : !!subTitle
     ? // ? subTitle + subTitleMinLengthText
       subTitle
     : showClosedListingHelpText
@@ -202,7 +214,20 @@ const BookingPanel = props => {
           {subTitleText ? <div className={css.bookingHelp}>{subTitleText}</div> : null}
         </div>
 
-        <BookingTypes intl={intl} listing={listing} onChange={toggleBookingType} />
+        <BookingTypes intl={intl} listing={listing} onChange={toggleBookingType}
+          initialBookingType={initialBookingType} />
+
+        {showScheduleForm ? <BookingScheduleForm
+          listing={listing}
+          bookingType={bookingType}
+          initialSchedule={initialSchedule}
+          searchDates={searchDates}
+          disabled={isOwnListing || isClosed}
+          promocode={promocode}
+          onReview={onScheduleReview}
+          history={history}
+          location={location}
+        /> : null}
 
         {showBookingDatesForm ? (
           <BookingDatesForm
@@ -232,32 +257,6 @@ const BookingPanel = props => {
           />
         ) : null}
 
-        {showBookingTimeForm ? (
-          <BookingTimeForm
-            updateDiscount={updateDiscount}
-            promocode={promocode}
-            key={bookingType}
-            className={css.bookingForm}
-            formId="BookingPanel"
-            submitButtonWrapperClassName={css.submitButtonWrapper}
-            unitType={unitType}
-            onSubmit={onSubmit}
-            price={price}
-            isOwnListing={isOwnListing}
-            listingId={listing.id}
-            monthlyTimeSlots={monthlyTimeSlots}
-            onFetchTimeSlots={onFetchTimeSlots}
-            startDatePlaceholder={intl.formatDate(TODAY, dateFormattingOptions)}
-            endDatePlaceholder={intl.formatDate(TODAY, dateFormattingOptions)}
-            timeZone={timeZone}
-            onFetchTransactionLineItems={onFetchTransactionLineItems}
-            lineItems={lineItems}
-            fetchLineItemsInProgress={fetchLineItemsInProgress}
-            fetchLineItemsError={fetchLineItemsError}
-            minBookingCount={minBookingCount}
-            minBookingType={minBookingType}
-          />
-        ) : null}
       </ModalInMobile>
       <div className={css.openBookingForm}>
         <div className={css.priceContainer}>
@@ -270,7 +269,7 @@ const BookingPanel = props => {
           </div>
         </div>
 
-        {showBookingDatesForm || showBookingTimeForm ? (
+        {showScheduleForm || showBookingDatesForm ? (
           <Button
             rootClassName={css.bookButton}
             onClick={() => openBookModal(isOwnListing, isClosed, history, location)}

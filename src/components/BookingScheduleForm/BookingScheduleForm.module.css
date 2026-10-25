@@ -1,0 +1,77 @@
+.root {
+  min-width: 0;
+  padding: 0 24px 100px;
+}
+.minimum {
+  color: #a12455;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+.hint {
+  color: #655e67;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.error {
+  color: #af243f;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.review {
+  border-top: 1px solid #e8e1e4;
+  margin-top: 24px;
+  padding-top: 16px;
+}
+.review h3 {
+  font-size: 18px;
+  margin: 0 0 12px;
+}
+.group {
+  border-bottom: 1px solid #e8e1e4;
+  padding: 16px 0;
+}
+.group h4 {
+  font-size: 15px;
+  margin: 0;
+}
+.group dl {
+  font-size: 13px;
+  margin: 16px 0;
+}
+.priceRow,
+.total {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 8px 0;
+}
+.group dd {
+  margin: 0;
+  flex-shrink: 0;
+}
+.total {
+  font-weight: 600;
+  border-top: 1px solid #e8e1e4;
+  padding-top: 12px;
+}
+.continue {
+  display: block;
+  width: 100%;
+  padding: 14px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #b42059;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+.continue:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+@media (min-width: 768px) {
+  .root {
+    padding: 0;
+  }
+}

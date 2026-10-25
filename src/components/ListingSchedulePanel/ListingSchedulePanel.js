@@ -4,8 +4,7 @@ import { NamedLink } from '../../components';
 import config from '../../config';
 import {
   normaliseSchedule,
-  scheduleIntervals,
-  dateGroups,
+  scheduleBookingGroups,
   meetsListingMinimum,
   minimumBookingLabel,
   scheduleSummary,
@@ -13,16 +12,7 @@ import {
 import { parse, stringify } from '../../util/urlHelpers';
 import css from './ListingSchedulePanel.module.css';
 
-export const scheduleBookingGroups = value => {
-  const schedule = normaliseSchedule(value);
-  if (schedule.unit === 'hourly') return scheduleIntervals(schedule);
-  return dateGroups(schedule.days).map(group => ({
-    day: group[0],
-    lastDay: group[group.length - 1],
-    start: new Date(`${group[0]}T00:00:00Z`),
-    end: new Date(Date.parse(`${group[group.length - 1]}T00:00:00Z`) + 86400000),
-  }));
-};
+export { scheduleBookingGroups } from '../../util/bookingSchedule';
 
 const ListingSchedulePanel = ({ listing, value, onReview, disabled, searchReturnTo }) => {
   let schedule;

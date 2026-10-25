@@ -73,7 +73,6 @@ import SectionRulesMaybe from './SectionRulesMaybe';
 import SectionMapMaybe from './SectionMapMaybe';
 import SectionCapacity from './SectionCapacity';
 import SectionSeats from './SectionSeats';
-import ListingSchedulePanel from '../../components/ListingSchedulePanel/ListingSchedulePanel';
 import css from './ListingPage.module.css';
 import Swal from 'sweetalert2';
 
@@ -743,13 +742,15 @@ export class ListingPageComponent extends Component {
                     enquiryDateTimeDataError={this.state.enquiryDateTimeDataError}
                   />
                 </div>
-                {selectedSchedule ? <ListingSchedulePanel
-                  listing={currentListing}
-                  value={selectedSchedule}
-                  searchReturnTo={searchReturnLocation(location)}
-                  disabled={isOwnListing || currentListing.attributes.state === LISTING_STATE_CLOSED}
-                  onReview={(unit, group) => this.setState({ bookingType: unit === 'hourly' ? 'price' : 'pricePerDay' }, () => this.handleSubmit(unit === 'hourly' ? { bookingStartTime: String(group.start.getTime()), bookingEndTime: String(group.end.getTime()) } : { bookingDates: { startDate: group.start, endDate: group.end } }))}
-                /> : <BookingPanel
+                <BookingPanel
+                  initialSchedule={selectedSchedule}
+                  searchDates={parse((searchReturnLocation(location) || {}).search || '').dates}
+                  onScheduleReview={(unit, group) => this.setState(
+                    { bookingType: unit === 'hourly' ? 'price' : 'pricePerDay' },
+                    () => this.handleSubmit(unit === 'hourly'
+                      ? { bookingStartTime: String(group.start.getTime()), bookingEndTime: String(group.end.getTime()) }
+                      : { bookingDates: { startDate: group.start, endDate: group.end } })
+                  )}
                   updateDiscount={this.updateDiscount}
                   promocode={this.state.promocode}
                   className={css.bookingPanel}
@@ -771,7 +772,7 @@ export class ListingPageComponent extends Component {
                   fetchLineItemsError={fetchLineItemsError}
                   bookingType={this.state.bookingType}
                   toggleBookingType={this.toggleBookingType}
-                />}
+                />
               </div>
             </div>
           </LayoutWrapperMain>

@@ -171,3 +171,13 @@ export const slotsCoverSchedule = (slots, value) => {
     return false;
   });
 };
+
+export const scheduleBookingGroups = value => {
+  const schedule = normaliseSchedule(value);
+  if (schedule.unit === 'hourly') return scheduleIntervals(schedule);
+  return dateGroups(schedule.days).map(group => ({
+    day: group[0], lastDay: group[group.length - 1],
+    start: new Date(`${group[0]}T00:00:00Z`),
+    end: new Date(Date.parse(`${group[group.length - 1]}T00:00:00Z`) + 86400000),
+  }));
+};

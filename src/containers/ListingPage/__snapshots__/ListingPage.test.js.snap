@@ -434,6 +434,7 @@ exports[`ListingPage matches snapshot 1`] = `
             monthlyTimeSlots={null}
             onFetchTransactionLineItems={[Function]}
             onManageDisableScrolling={[Function]}
+            onScheduleReview={[Function]}
             onSubmit={[Function]}
             promocode={false}
             subTitle="ListingPage.bookingSubTitle"
