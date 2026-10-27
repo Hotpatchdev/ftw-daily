@@ -1,6 +1,6 @@
 import pick from 'lodash/pick';
 import config from '../../config';
-import { initiatePrivileged, transitionPrivileged } from '../../util/api';
+import { initiatePrivileged, transitionPrivileged, combinedBooking } from '../../util/api';
 import { denormalisedResponseEntities } from '../../util/data';
 import { storableError } from '../../util/errors';
 import {
@@ -249,6 +249,14 @@ export const initiateOrder = (data, transactionId) => (dispatch, getState, sdk) 
     throw e;
   };
 
+  if (data.combinedSchedule) {
+    return combinedBooking({ listingId: orderParams.listingId, schedule: data.combinedSchedule,
+      attempt: data.combinedAttempt, expectedTotal: data.expectedTotal, currency: data.currency,
+      paymentMethod: data.paymentMethod, setupPaymentMethodForSaving: data.setupPaymentMethodForSaving,
+      promocode: data.promocode })
+      .then(handleSucces).catch(handleError);
+  }
+
   if (isTransition && isPrivilegedTransition) {
     // transition privileged
     return transitionPrivileged({ isSpeculative: false, bookingData, bodyParams, queryParams })
@@ -283,8 +291,10 @@ export const confirmPayment = orderParams => (dispatch, getState, sdk) => {
     params: {},
   };
 
-  return sdk.transactions
-    .transition(bodyParams)
+  return sdk.transactions.show({ id: orderParams.transactionId }).then(response =>
+    response.data.data.attributes.processName === 'hotpatch-combined-booking'
+      ? combinedBooking({ transactionId: orderParams.transactionId, action: 'confirm' })
+      : sdk.transactions.transition(bodyParams))
     .then(response => {
       const order = response.data.data;
       dispatch(confirmPaymentSuccess(order.id));
@@ -396,6 +406,12 @@ export const speculateTransaction = (requestParams, transactionId) => (dispatch,
     });
     return dispatch(speculateTransactionError(storableError(e)));
   };
+
+  if (requestParams.combinedSchedule) {
+    return combinedBooking({ listingId: params.listingId, schedule: requestParams.combinedSchedule,
+      isSpeculative: true, promocode: requestParams.promocode })
+      .then(handleSuccess).catch(handleError);
+  }
 
   if (isTransition && isPrivilegedTransition) {
     // transition privileged

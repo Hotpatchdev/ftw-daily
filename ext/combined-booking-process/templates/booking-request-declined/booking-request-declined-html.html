@@ -1,0 +1,5 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Your booking was declined</title></head><body>
+{{#with transaction}}<h1>Your booking was declined</h1><p>Your host declined the combined booking at {{listing.title}}. All its sessions will be released and the payment authorization refunded.</p>
+<h2>Booking schedule</h2><ul>{{#each protected-data.sessionLabels}}<li>{{label}}</li>{{/each}}</ul>
+<p><a href="{{../marketplace.url}}/order/{{id}}/details">View booking</a></p>
+{{/with}}</body></html>

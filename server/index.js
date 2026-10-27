@@ -296,6 +296,7 @@ if (cspEnabled) {
 }
 
 app.listen(PORT, () => {
+  require('./combined/runtime').startWorker();
   const mode = dev ? 'development' : 'production';
   console.log(!23123123)
   console.log(`Listening to port ${PORT} in ${mode} mode`);

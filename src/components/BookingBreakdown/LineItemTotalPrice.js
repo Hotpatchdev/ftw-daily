@@ -34,8 +34,10 @@ const LineItemUnitPrice = props => {
     item => item.code === 'line-item/units'
   );
 
-  const newTotalForProvider = new Money(units.lineTotal.amount - (units.lineTotal.amount * 5 / 100), units.lineTotal.currency)
-  const formattedNewTotalForProvider = formatMoney(intl, newTotalForProvider);
+  const newTotalForProvider = discount && isProvider && units
+    ? new Money(units.lineTotal.amount - (units.lineTotal.amount * 5 / 100), units.lineTotal.currency)
+    : null;
+  const formattedNewTotalForProvider = newTotalForProvider ? formatMoney(intl, newTotalForProvider) : null;
   const totalPrice = isProvider
     ? transaction.attributes.payoutTotal
     : transaction.attributes.payinTotal;
@@ -46,7 +48,7 @@ const LineItemUnitPrice = props => {
       <hr className={css.totalDivider} />
       <div className={css.lineItemTotal}>
         <div className={css.totalLabel}>{totalLabel}</div>
-        <div className={css.totalPrice}>{discount && isProvider ? formattedNewTotalForProvider : formattedTotalPrice}</div>
+        <div className={css.totalPrice}>{formattedNewTotalForProvider || formattedTotalPrice}</div>
       </div>
     </>
   );

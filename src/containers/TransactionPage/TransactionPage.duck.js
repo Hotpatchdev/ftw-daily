@@ -14,7 +14,7 @@ import {
   TRANSITION_DECLINE,
 } from '../../util/transaction';
 import { LINE_ITEM_UNITS, LINE_ITEM_DAY } from '../../util/types';
-import { transactionLineItems } from '../../util/api';
+import { transactionLineItems, combinedBooking } from '../../util/api';
 import * as log from '../../util/log';
 import {
   updatedEntities,
@@ -409,8 +409,10 @@ export const acceptSale = id => (dispatch, getState, sdk) => {
   }
   dispatch(acceptSaleRequest());
 
-  return sdk.transactions
-    .transition({ id, transition: TRANSITION_ACCEPT, params: {} }, { expand: true })
+  return sdk.transactions.show({ id }).then(response =>
+    response.data.data.attributes.processName === 'hotpatch-combined-booking'
+      ? combinedBooking({ transactionId: id, action: 'accept' })
+      : sdk.transactions.transition({ id, transition: TRANSITION_ACCEPT, params: {} }, { expand: true }))
     .then(response => {
       dispatch(addMarketplaceEntities(response));
       dispatch(acceptSaleSuccess());
@@ -433,8 +435,10 @@ export const declineSale = id => (dispatch, getState, sdk) => {
   }
   dispatch(declineSaleRequest());
 
-  return sdk.transactions
-    .transition({ id, transition: TRANSITION_DECLINE, params: {} }, { expand: true })
+  return sdk.transactions.show({ id }).then(response =>
+    response.data.data.attributes.processName === 'hotpatch-combined-booking'
+      ? combinedBooking({ transactionId: id, action: 'decline' })
+      : sdk.transactions.transition({ id, transition: TRANSITION_DECLINE, params: {} }, { expand: true }))
     .then(response => {
       dispatch(addMarketplaceEntities(response));
       dispatch(declineSaleSuccess());

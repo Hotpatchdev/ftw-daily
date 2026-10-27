@@ -15,6 +15,7 @@ import { minimumFinishTime } from '../../util/bookingMinimumSuggestion';
 import { quoteListingSchedule } from '../../util/bookingScheduleQuote';
 import { parse, stringify } from '../../util/urlHelpers';
 import css from './BookingScheduleForm.module.css';
+import { combinedBookingEnabled } from '../../util/api';
 
 const money = (amount, currency) =>
   new Intl.NumberFormat('en-GB', { style: 'currency', currency }).format(amount / 100);
@@ -35,6 +36,7 @@ export const BookingScheduleFormComponent = ({
   disabled,
   promocode,
   onCheckSchedule,
+  onCombinedReady,
   onReview,
   history,
   location,
@@ -59,6 +61,12 @@ export const BookingScheduleFormComponent = ({
   const [error, setError] = useState(null);
   const [checking, setChecking] = useState(false);
   const [retry, setRetry] = useState(0);
+  const [combinedEnabled, setCombinedEnabled] = useState(false);
+  useEffect(() => {
+    let active = true;
+    if (onCombinedReady) onCombinedReady().then(ready => { if (active) setCombinedEnabled(ready); }).catch(() => {});
+    return () => { active = false; };
+  }, [onCombinedReady]);
   const unit = bookingType === 'pricePerDay' ? 'daily' : 'hourly';
   const schedule = { ...value, unit };
   let normalised = null,
@@ -114,7 +122,8 @@ export const BookingScheduleFormComponent = ({
     // The key contains the complete normalised selection; other dependencies are stable props.
   }, [key, validation, disabled, retry]);
   const quote = result && result.key === key ? result.quote : null;
-  const review = group => {
+  const combined = combinedEnabled && quote && quote.groups.length > 1;
+  const review = (group, all = false) => {
     if (!quote || checking || validation || disabled) return;
     history.replace({
       ...location,
@@ -123,7 +132,8 @@ export const BookingScheduleFormComponent = ({
         schedule: JSON.stringify(quote.schedule),
       })}`,
     });
-    onReview(unit, group);
+    if (all) onReview(unit, group, quote.schedule);
+    else onReview(unit, group);
   };
   return (
     <section className={css.root} aria-label="Choose your booking schedule">
@@ -159,8 +169,9 @@ export const BookingScheduleFormComponent = ({
           <h3>Review your booking</h3>
           {quote.groups.length > 1 ? (
             <p className={css.hint}>
-              Each session or group of consecutive days has a separate checkout, payment and host
-              confirmation.
+              {combined
+                ? 'All selected sessions will be included in one payment and one host confirmation.'
+                : 'Each session or group of consecutive days has a separate checkout, payment and host confirmation.'}
             </p>
           ) : null}
           {quote.groups.map((group, index) => (
@@ -200,7 +211,7 @@ export const BookingScheduleFormComponent = ({
                   <dd>{money(group.total, group.currency)}</dd>
                 </div>
               </dl>
-              <button
+              {!combined ? <button
                 className={css.continue}
                 type="button"
                 disabled={checking || !!validation || disabled}
@@ -209,9 +220,19 @@ export const BookingScheduleFormComponent = ({
                 {quote.groups.length > 1
                   ? `Continue to checkout ${index + 1}`
                   : 'Continue to checkout'}
-              </button>
+              </button> : null}
             </div>
           ))}
+          {combined ? <div className={css.group}>
+            <dl><div className={css.total}><dt>Total for all sessions</dt>
+              <dd>{money(quote.groups.reduce((sum, g) => sum + g.total, 0), quote.groups[0].currency)}</dd>
+            </div></dl>
+            <button className={css.continue} type="button"
+              disabled={checking || !!validation || disabled}
+              onClick={() => review(quote.groups[quote.groups.length - 1], true)}>
+              Continue to checkout
+            </button>
+          </div> : null}
           <p className={css.hint}>Availability and price are confirmed again at checkout.</p>
         </section>
       ) : !schedule.days.length ? (
@@ -222,6 +243,7 @@ export const BookingScheduleFormComponent = ({
 };
 
 export default connect(null, dispatch => ({
+  onCombinedReady: combinedBookingEnabled,
   onCheckSchedule: (listing, schedule, promocode, active) =>
     dispatch((dispatch, getState, sdk) =>
       quoteListingSchedule(sdk, listing, schedule, promocode, active)

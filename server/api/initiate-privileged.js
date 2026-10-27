@@ -4,6 +4,8 @@ const { getSdk, getTrustedSdk, handleError, serialize } = require('../api-util/s
 
 module.exports = (req, res) => {
   const { isSpeculative, bookingData, bodyParams, queryParams } = req.body;
+  if (String((bodyParams || {}).processAlias).startsWith('hotpatch-combined-'))
+    return res.status(403).json({ error: 'Use the combined booking endpoint.' });
 
   const listingId = bodyParams && bodyParams.params ? bodyParams.params.listingId : null;
 

@@ -223,6 +223,7 @@ export class CheckoutPageComponent extends Component {
           bookingStart: bookingStartForAPI,
           bookingEnd: bookingEndForAPI,
           type: pageData.bookingData.bookingType,
+          combinedSchedule: pageData.bookingData.combinedSchedule,
         },
         transactionId
       );
@@ -427,6 +428,10 @@ export class CheckoutPageComponent extends Component {
       promocode,
       quantity: pageData.bookingData ? pageData.bookingData.quantity : null,
       type: bookingType,
+      combinedSchedule: pageData.bookingData.combinedSchedule,
+      combinedAttempt: pageData.bookingData.combinedAttempt,
+      expectedTotal: tx.attributes.payinTotal.amount,
+      currency: tx.attributes.payinTotal.currency,
       seats: bookingType === HOURLY_PRICE ? 1 : seats,
       ...optionalPaymentParams,
     };

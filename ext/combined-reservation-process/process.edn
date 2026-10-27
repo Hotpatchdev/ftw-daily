@@ -1,0 +1,23 @@
+{:format :v3,
+ :transitions
+ [{:name :transition/reserve-session, :actor :actor.role/customer, :privileged? true,
+   :actions [{:name :action/create-pending-booking, :config {:type :time}}
+             {:name :action/update-protected-data}], :to :state/pending}
+  {:name :transition/expire-session,
+   :at {:fn/plus [{:fn/timepoint [:time/first-entered-state :state/pending]} {:fn/period ["PT15M"]}]},
+   :actions [{:name :action/decline-booking}], :from :state/pending, :to :state/released}
+  {:name :transition/hold-session, :actor :actor.role/operator,
+   :actions [], :from :state/pending, :to :state/held}
+  {:name :transition/expire-held-session,
+   :at {:fn/min [{:fn/plus [{:fn/timepoint [:time/first-entered-state :state/held]} {:fn/period ["P6D"]}]}
+                {:fn/timepoint [:time/booking-display-start]}]},
+   :actions [{:name :action/decline-booking}], :from :state/held, :to :state/released}
+  {:name :transition/accept-session, :actor :actor.role/operator,
+   :actions [{:name :action/accept-booking}], :from :state/held, :to :state/accepted}
+  {:name :transition/release-pending-session, :actor :actor.role/operator,
+   :actions [{:name :action/decline-booking}], :from :state/pending, :to :state/released}
+  {:name :transition/release-held-session, :actor :actor.role/operator,
+   :actions [{:name :action/decline-booking}], :from :state/held, :to :state/released}
+  {:name :transition/cancel-session, :actor :actor.role/operator,
+   :actions [{:name :action/cancel-booking}], :from :state/accepted, :to :state/released}],
+ :notifications []}

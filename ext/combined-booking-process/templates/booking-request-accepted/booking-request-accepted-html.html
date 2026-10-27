@@ -1,0 +1,5 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Your booking was accepted</title></head><body>
+{{#with transaction}}<h1>Your booking was accepted</h1><p>Your host has accepted all the following sessions at {{listing.title}}. They are covered by one payment.</p>
+<h2>Booking schedule</h2><ul>{{#each protected-data.sessionLabels}}<li>{{label}}</li>{{/each}}</ul>
+<p><a href="{{../marketplace.url}}/order/{{id}}/details">View booking</a></p>
+{{/with}}</body></html>

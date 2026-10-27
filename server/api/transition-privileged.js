@@ -10,8 +10,13 @@ module.exports = (req, res) => {
   const sdk = getSdk(req, res);
   let lineItems = null;
 
-  sdk.listings
+  sdk.transactions.show({ id: bodyParams.id })
+    .then(response => {
+      if (String(response.data.data.attributes.processName).startsWith('hotpatch-combined-'))
+        throw Object.assign(new Error('Use the combined booking endpoint.'), { status: 403 });
+      return sdk.listings
     .show({ id: listingId })
+    })
     .then(listingResponse => {
       const listing = listingResponse.data.data;
       validateBookingRequest(bookingData, bodyParams);

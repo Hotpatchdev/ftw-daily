@@ -131,6 +131,8 @@ const stateDescription = {
       on: {
         [TRANSITION_EXPIRE_PAYMENT]: STATE_PAYMENT_EXPIRED,
         [TRANSITION_CONFIRM_PAYMENT]: STATE_PREAUTHORIZED,
+        'transition/operator-confirm-payment': STATE_PREAUTHORIZED,
+        'transition/abort-payment': STATE_PAYMENT_EXPIRED,
       },
     },
 
@@ -140,6 +142,8 @@ const stateDescription = {
         [TRANSITION_DECLINE]: STATE_DECLINED,
         [TRANSITION_EXPIRE]: STATE_DECLINED,
         [TRANSITION_ACCEPT]: STATE_ACCEPTED,
+        'transition/operator-accept': STATE_ACCEPTED,
+        'transition/operator-decline': STATE_DECLINED,
       },
     },
 

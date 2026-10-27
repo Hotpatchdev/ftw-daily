@@ -44,6 +44,8 @@ export const BookingBreakdownComponent = props => {
     promocode,
   } = props;
 
+  const combined = transaction.attributes.protectedData && transaction.attributes.protectedData.combinedBooking;
+  const sessionLabels = (transaction.attributes.protectedData || {}).sessionLabels || [];
   const isDaily = dateType === DATE_TYPE_DATE;
   const transactionType =
     transaction &&
@@ -100,6 +102,10 @@ export const BookingBreakdownComponent = props => {
 
   return (
     <div className={classes}>
+      {combined ? <section aria-label="All booked sessions">
+        <h3>{sessionLabels.length} sessions · one booking</h3>
+        <ul>{sessionLabels.map((session, index) => <li key={index}>{session.label}</li>)}</ul>
+      </section> : <>
       <LineItemBookingPeriod
         booking={booking}
         unitType={unitType}
@@ -122,6 +128,7 @@ export const BookingBreakdownComponent = props => {
         isDaily={isDaily}
         transactionType={transactionType}
       />
+      </>}
       <LineItemUnknownItemsMaybe transaction={transaction} isProvider={isProvider} intl={intl} />
 
       <LineItemSubTotalMaybe

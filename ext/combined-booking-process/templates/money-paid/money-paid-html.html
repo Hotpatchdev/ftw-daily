@@ -1,0 +1,5 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Your booking payout</title></head><body>
+{{#with transaction}}<h1>Your booking payout</h1><p>The final session at {{listing.title}} has ended and the payout has been created.</p>
+<h2>Booking schedule</h2><ul>{{#each protected-data.sessionLabels}}<li>{{label}}</li>{{/each}}</ul>
+<p><a href="{{../marketplace.url}}/order/{{id}}/details">View booking</a></p>
+{{/with}}</body></html>

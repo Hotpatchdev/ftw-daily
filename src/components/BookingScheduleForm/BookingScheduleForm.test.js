@@ -53,3 +53,21 @@ it('ignores a slow old quote after the user changes dates', async () => {
   wrapper.update();
   expect(wrapper.find('button.continue')).toHaveLength(0);
 });
+it('reviews multiple sessions with one fee-inclusive total and one checkout', async () => {
+  const old = process.env.REACT_APP_COMBINED_BOOKINGS;
+  process.env.REACT_APP_COMBINED_BOOKINGS = 'true';
+  try {
+    const p = props();
+    p.onCombinedReady = jest.fn().mockResolvedValue(true);
+    const second = { ...quote.groups[0], day:'2027-02-03', start:new Date('2027-02-03T09:00Z'), end:new Date('2027-02-03T15:00Z') };
+    const full = { schedule:{...schedule,days:['2027-02-01','2027-02-03']}, groups:[quote.groups[0],second] };
+    p.onCheckSchedule.mockResolvedValue(full);
+    act(() => { wrapper = mount(<BookingScheduleFormComponent {...p} initialSchedule={JSON.stringify(full.schedule)} />); });
+    await settle();
+    expect(wrapper.text()).toContain('Total for all sessions£132.00');
+    expect(wrapper.text()).toContain('one payment and one host confirmation');
+    expect(wrapper.find('button.continue')).toHaveLength(1);
+    wrapper.find('button.continue').simulate('click');
+    expect(p.onReview).toHaveBeenCalledWith('hourly',second,full.schedule);
+  } finally { if(old===undefined) delete process.env.REACT_APP_COMBINED_BOOKINGS; else process.env.REACT_APP_COMBINED_BOOKINGS=old; }
+});

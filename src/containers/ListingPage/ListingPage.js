@@ -745,11 +745,15 @@ export class ListingPageComponent extends Component {
                 <BookingPanel
                   initialSchedule={selectedSchedule}
                   searchDates={parse((searchReturnLocation(location) || {}).search || '').dates}
-                  onScheduleReview={(unit, group) => this.setState(
+                  onScheduleReview={(unit, group, combinedSchedule) => this.setState(
                     { bookingType: unit === 'hourly' ? 'price' : 'pricePerDay' },
-                    () => this.handleSubmit(unit === 'hourly'
-                      ? { bookingStartTime: String(group.start.getTime()), bookingEndTime: String(group.end.getTime()) }
-                      : { bookingDates: { startDate: group.start, endDate: group.end } })
+                    () => this.handleSubmit({
+                      ...(unit === 'hourly'
+                        ? { bookingStartTime: String(group.start.getTime()), bookingEndTime: String(group.end.getTime()) }
+                        : { bookingDates: { startDate: group.start, endDate: group.end } }),
+                      ...(combinedSchedule ? { combinedSchedule,
+                        combinedAttempt: Array.from(window.crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('') } : {}),
+                    })
                   )}
                   updateDiscount={this.updateDiscount}
                   promocode={this.state.promocode}

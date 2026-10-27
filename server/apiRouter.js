@@ -54,6 +54,8 @@ router.get('/login-as', loginAs);
 router.post('/transaction-line-items', transactionLineItems);
 router.post('/initiate-privileged', initiatePrivileged);
 router.post('/transition-privileged', transitionPrivileged);
+router.post('/combined-booking', require('./api/combined-booking'));
+router.get('/combined-booking-enabled', (req, res) => res.json({ enabled: require('./combined/runtime').enabled() }));
 
 // Create user with identity provider (e.g. Facebook or Google)
 // This endpoint is called to create a new user after user has confirmed

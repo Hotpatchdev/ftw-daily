@@ -116,3 +116,8 @@ export const transitionPrivileged = body => {
 export const createUserWithIdp = body => {
   return post('/api/auth/create-user-with-idp', body);
 };
+
+export const combinedBooking = body => post('/api/combined-booking', body);
+export const combinedBookingEnabled = () => window.fetch(`${apiBaseUrl()}/api/combined-booking-enabled`, { credentials: 'include' })
+  .then(response => response.ok ? response.json() : { enabled: false })
+  .then(result => result.enabled === true);
