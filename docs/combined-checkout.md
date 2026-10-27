@@ -26,8 +26,8 @@ COMBINED_BOOKING_STORE_DIR must point outside numbered releases. The booking for
 reads the server capability flag, so it keeps the existing checkout until enabled.
 Production is out of scope.
 
-Validation: 35 server checks and 20 focused interface checks pass. Legacy nightly
+Validation: 36 server checks and 20 focused interface checks pass. Legacy nightly
 booking-breakdown snapshots have pre-existing date/label/subtotal differences; they
 were not rewritten. scripts/verify-combined-dev.cjs checks native dev reservations,
 gaps, duplicate retries, Stripe test authorization/capture, worker recovery and full
-cancellation/refund with booking notifications disabled. Enable only after it passes.
+cancellation/refund with booking notifications disabled. Native dev check 40585955721 passed: two exact reservations, one test-card authorization/capture, retry recovery, full refund and release. No host booking emails were sent during these checks.
