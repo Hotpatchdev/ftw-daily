@@ -24,12 +24,10 @@ jobs:
           printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/staging.key ~/.ssh/known_hosts
           ssh -i ~/.ssh/staging.key -p "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$SSH_USER@$SSH_HOST" 'cd /home/sharetribe/web/staging.hotpatch.com/current && NODE_ENV=production /home/sharetribe/.nvm/versions/node/v14.15.4/bin/node' <<'REMOTE_JS'
-          const fs=require('fs'),cp=require('child_process');const file=fs.realpathSync('.env');
-          if(!file.startsWith('/home/sharetribe/web/staging.hotpatch.com/'))throw Error('Wrong environment');
-          require('./server/env').configureEnv();
-          if(process.env.REACT_APP_SHARETRIBE_SDK_CLIENT_ID!=='a187af2a-0454-4bed-abb9-834129ccf241')throw Error('Wrong marketplace');
-          const old=fs.readFileSync(file,'utf8');if(!/COMBINED_BOOKINGS_ENABLED=false/.test(old))throw Error('Expected paused feature');
-          fs.writeFileSync(file+'.enable.tmp',old.replace(/COMBINED_BOOKINGS_ENABLED=false/g,'COMBINED_BOOKINGS_ENABLED=true'),{mode:0o600});fs.renameSync(file+'.enable.tmp',file);
-          cp.execFileSync('pm2',['restart','staging','--update-env'],{stdio:'ignore'});cp.execFileSync('pm2',['save'],{stdio:'ignore'});
-          console.log('Combined checkout enabled on staging dev');
+          const fs=require('fs'),cp=require('child_process');
+          const apps=JSON.parse(cp.execFileSync('pm2',['jlist'],{encoding:'utf8'}));const app=apps.find(a=>a.name==='staging');
+          if(!app)throw Error('Staging process missing');const file=app.pm2_env.pm_err_log_path;
+          if(!file.startsWith('/home/sharetribe/.pm2/logs/'))throw Error('Unexpected log path');
+          const lines=fs.readFileSync(file,'utf8').split('\n').filter(l=>/Combined booking request failed [0-9]+/.test(l)).slice(-5);
+          lines.forEach(l=>console.log(l.match(/Combined booking request failed [0-9]+/)[0]));
           REMOTE_JS
