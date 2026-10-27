@@ -23,4 +23,19 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/staging.key
           printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/staging.key ~/.ssh/known_hosts
-          ssh -i ~/.ssh/staging.key -p "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$SSH_USER@$SSH_HOST" 'set -e; cd /home/sharetribe/web/staging.hotpatch.com/current; NODE_ENV=production /home/sharetribe/.nvm/versions/node/v14.15.4/bin/node -e \"const fs=require(\\\"fs\\\");const d=require(\\\"dotenv\\\");const p=fs.realpathSync(\\\".env\\\");if(!p.startsWith(\\\"/home/sharetribe/web/staging.hotpatch.com/\\\"))throw Error(\\\"Wrong environment\\\");const old=fs.readFileSync(p,\\\"utf8\\\");const env=d.parse(old);if(env.REACT_APP_SHARETRIBE_SDK_CLIENT_ID!==\\\"a187af2a-0454-4bed-abb9-834129ccf241\\\"||!String(env.REACT_APP_STRIPE_PUBLISHABLE_KEY).startsWith(\\\"pk_test_\\\"))throw Error(\\\"Dev/test identity check failed\\\");fs.copyFileSync(p,p+\\\".before-combined-20261027\\\",fs.constants.COPYFILE_EXCL);fs.chmodSync(p+\\\".before-combined-20261027\\\",0o600);const clean=old.split(/\\\\r?\\\\n/).filter(l=>!/^\\\\s*(COMBINED_BOOKINGS_ENABLED|COMBINED_BOOKING_STORE_DIR)\\\\s*=/.test(l)).join(\\\"\\\\n\\\");fs.writeFileSync(p+\\\".combined.tmp\\\",clean+\\\"\\\\nCOMBINED_BOOKINGS_ENABLED=false\\\\nCOMBINED_BOOKING_STORE_DIR=/home/sharetribe/web/staging.hotpatch.com/shared/combined-bookings\\\\n\\\",{mode:0o600});fs.renameSync(p+\\\".combined.tmp\\\",p);fs.mkdirSync(\\\"/home/sharetribe/web/staging.hotpatch.com/shared/combined-bookings\\\",{recursive:true,mode:0o700});console.log(\\\"Dev identity verified; combined checkout remains disabled until checks pass\\\");\"' | sed -E 's/(Bearer |token[=: ]+|secret[=: ]+)[^ ]+/\1[redacted]/Ig'
+          ssh -i ~/.ssh/staging.key -p "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$SSH_USER@$SSH_HOST" 'cd /home/sharetribe/web/staging.hotpatch.com/current && NODE_ENV=production /home/sharetribe/.nvm/versions/node/v14.15.4/bin/node' <<'REMOTE_JS'
+          const fs = require('fs'), dotenv = require('dotenv');
+          const file = fs.realpathSync('.env');
+          if (!file.startsWith('/home/sharetribe/web/staging.hotpatch.com/')) throw Error('Wrong environment');
+          const old = fs.readFileSync(file, 'utf8'), env = dotenv.parse(old);
+          if (env.REACT_APP_SHARETRIBE_SDK_CLIENT_ID !== 'a187af2a-0454-4bed-abb9-834129ccf241' || !String(env.REACT_APP_STRIPE_PUBLISHABLE_KEY).startsWith('pk_test_')) throw Error('Dev/test identity check failed');
+          if (!fs.existsSync(file + '.before-combined-20261027')) {
+           fs.copyFileSync(file, file + '.before-combined-20261027', fs.constants.COPYFILE_EXCL);
+           fs.chmodSync(file + '.before-combined-20261027', 0o600);
+          }
+          const clean = old.split(/\r?\n/).filter(line => !/^\s*(COMBINED_BOOKINGS_ENABLED|COMBINED_BOOKING_STORE_DIR)\s*=/.test(line)).join('\n');
+          fs.writeFileSync(file + '.combined.tmp', clean + '\nCOMBINED_BOOKINGS_ENABLED=false\nCOMBINED_BOOKING_STORE_DIR=/home/sharetribe/web/staging.hotpatch.com/shared/combined-bookings\n', {mode: 0o600});
+          fs.renameSync(file + '.combined.tmp', file);
+          fs.mkdirSync('/home/sharetribe/web/staging.hotpatch.com/shared/combined-bookings', {recursive:true, mode:0o700});
+          console.log('Dev identity verified; combined checkout remains disabled until checks pass');
+          REMOTE_JS
