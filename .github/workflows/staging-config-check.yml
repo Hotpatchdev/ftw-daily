@@ -25,31 +25,24 @@ jobs:
           chmod 600 ~/.ssh/staging.key ~/.ssh/known_hosts
           ssh -i ~/.ssh/staging.key -p "$SSH_PORT" \
             -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 \
-            "$SSH_USER@$SSH_HOST" 'python3 -' <<'PY'
-          from pathlib import Path
-          import re
-
-          config = Path('/home/sharetribe/web/staging.hotpatch.com/current/.env')
-          if not config.is_file():
-              raise SystemExit('Staging environment file unavailable')
-          selected = {}
-          for line in config.read_text().splitlines():
-              match = re.match(r'^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$', line)
-              if not match:
-                  continue
-              key, value = match.groups()
-              value = value.strip().strip('\"\x27')
-              upper = key.upper()
-              relevant = 'INTEGRATION' in upper or (
-                  any(prefix in upper for prefix in ('FLEX', 'SHARETRIBE')) and
-                  any(part in upper for part in ('CLIENT', 'SECRET', 'KEY'))
-              )
-              if relevant:
-                  selected[key] = 'configured' if value and value.lower() not in (
-                      'change-me', 'your-client-id', 'your-client-secret'
-                  ) else 'empty/placeholder'
-          print('Staging configuration readable')
-          for key, status in sorted(selected.items()):
-              print(key + ': ' + status)
-          print('Integration-named settings present: ' + str(any('INTEGRATION' in key.upper() for key in selected)))
-          PY
+            "$SSH_USER@$SSH_HOST" 'awk -f - /home/sharetribe/web/staging.hotpatch.com/current/.env' <<'AWK'
+          /^[[:space:]]*#/ { next }
+          {
+              equal = index($0, "=")
+              if (!equal) next
+              key = substr($0, 1, equal - 1)
+              sub(/^[[:space:]]*(export[[:space:]]+)?/, "", key)
+              sub(/[[:space:]]+$/, "", key)
+              if (key !~ /^[A-Za-z_][A-Za-z0-9_]*$/) next
+              upper = toupper(key)
+              relevant = upper ~ /INTEGRATION/ || (upper ~ /FLEX|SHARETRIBE/ && upper ~ /CLIENT|SECRET|KEY/)
+              if (!relevant) next
+              value = substr($0, equal + 1)
+              gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+              gsub(/^["\047]|["\047]$/, "", value)
+              status = length(value) && tolower(value) !~ /^(change-me|your-client-id|your-client-secret)$/ ? "configured" : "empty/placeholder"
+              print key ": " status
+              if (upper ~ /INTEGRATION/) found = 1
+          }
+          END { print "Integration-named settings present: " (found ? "yes" : "no") }
+          AWK
