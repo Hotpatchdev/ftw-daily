@@ -1,0 +1,55 @@
+name: Read staging integration configuration
+on:
+  push:
+    branches: [design/search-discovery]
+    paths: [.github/workflows/staging-config-check.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check configuration presence without exposing values
+        env:
+          SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
+          SSH_PORT: ${{ secrets.STAGING_SSH_PORT }}
+          SSH_KNOWN_HOSTS: ${{ secrets.STAGING_SSH_KNOWN_HOSTS }}
+        run: |
+          set -eu
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/staging.key
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/staging.key ~/.ssh/known_hosts
+          ssh -i ~/.ssh/staging.key -p "$SSH_PORT" \
+            -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 \
+            "$SSH_USER@$SSH_HOST" 'python3 -' <<'PY'
+          from pathlib import Path
+          import re
+
+          config = Path('/home/sharetribe/web/staging.hotpatch.com/current/.env')
+          if not config.is_file():
+              raise SystemExit('Staging environment file unavailable')
+          selected = {}
+          for line in config.read_text().splitlines():
+              match = re.match(r'^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$', line)
+              if not match:
+                  continue
+              key, value = match.groups()
+              value = value.strip().strip('\"\x27')
+              upper = key.upper()
+              relevant = 'INTEGRATION' in upper or (
+                  any(prefix in upper for prefix in ('FLEX', 'SHARETRIBE')) and
+                  any(part in upper for part in ('CLIENT', 'SECRET', 'KEY'))
+              )
+              if relevant:
+                  selected[key] = 'configured' if value and value.lower() not in (
+                      'change-me', 'your-client-id', 'your-client-secret'
+                  ) else 'empty/placeholder'
+          print('Staging configuration readable')
+          for key, status in sorted(selected.items()):
+              print(key + ': ' + status)
+          print('Integration-named settings present: ' + str(any('INTEGRATION' in key.upper() for key in selected)))
+          PY
