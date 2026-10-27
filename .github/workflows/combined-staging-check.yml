@@ -23,4 +23,25 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/staging.key
           printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/staging.key ~/.ssh/known_hosts
-          ssh -i ~/.ssh/staging.key -p "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$SSH_USER@$SSH_HOST" 'set -e; cd /home/sharetribe/web/staging.hotpatch.com/current; test "$(cat REVISION)" = 15dd5e9b89262ba93c4b259b4dd5c7488d0eff67; pm2 restart staging --update-env; pm2 save; sleep 3; curl --silent --fail http://127.0.0.1:3000/api/combined-booking-enabled'
+          ssh -i ~/.ssh/staging.key -p "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$SSH_USER@$SSH_HOST" 'cd /home/sharetribe/web/staging.hotpatch.com/current && NODE_ENV=production /home/sharetribe/.nvm/versions/node/v14.15.4/bin/node' <<'REMOTE_JS'
+          const fs=require('fs'), cp=require('child_process'), dotenv=require('dotenv');
+          const file=fs.realpathSync('.env'), old=fs.readFileSync(file,'utf8');
+          if (!file.startsWith('/home/sharetribe/web/staging.hotpatch.com/')) throw Error('Wrong environment');
+          fs.writeFileSync(file+'.pause.tmp',old.replace(/COMBINED_BOOKINGS_ENABLED=true/g,'COMBINED_BOOKINGS_ENABLED=false'),{mode:0o600});fs.renameSync(file+'.pause.tmp',file);
+          cp.execFileSync('pm2',['restart','staging','--update-env'],{stdio:'ignore'});cp.execFileSync('pm2',['save'],{stdio:'ignore'});
+          process.env.NODE_ENV='production';require('./server/env').configureEnv();process.env.COMBINED_BOOKINGS_ENABLED='true';
+          const sdkLib=require('sharetribe-flex-sdk'), store=sdkLib.tokenStore.memoryStore();
+          const sdk=sdkLib.createInstance({clientId:process.env.REACT_APP_SHARETRIBE_SDK_CLIENT_ID,clientSecret:process.env.SHARETRIBE_SDK_CLIENT_SECRET,tokenStore:store});
+          const profile=JSON.parse(fs.readFileSync('/home/sharetribe/web/staging.hotpatch.com/shared/combined-qa/customer.json','utf8'));
+          const helpers=require('./server/api-util/sdk');
+          const report=e=>console.log('Diagnostic API error',e.status,(e.data&&e.data.errors||[]).map(x=>({code:x.code,metaKeys:Object.keys(x.meta||{}),key:(x.meta||{}).key})));
+          const realSdk=helpers.getSdk;helpers.getSdk=(...args)=>{const s=realSdk(...args);for(const [resource,method] of [['currentUser','show'],['listings','show']]){const real=s[resource][method];s[resource][method]=(...p)=>real(...p).catch(e=>{report(e);throw e;});}return s;};
+          const realTrusted=helpers.getTrustedSdk;helpers.getTrustedSdk=(...args)=>realTrusted(...args).then(s=>{const real=s.transactions.initiateSpeculative;s.transactions.initiateSpeculative=(...p)=>real(...p).catch(e=>{report(e);throw e;});return s;}).catch(e=>{report(e);throw e;});
+          (async()=>{
+          await sdk.login({username:profile.email,password:profile.password});
+          const req={cookies:{},body:{listingId:new sdkLib.types.UUID('6273aafd-fe77-499e-b00d-6c3b9f2db05b'),isSpeculative:true,schedule:{unit:'hourly',days:['2026-11-10','2026-11-12'],same:true,start:'09:00',end:'11:30',timeZone:'Europe/Kiev'}}};
+          req.cookies['st-'+process.env.REACT_APP_SHARETRIBE_SDK_CLIENT_ID+'-token']=JSON.stringify(store.getToken());
+          let status;const res={cookie(){},clearCookie(){},status(v){status=v;return this;},set(){return this;},json(v){console.log('Diagnostic preview response',status,v.message||v.error);return this;},send(value){const data=helpers.deserialize(value);console.log('Diagnostic preview success',status,data.data.data.attributes.payinTotal.amount);return this;},end(){}};
+          await require('./server/api/combined-booking')(req,res);
+          })().catch(e=>{report(e);console.log('Diagnostic failed',e.message);process.exitCode=1;});
+          REMOTE_JS
