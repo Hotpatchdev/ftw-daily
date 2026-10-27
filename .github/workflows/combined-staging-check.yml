@@ -23,12 +23,4 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/staging.key
           printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/staging.key ~/.ssh/known_hosts
-          ssh -i ~/.ssh/staging.key -p "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$SSH_USER@$SSH_HOST" 'cd /home/sharetribe/web/staging.hotpatch.com/current && NODE_ENV=production /home/sharetribe/.nvm/versions/node/v14.15.4/bin/node' <<'REMOTE_JS'
-          const fs=require('fs'), dotenv=require('dotenv');
-          const file=fs.realpathSync('.env'), old=fs.readFileSync(file,'utf8'), env=dotenv.parse(old);
-          if (!file.startsWith('/home/sharetribe/web/staging.hotpatch.com/') || env.REACT_APP_SHARETRIBE_SDK_CLIENT_ID!=='a187af2a-0454-4bed-abb9-834129ccf241' || !String(env.REACT_APP_STRIPE_PUBLISHABLE_KEY).startsWith('pk_test_') || !env.SHARETRIBE_INTEGRATION_CLIENT_ID || !env.SHARETRIBE_INTEGRATION_CLIENT_SECRET) throw Error('Staging dev verification failed');
-          const clean=old.split(/\r?\n/).filter(line=>!/^\s*COMBINED_BOOKINGS_ENABLED\s*=/.test(line)).join('\n');
-          fs.writeFileSync(file+'.combined-enable.tmp',clean+'\nCOMBINED_BOOKINGS_ENABLED=true\n',{mode:0o600});
-          fs.renameSync(file+'.combined-enable.tmp',file);
-          console.log('Verified dev/test-only combined checkout enabled in server configuration.');
-          REMOTE_JS
+          ssh -i ~/.ssh/staging.key -p "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$SSH_USER@$SSH_HOST" 'set -e; cd /home/sharetribe/web/staging.hotpatch.com/current; test "$(cat REVISION)" = 15dd5e9b89262ba93c4b259b4dd5c7488d0eff67; pm2 restart staging --update-env; pm2 save; sleep 3; curl --silent --fail http://127.0.0.1:3000/api/combined-booking-enabled'
