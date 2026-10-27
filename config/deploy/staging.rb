@@ -7,9 +7,9 @@ namespace :deploy do
   desc 'restart application'
   task :app_restart do
     on roles(:app), in: :sequence, wait: 5 do
-      execute "pm2 kill"
-      execute "cd /home/sharetribe/web/staging.hotpatch.com/current && pm2 start server/index.js --name staging"
-      execute "pm2 save"
+      # Save the current release in the same session as the restart.
+      execute "pm2 delete staging || true"
+      execute "NODE_ENV=production pm2 start /home/sharetribe/web/staging.hotpatch.com/current/server/index.js --cwd /home/sharetribe/web/staging.hotpatch.com/current --interpreter /home/sharetribe/.nvm/versions/node/v14.15.4/bin/node --name staging && pm2 save"
     end
   end
 end
