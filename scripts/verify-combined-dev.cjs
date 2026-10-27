@@ -65,6 +65,7 @@ const stripeConfirm = (payment, method) => new Promise((resolve, reject) => {
   req.end(body);
 });
 
+let phase = 'prepare';
 (async () => {
   // Never resume an old test with live holds.
   await abortAll();
@@ -77,19 +78,24 @@ const stripeConfirm = (payment, method) => new Promise((resolve, reject) => {
       firstName: 'Combined', lastName: 'QA', displayName: 'Combined checkout QA' }, { expand: true });
     profile.id = user.data.data.id.uuid;
     fs.writeFileSync(profileFile, JSON.stringify(profile), { mode: 0o600, flag: 'wx' });
-    await integ.users.verifyEmail({ id: iid(profile.id) });
   }
+  phase = 'verify customer';
+  await integ.users.verifyEmail({ id: iid(profile.id), email: profile.email });
+  phase = 'sign in';
   await sdk.login({ username: profile.email, password: profile.password });
+  phase = 'trusted token';
   const exchange = await sdk.exchangeToken();
   const tokenStore = marketplace.tokenStore.memoryStore(); tokenStore.setToken(exchange.data);
   const trustedSdk = marketplace.createInstance({ clientId, tokenStore });
   const trusted = { initiate: body => trustedSdk.transactions.initiate({ ...body,
     params: { ...body.params, listingId: mid(body.params.listingId) } }, { expand: true, include: ['booking'] }).then(r => r.data) };
   const listingId = '6273aafd-fe77-499e-b00d-6c3b9f2db05b';
+  phase = 'read listing';
   const listing = (await sdk.listings.show({ id: mid(listingId) })).data.data;
   const zone = listing.attributes.availabilityPlan.timezone;
   const start = moment().add(14, 'days').startOf('day').toDate();
   const end = moment(start).add(21, 'days').toDate();
+  phase = 'read availability';
   const slotsResponse = await sdk.timeSlots.query({ listingId: mid(listingId), start, end, perPage: 100 });
   const slots = slotsResponse.data.data;
   const days = [];
@@ -105,6 +111,7 @@ const stripeConfirm = (payment, method) => new Promise((resolve, reject) => {
   const schedule = { unit: 'hourly', days: selected, start: '09:00', end: '12:00', same: true, timeZone: zone };
   const plan = prepareCombinedBooking(listing, schedule);
   const attempt = crypto.randomBytes(16).toString('hex');
+  phase = 'reserve sessions';
   const parentId = await coordinator.start({ customer: profile.id, attempt, listing: listingId, plan, trusted });
   const record = store.records().find(r => r.parent === parentId);
   const parent = (await api.show(parentId)).data;
@@ -116,6 +123,7 @@ const stripeConfirm = (payment, method) => new Promise((resolve, reject) => {
   assert.ok(!slotsCoverSchedule(after, schedule), 'Both sessions must be held');
   assert.ok(slotsCoverSchedule(after, { ...schedule, days: [gap] }), 'The unselected gap must remain bookable');
   console.log('Dev check: one payment, exact reservations, gap availability and retry passed');
+  phase = 'test authorization';
   const payment = parent.attributes.protectedData.stripePaymentIntents.default;
   assert.strictEqual(await stripeConfirm(payment, 'pm_card_visa'), 'requires_capture');
   // The worker recovers authorization even without the browser's confirm call.
@@ -135,7 +143,7 @@ const stripeConfirm = (payment, method) => new Promise((resolve, reject) => {
   await abortAll();
   console.log('COMBINED_DEV_CHECK_PASSED');
 })().catch(async error => {
-  console.error('COMBINED_DEV_CHECK_FAILED', error.message, error.code || error.status || '');
+  console.error('COMBINED_DEV_CHECK_FAILED', phase, error.message, error.code || error.status || '');
   if (error.data && error.data.errors) console.error('API codes:', error.data.errors.map(e => e.code).join(','));
   try { await abortAll(); } catch (_) { console.error('Dev reservation cleanup needs retry'); }
   process.exitCode = 1;
