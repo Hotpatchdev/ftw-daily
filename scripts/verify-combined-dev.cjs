@@ -80,7 +80,8 @@ let phase = 'prepare';
     fs.writeFileSync(profileFile, JSON.stringify(profile), { mode: 0o600, flag: 'wx' });
   }
   phase = 'verify customer';
-  await integ.users.verifyEmail({ id: iid(profile.id), email: profile.email });
+  if (!(await integ.users.show({ id: iid(profile.id) })).data.data.attributes.emailVerified)
+    await integ.users.verifyEmail({ id: iid(profile.id), email: profile.email });
   phase = 'sign in';
   await sdk.login({ username: profile.email, password: profile.password });
   phase = 'trusted token';
@@ -96,7 +97,7 @@ let phase = 'prepare';
   const start = moment().add(14, 'days').startOf('day').toDate();
   const end = moment(start).add(21, 'days').toDate();
   phase = 'read availability';
-  const slotsResponse = await sdk.timeSlots.query({ listingId: mid(listingId), start, end, perPage: 100 });
+  const slotsResponse = await sdk.timeslots.query({ listingId: mid(listingId), start, end, per_page: 500 });
   const slots = slotsResponse.data.data;
   const days = [];
   for (let date = moment(start).tz(zone); date.isBefore(end); date.add(1, 'day')) {
@@ -119,8 +120,12 @@ let phase = 'prepare';
   assert.strictEqual(record.children.length, 1);
   assert.strictEqual(parent.attributes.payinTotal.amount, plan.customerTotal.amount);
   assert.strictEqual(await coordinator.start({ customer: profile.id, attempt, listing: listingId, plan, trusted }), parentId);
-  const after = (await sdk.timeSlots.query({ listingId: mid(listingId), start, end, perPage: 100 })).data.data;
-  assert.ok(!slotsCoverSchedule(after, schedule), 'Both sessions must be held');
+  const after = (await sdk.timeslots.query({ listingId: mid(listingId), start, end, per_page: 500 })).data.data;
+  const seatsAt = (values, instant) => {
+    const slot = values.find(value => new Date(value.attributes.start) <= instant && new Date(value.attributes.end) > instant);
+    return slot ? slot.attributes.seats : 0;
+  };
+  for (const session of plan.sessions) assert.strictEqual(seatsAt(after, session.start), seatsAt(slots, session.start) - 1, 'Each session must reserve one hourly seat');
   assert.ok(slotsCoverSchedule(after, { ...schedule, days: [gap] }), 'The unselected gap must remain bookable');
   console.log('Dev check: one payment, exact reservations, gap availability and retry passed');
   phase = 'test authorization';
@@ -137,7 +142,7 @@ let phase = 'prepare';
   await coordinator.sweep();
   assert.strictEqual((await api.show(parentId)).data.attributes.state, 'state/cancelled');
   for (const child of record.children) assert.strictEqual((await api.show(child.id)).data.attributes.state, 'state/released');
-  const released = (await sdk.timeSlots.query({ listingId: mid(listingId), start, end, perPage: 100 })).data.data;
+  const released = (await sdk.timeslots.query({ listingId: mid(listingId), start, end, per_page: 500 })).data.data;
   assert.ok(slotsCoverSchedule(released, schedule), 'Cancellation must release every session');
   console.log('Dev check: whole-booking refund and calendar release passed');
   await abortAll();
