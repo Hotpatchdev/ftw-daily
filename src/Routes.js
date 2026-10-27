@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { arrayOf, bool, object, func, shape, string } from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
@@ -100,11 +101,13 @@ class RouteComponentRenderer extends Component {
     const { route, match, location, staticContext } = this.props;
     const { component: RouteComponent, authPage = 'SignupPage', extraProps } = route;
     const canShow = canShowComponent(this.props);
+    const hideChat = ['CheckoutPage', 'ListingPage', 'ListingPageVariant', 'ListingPageCanonical'].includes(route.name);
     if (!canShow) {
       staticContext.unauthorized = true;
     }
     return canShow ? (
       <LoadableComponentErrorBoundary>
+        {hideChat ? <Helmet><style>{'#tidio-chat { display: none !important; }'}</style></Helmet> : null}
         <RouteComponent params={match.params} location={location} {...extraProps} />
       </LoadableComponentErrorBoundary>
     ) : (

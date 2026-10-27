@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
       result = await sdk.transactions.show({ id: transactionId, ...query });
     } else {
       const listingId = id(body.listingId);
-      const listing = (await sdk.listings.show({ id: listingId }, { include: ['author'] })).data.data;
+      const listing = (await sdk.listings.show({ id: listingId, include: ['author'] })).data.data;
       if (listing.relationships.author.data.id.uuid === user.id.uuid) throw new Error('You cannot book your own space.');
       if (body.promocode) throw new Error('Please remove the promotion code before using combined checkout.');
       const plan = prepareCombinedBooking(listing, body.schedule);

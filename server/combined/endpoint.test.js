@@ -31,6 +31,7 @@ it('passes only verified listing pricing and whitelisted payment fields to the c
   await endpoint({body:{listingId,schedule,expectedTotal:6600,currency:'GBP',attempt:'checkout-reference-123456789',
     lineItems:[],processAlias:'other/process',protectedData:{combinedParentId:'forged'}}},res);
   expect(res.status).toHaveBeenCalledWith(200);
+  expect(sdk.listings.show).toHaveBeenCalledWith({ id:listingId,include:['author'] });
   expect(service.start).toHaveBeenCalledWith(expect.objectContaining({customer:customer.uuid,listing:listingId.uuid,
     payment:{},plan:expect.objectContaining({customerTotal:new types.Money(6600,'GBP')})}));
 });
