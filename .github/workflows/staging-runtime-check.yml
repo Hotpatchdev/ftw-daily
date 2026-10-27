@@ -23,4 +23,4 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/staging.key
           printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/staging.key ~/.ssh/known_hosts
-          ssh -i ~/.ssh/staging.key -p "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$SSH_USER@$SSH_HOST" 'pm2 list; tail -100 /home/sharetribe/.pm2/logs/staging-out.log; find /home/sharetribe/web/staging.hotpatch.com -maxdepth 3 -name \"*log\" -type f | head -20' | sed -E 's/(Bearer |token[=: ]+|secret[=: ]+)[^ ]+/\1[redacted]/Ig'
+          ssh -i ~/.ssh/staging.key -p "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$SSH_USER@$SSH_HOST" 'cd /home/sharetribe/web/staging.hotpatch.com/current && pm2 start server/index.js --name staging && pm2 save && sleep 5 && pm2 list && tail -35 /home/sharetribe/.pm2/logs/staging-error.log' | sed -E 's/(Bearer |token[=: ]+|secret[=: ]+)[^ ]+/\1[redacted]/Ig'
