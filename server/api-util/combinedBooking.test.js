@@ -158,3 +158,9 @@ it('rejects invalid or unsupported rates and leaves input data unchanged', () =>
   prepareCombinedBooking(listing, schedule, options);
   expect(JSON.stringify({ listing, schedule })).toBe(before);
 });
+it('preserves the existing whole-space capacity for daily bookings', () => {
+  const dailyListing = {...listing, attributes:{...listing.attributes, publicData:{...listing.attributes.publicData,seats:4,minBooking:{}}}};
+  const result=prepareCombinedBooking(dailyListing,{unit:'daily',days:['2027-02-01','2027-02-03']},options);
+  expect(result.seats).toBe(4);
+  expect(prepareCombinedBooking(dailyListing,schedule,options).seats).toBe(1);
+});

@@ -50,7 +50,7 @@ module.exports = async (req, res) => {
         result = await trustedSdk.transactions.initiateSpeculative(adapt({ processAlias: `${PARENT}/release-1`,
           transition: 'transition/request-payment', params: { bookingStart: plan.anchor.start,
             bookingEnd: plan.anchor.end, bookingDisplayStart: plan.displayStart, bookingDisplayEnd: plan.displayEnd,
-            lineItems: plan.lineItems, seats: 1, cardToken: 'CheckoutPage_speculative_card_token',
+            lineItems: plan.lineItems, seats: plan.seats, cardToken: 'CheckoutPage_speculative_card_token',
             protectedData: { combinedBooking: true, schedule: plan.schedule, type: plan.type,
               sessionLabels: plan.sessions.map(s => ({ label: s.label })) } } }), query);
       } else {

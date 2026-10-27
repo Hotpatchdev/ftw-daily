@@ -74,7 +74,7 @@ class CombinedCoordinator {
         try {
           const response = await trusted.initiate({ processAlias: `${PARENT}/release-1`, transition: 'transition/request-payment',
             params: { listingId: listing, bookingStart: plan.anchor.start, bookingEnd: plan.anchor.end,
-              bookingDisplayStart: plan.displayStart, bookingDisplayEnd: plan.displayEnd, seats: 1,
+              bookingDisplayStart: plan.displayStart, bookingDisplayEnd: plan.displayEnd, seats: plan.seats || 1,
               lineItems: plan.lineItems, ...payment,
               protectedData: { combinedBooking: true, combinedAttempt: key, schedule: plan.schedule,
                 sessions: record.sessions, type: plan.type, isHourly: plan.type === 'price', isDaily: plan.type === 'pricePerDay',
@@ -105,7 +105,7 @@ class CombinedCoordinator {
           let response;
           try { response = await trusted.initiate({ processAlias: `${CHILD}/release-1`, transition: 'transition/reserve-session',
             params: { listingId: listing, bookingStart: session.start, bookingEnd: session.end,
-              bookingDisplayStart: plan.displayStart, bookingDisplayEnd: plan.displayEnd, seats: 1,
+              bookingDisplayStart: plan.displayStart, bookingDisplayEnd: plan.displayEnd, seats: plan.seats || 1,
               protectedData: { combinedAttempt: key, combinedParentId: record.parent, sessionIndex: i } } }); }
           catch (e) {
             if (e.status >= 400 && e.status < 500 && e.status !== 408) child.issuing = false;

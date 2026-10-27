@@ -34,6 +34,9 @@ const prepareCombinedBooking = (
     throw new Error('Choose booking times in the space’s time zone.');
 
   const type = schedule.unit === 'hourly' ? 'price' : 'pricePerDay';
+  // Match the existing daily checkout: reserve the whole space's capacity.
+  const seats = schedule.unit === 'hourly' ? 1 : Number(publicData.seats || 1);
+  if (!Number.isSafeInteger(seats) || seats < 1) throw new Error('This space has an invalid booking capacity.');
   const price = type === 'price' ? attributes.price : publicData.pricePerDay;
   if (
     !price ||
@@ -99,6 +102,7 @@ const prepareCombinedBooking = (
   return {
     schedule,
     type,
+    seats,
     sessions,
     anchor: { start: anchor.start, end: anchor.end },
     childSessions: sessions.slice(0, -1).map(({ index, start, end }) => ({ index, start, end })),
