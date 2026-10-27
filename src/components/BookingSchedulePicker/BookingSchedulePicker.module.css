@@ -91,6 +91,12 @@
   line-height: 1.6;
   margin: 12px 0;
 }
+.suggestion {
+  font-size: 12px;
+  color: #a12455;
+  line-height: 1.6;
+  margin: 12px 0;
+}
 .same {
   display: flex;
   align-items: flex-start;

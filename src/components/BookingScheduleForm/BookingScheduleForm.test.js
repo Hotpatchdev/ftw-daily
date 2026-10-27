@@ -17,7 +17,7 @@ it('appears directly on a listing with the host timezone, minimum and required d
   const p = props();
   act(() => { wrapper = mount(<BookingScheduleFormComponent {...p} />); });
   expect(wrapper.text()).toContain('Minimum booking: 5 hours');
-  expect(wrapper.find(BookingSchedulePicker).props()).toMatchObject({ showUnits: false, required: true, value: { days: [], timeZone: 'America/New_York' } });
+  expect(wrapper.find(BookingSchedulePicker).props()).toMatchObject({ showUnits: false, required: true, value: { days: [], end: '14:00', timeZone: 'America/New_York' } });
   expect(wrapper.text()).toContain('Select dates to see availability');
   expect(p.onCheckSchedule).not.toHaveBeenCalled();
 });

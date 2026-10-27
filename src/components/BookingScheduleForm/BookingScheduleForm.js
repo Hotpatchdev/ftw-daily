@@ -9,7 +9,9 @@ import {
   normaliseSchedule,
   minimumBookingLabel,
   meetsListingMinimum,
+  listingMinimum,
 } from '../../util/bookingSchedule';
+import { minimumFinishTime } from '../../util/bookingMinimumSuggestion';
 import { quoteListingSchedule } from '../../util/bookingScheduleQuote';
 import { parse, stringify } from '../../util/urlHelpers';
 import css from './BookingScheduleForm.module.css';
@@ -37,13 +39,21 @@ export const BookingScheduleFormComponent = ({
   history,
   location,
 }) => {
+  let minimum = null;
+  try {
+    minimum = listingMinimum(listing);
+  } catch (e) {
+    /* Invalid host rules remain blocked by validation. */
+  }
   const [value, setValue] = useState(() => {
     const draft = scheduleDraft({ schedule: initialSchedule, dates: searchDates });
     const zone = (listing.attributes.availabilityPlan || {}).timezone;
-    return {
+    const initial = {
       ...draft,
       timeZone: initialSchedule ? draft.timeZone : zone || emptySchedule().timeZone,
     };
+    const finish = minimumFinishTime(initial.start, minimum, initial.days, initial.timeZone);
+    return !initialSchedule && finish ? { ...initial, end: finish } : initial;
   });
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -64,7 +74,16 @@ export const BookingScheduleFormComponent = ({
     }
   }
   const key = normalised
-    ? JSON.stringify({ schedule: normalised, listingId: listing.id.uuid, pricing: { price: listing.attributes.price, daily: (listing.attributes.publicData || {}).pricePerDay, minimum: (listing.attributes.publicData || {}).minBooking }, promocode })
+    ? JSON.stringify({
+        schedule: normalised,
+        listingId: listing.id.uuid,
+        pricing: {
+          price: listing.attributes.price,
+          daily: (listing.attributes.publicData || {}).pricePerDay,
+          minimum: (listing.attributes.publicData || {}).minBooking,
+        },
+        promocode,
+      })
     : '';
   useEffect(() => {
     let active = true;
@@ -117,6 +136,8 @@ export const BookingScheduleFormComponent = ({
         compact
         showUnits={false}
         required
+        minimum={minimum}
+        initiallySuggested={!initialSchedule}
       />
       {disabled ? <p className={css.error}>Bookings are unavailable for this space.</p> : null}
       {validation ? (

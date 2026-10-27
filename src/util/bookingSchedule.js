@@ -1,18 +1,18 @@
-import moment from 'moment-timezone';
-import { readListingMinimum } from './bookingMinimum';
+const moment = require('moment-timezone');
+const { readListingMinimum } = require('./bookingMinimum');
 
-export const MAX_SCHEDULE_DATES = 31;
-export const validScheduleDate = value =>
+const MAX_SCHEDULE_DATES = 31;
+const validScheduleDate = value =>
   typeof value === 'string' &&
   /^\d{4}-\d{2}-\d{2}$/.test(value) &&
   Number.isFinite(Date.parse(value)) &&
   new Date(value).toISOString().slice(0, 10) === value;
-export const validScheduleTime = value =>
+const validScheduleTime = value =>
   typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 
 // Reject missing/repeated local clock times instead of silently shifting them
 // when the selected zone enters or leaves daylight-saving time.
-export const scheduleInstant = (date, time, timeZone) => {
+const scheduleInstant = (date, time, timeZone) => {
   if (!validScheduleDate(date) || !validScheduleTime(time) || !moment.tz.zone(timeZone))
     throw new Error('Choose valid dates, times and a time zone.');
   const wall = Date.parse(`${date}T${time}:00Z`);
@@ -35,7 +35,7 @@ export const scheduleInstant = (date, time, timeZone) => {
   return new Date(candidates[0]);
 };
 
-export const normaliseSchedule = value => {
+const normaliseSchedule = value => {
   let data;
   try {
     data = typeof value === 'string' ? JSON.parse(value) : value;
@@ -82,7 +82,7 @@ export const normaliseSchedule = value => {
   return schedule;
 };
 
-export const scheduleIntervals = value => {
+const scheduleIntervals = value => {
   const schedule = normaliseSchedule(value);
   return schedule.days.map(day => {
     if (schedule.unit === 'daily') {
@@ -98,7 +98,7 @@ export const scheduleIntervals = value => {
   });
 };
 
-export const dateGroups = days =>
+const dateGroups = days =>
   days.reduce((groups, day) => {
     const last = groups[groups.length - 1];
     if (last && Date.parse(day) - Date.parse(last[last.length - 1]) === 86400000) last.push(day);
@@ -106,8 +106,8 @@ export const dateGroups = days =>
     return groups;
   }, []);
 
-export const listingMinimum = readListingMinimum;
-export const minimumBookingLabel = listing => {
+const listingMinimum = readListingMinimum;
+const minimumBookingLabel = listing => {
   try {
     const rule = listingMinimum(listing);
     return rule
@@ -118,7 +118,7 @@ export const minimumBookingLabel = listing => {
   }
 };
 
-export const meetsListingMinimum = (listing, value) => {
+const meetsListingMinimum = (listing, value) => {
   const schedule = normaliseSchedule(value);
   let rule;
   try {
@@ -134,7 +134,7 @@ export const meetsListingMinimum = (listing, value) => {
   return dateGroups(schedule.days).every(group => group.length * 24 >= rule.hours);
 };
 
-export const scheduleSummary = value => {
+const scheduleSummary = value => {
   try {
     const schedule = normaliseSchedule(value);
     if (schedule.unit === 'daily')
@@ -151,7 +151,7 @@ export const scheduleSummary = value => {
   }
 };
 
-export const slotsCoverSchedule = (slots, value) => {
+const slotsCoverSchedule = (slots, value) => {
   const available = slots
     .map(slot => slot.attributes || {})
     .filter(slot => slot.seats > 0)
@@ -172,7 +172,7 @@ export const slotsCoverSchedule = (slots, value) => {
   });
 };
 
-export const scheduleBookingGroups = value => {
+const scheduleBookingGroups = value => {
   const schedule = normaliseSchedule(value);
   if (schedule.unit === 'hourly') return scheduleIntervals(schedule);
   return dateGroups(schedule.days).map(group => ({
@@ -180,4 +180,21 @@ export const scheduleBookingGroups = value => {
     start: new Date(`${group[0]}T00:00:00Z`),
     end: new Date(Date.parse(`${group[group.length - 1]}T00:00:00Z`) + 86400000),
   }));
+};
+
+// Use the same schedule validation in the browser and trusted server pricing.
+module.exports = {
+  MAX_SCHEDULE_DATES,
+  validScheduleDate,
+  validScheduleTime,
+  scheduleInstant,
+  normaliseSchedule,
+  scheduleIntervals,
+  dateGroups,
+  listingMinimum,
+  minimumBookingLabel,
+  meetsListingMinimum,
+  scheduleSummary,
+  slotsCoverSchedule,
+  scheduleBookingGroups,
 };

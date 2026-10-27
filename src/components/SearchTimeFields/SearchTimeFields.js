@@ -10,7 +10,7 @@ export const quickTimes = [
 ];
 
 // Controlled fields are shared by the homepage and the search filter draft.
-const SearchTimeFields = ({ value, onChange, idPrefix }) => {
+const SearchTimeFields = ({ value, onChange, idPrefix, minimumEndTime }) => {
   const { startTime = '', endTime = '', timeZone = 'Europe/London' } = value;
   return (
     <section className={css.root} aria-labelledby={`${idPrefix}-title`}>
@@ -31,6 +31,7 @@ const SearchTimeFields = ({ value, onChange, idPrefix }) => {
           <input
             type="time"
             value={endTime}
+            min={minimumEndTime || undefined}
             step="300"
             onInput={event => onChange({ ...value, endTime: event.target.value })}
             onChange={event => onChange({ ...value, endTime: event.target.value })}

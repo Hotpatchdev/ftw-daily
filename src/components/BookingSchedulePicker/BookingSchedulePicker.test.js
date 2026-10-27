@@ -2,6 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import '../../util/test-helpers';
 import BookingSchedulePicker from './BookingSchedulePicker';
+import SearchTimeFields from '../SearchTimeFields/SearchTimeFields';
 
 const value = { unit: 'hourly', days: ['2027-02-01', '2027-02-03'], start: '09:00', end: '15:00', timeZone: 'Europe/London', same: true, overrides: {} };
 const labelledButton = (wrapper, label) => wrapper.find('button').filterWhere(button => button.prop('aria-label') === label);
@@ -36,4 +37,35 @@ it('clears the selected dates and keeps the selected time zone', () => {
   const wrapper = shallow(<BookingSchedulePicker value={value} onChange={onChange} />);
   wrapper.find('button').filterWhere(button => button.text() === 'Clear dates').simulate('click');
   expect(onChange.mock.calls[0][0]).toMatchObject({ days: [], timeZone: 'Europe/London' });
+});
+
+it('suggests a minimum finish after a start-time change, while preserving an explicit longer finish', () => {
+  const onChange = jest.fn();
+  const wrapper = shallow(<BookingSchedulePicker value={{...value,end:'14:00'}} onChange={onChange} minimum={{hours:5}} initiallySuggested />);
+  wrapper.find(SearchTimeFields).prop('onChange')({startTime:'10:00',endTime:'14:00',timeZone:value.timeZone});
+  expect(onChange.mock.calls[0][0].end).toBe('15:00');
+  wrapper.find(SearchTimeFields).prop('onChange')({startTime:'09:00',endTime:'18:00',timeZone:value.timeZone});
+  wrapper.setProps({value:{...value,end:'18:00'}});
+  wrapper.find(SearchTimeFields).prop('onChange')({startTime:'10:00',endTime:'18:00',timeZone:value.timeZone});
+  expect(onChange.mock.calls[2][0].end).toBe('18:00');
+});
+
+it('suggests each individual session finish without changing other session overrides', () => {
+  const onChange=jest.fn();
+  const wrapper=shallow(<BookingSchedulePicker value={{...value,same:false,end:'14:00',overrides:{'2027-02-03':{start:'09:00',end:'14:00'}}}} onChange={onChange} minimum={{hours:5}} />);
+  wrapper.find('input').filterWhere(input=>input.prop('aria-label')==='From time on 2027-02-03').simulate('input',{target:{value:'10:00'}});
+  expect(onChange.mock.calls[0][0].overrides['2027-02-03']).toEqual({start:'10:00',end:'15:00'});
+});
+
+it('suggests the inclusive daily minimum and blocks earlier range finishes', () => {
+  const onChange=jest.fn();
+  const wrapper=shallow(<BookingSchedulePicker value={{...value,unit:'daily',days:[]}} onChange={onChange} minimum={{hours:72}} />);
+  wrapper.find('button').filterWhere(b=>b.text()==='Date range').simulate('click');
+  // The initial month follows today when no dates have been chosen.
+  wrapper.setProps({value:{...value,unit:'daily',days:['2027-02-01']}});
+  while(!labelledButton(wrapper,'Monday 1 February 2027').length) labelledButton(wrapper,'Next month').simulate('click');
+  labelledButton(wrapper,'Monday 1 February 2027').simulate('click');
+  expect(onChange.mock.calls[0][0].days).toEqual(['2027-02-01','2027-02-02','2027-02-03']);
+  expect(labelledButton(wrapper,'Tuesday 2 February 2027').prop('disabled')).toBe(true);
+  expect(wrapper.text()).toContain('Earliest last day: Wed 3 Feb');
 });
