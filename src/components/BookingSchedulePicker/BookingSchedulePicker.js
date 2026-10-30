@@ -374,15 +374,15 @@ const BookingSchedulePicker = ({
             <>
               <h3>Daily booking</h3>
               <p className={css.hint}>
-                Each selected date is one booking day. Availability and minimum booking lengths are
-                checked for each space.
+                Each selected date is one booking day. The minimum counts all selected days in
+                this checkout, including days separated by gaps.
               </p>
             </>
           )}
           {schedule.unit === 'daily' && suggestedLastDay ? (
             <p className={css.suggestion} aria-live="polite">
               Suggested through {moment.utc(suggestedLastDay).format('ddd D MMM')} to meet the{' '}
-              {dailyMinimum}-day minimum. The last day is included; you can extend your selection.
+              {dailyMinimum}-day total minimum. The last day is included; you can extend your selection.
             </p>
           ) : null}
         </div>
@@ -462,7 +462,9 @@ const BookingSchedulePicker = ({
         {schedule.days.length && !error ? scheduleSummary(schedule) : ''}
       </p>
       <p className={css.hint}>
-        Each space’s minimum is checked for every session or consecutive group of days.
+        {schedule.unit === 'daily'
+          ? 'The daily minimum counts all booked days together. Unselected days are not booked or charged.'
+          : 'The hourly minimum is checked separately for each session.'}
       </p>
     </section>
   );

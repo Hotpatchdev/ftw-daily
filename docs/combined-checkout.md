@@ -1,9 +1,12 @@
 # Combined booking checkout
 
 One space, multiple hourly sessions or daily groups, one payment and one host decision.
-Each session/group must meet the host's minimum. Gaps remain available.
+Hourly minimums apply per session. Daily minimums count all selected booking days
+in the same checkout, including separated dates. Gaps remain available and uncharged.
 
 The server recalculates current prices and compares them with the reviewed total.
+Daily price previews validate the complete schedule and the exact priced group;
+standalone checkouts cannot borrow other dates to bypass their own minimum.
 One parent transaction pays for all sessions and reserves the final session; child
 transactions reserve earlier sessions without payments, emails or inbox entries.
 Host acceptance captures the single payment only after all reservations are accepted.
@@ -26,7 +29,9 @@ COMBINED_BOOKING_STORE_DIR must point outside numbered releases. The booking for
 reads the server capability flag, so it keeps the existing checkout until enabled.
 Production is out of scope.
 
-Validation: 36 server checks and 20 focused interface checks pass. Legacy nightly
+Validation for daily totals: 42 server checks and 35 focused interface checks pass,
+including 15 plus 2 separated days at the cricket listing's euro rate, gap exclusion,
+and protection against standalone-checkout bypass. Legacy nightly
 booking-breakdown snapshots have pre-existing date/label/subtotal differences; they
 were not rewritten. scripts/verify-combined-dev.cjs checks native dev reservations,
 gaps, duplicate retries, Stripe test authorization/capture, worker recovery and full

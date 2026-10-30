@@ -5,6 +5,7 @@ import {
   meetsListingMinimum,
   slotsCoverSchedule,
   scheduleBookingGroups,
+  listingMinimum,
 } from './bookingSchedule';
 import { fetchListingScheduleSlots } from './scheduleSearch';
 
@@ -32,7 +33,7 @@ export const quoteListingSchedule = async (sdk, listing, value, promocode, activ
     !price ||
     !Number.isSafeInteger(price.amount) ||
     price.amount <= 0 ||
-    ![config.currency, config.additionalCurrency].includes(price.currency)
+    ![config.currency, config.additionalCurrency, config.additionalCurrencyEuro].includes(price.currency)
   )
     throw new Error('This space does not offer a supported rate for this booking.');
   const slots = await fetchListingScheduleSlots(sdk, listing, schedule, active);
@@ -52,6 +53,7 @@ export const quoteListingSchedule = async (sdk, listing, value, promocode, activ
         const response = await transactionLineItems({
           listingId: listing.id,
           isOwnListing: false,
+          ...(schedule.unit === 'daily' ? { schedule } : {}),
           bookingData: { startDate: group.start, endDate: group.end, type, promocode },
         });
         assertActive();
@@ -80,5 +82,8 @@ export const quoteListingSchedule = async (sdk, listing, value, promocode, activ
     })
   );
   assertActive();
-  return { schedule, groups: quotes };
+  const minimum = listingMinimum(listing);
+  const requiresCombinedCheckout = schedule.unit === 'daily' && groups.length > 1 && minimum &&
+    groups.some(group => (group.end - group.start) / 3600000 < minimum.hours);
+  return { schedule, groups: quotes, requiresCombinedCheckout: !!requiresCombinedCheckout };
 };

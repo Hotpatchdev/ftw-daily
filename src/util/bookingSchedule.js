@@ -131,7 +131,7 @@ const meetsListingMinimum = (listing, value) => {
     return scheduleIntervals(schedule).every(
       interval => (interval.end - interval.start) / 3600000 >= rule.hours
     );
-  return dateGroups(schedule.days).every(group => group.length * 24 >= rule.hours);
+  return schedule.days.length * 24 >= rule.hours;
 };
 
 const scheduleSummary = value => {
@@ -182,6 +182,21 @@ const scheduleBookingGroups = value => {
   }));
 };
 
+// Price an exact daily group within a validated complete schedule. This is used
+// only for price previews and the combined checkout's trusted preparation;
+// standalone checkout still validates its own booked interval independently.
+const validateDailyScheduleGroup = (listing, value, bookingData) => {
+  const schedule = normaliseSchedule(value);
+  if (schedule.unit !== 'daily' || bookingData.type !== 'pricePerDay')
+    throw new Error('Choose a valid daily booking schedule.');
+  if (!meetsListingMinimum(listing, schedule))
+    throw new Error(`${minimumBookingLabel(listing)}. Select more booking days.`);
+  const start = new Date(bookingData.startDate).getTime();
+  const end = new Date(bookingData.endDate).getTime();
+  if (!scheduleBookingGroups(schedule).some(group => +group.start === start && +group.end === end))
+    throw new Error('The priced dates must match a group in the selected schedule.');
+};
+
 // Use the same schedule validation in the browser and trusted server pricing.
 module.exports = {
   MAX_SCHEDULE_DATES,
@@ -194,6 +209,7 @@ module.exports = {
   listingMinimum,
   minimumBookingLabel,
   meetsListingMinimum,
+  validateDailyScheduleGroup,
   scheduleSummary,
   slotsCoverSchedule,
   scheduleBookingGroups,

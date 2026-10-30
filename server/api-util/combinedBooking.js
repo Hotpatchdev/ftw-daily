@@ -1,5 +1,5 @@
 const { types } = require('sharetribe-flex-sdk');
-const { normaliseSchedule, scheduleBookingGroups } = require('../../src/util/bookingSchedule');
+const { normaliseSchedule, scheduleBookingGroups, meetsListingMinimum, minimumBookingLabel } = require('../../src/util/bookingSchedule');
 const { transactionLineItems } = require('./lineItems');
 const {
   calculateLineTotal,
@@ -21,12 +21,15 @@ const prepareCombinedBooking = (
     supportedCurrencies = [
       process.env.REACT_APP_SHARETRIBE_MARKETPLACE_CURRENCY,
       process.env.REACT_APP_SHARETRIBE_ADDITIONAL_MARKETPLACE_CURRENCY,
+      'EUR',
     ]
       .filter(Boolean)
       .map(currency => currency.toUpperCase()),
   } = {}
 ) => {
   const schedule = normaliseSchedule(value);
+  if (!meetsListingMinimum(listing, schedule))
+    throw new Error(`${minimumBookingLabel(listing)}. Update your booking dates or times.`);
   const attributes = (listing || {}).attributes || {};
   const publicData = attributes.publicData || {};
   const listingZone = (attributes.availabilityPlan || {}).timezone;
@@ -51,13 +54,13 @@ const prepareCombinedBooking = (
   const sessions = scheduleBookingGroups(schedule).map((group, index) => {
     if (group.start.getTime() <= clock || group.end.getTime() > clock + 365 * DAY)
       throw new Error('Choose future dates within the next year.');
-    // This checks the current host minimum independently for each selected group.
+    // Daily minimums apply to the entire payment; hourly minimums remain per session.
     const items = transactionLineItems(listing, {
       startDate: group.start,
       endDate: group.end,
       type,
       promocode,
-    });
+    }, { minimumSchedule: schedule.unit === 'daily' ? schedule : undefined });
     return {
       index,
       start: group.start,

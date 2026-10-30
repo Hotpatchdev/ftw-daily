@@ -47,7 +47,7 @@ it('cannot pool several short sessions to bypass the host minimum', () => {
   );
 });
 
-it('groups consecutive daily bookings and enforces the minimum on each group', () => {
+it('groups daily reservations but enforces their total booked-day minimum once', () => {
   const space = {
     attributes: {
       ...listing.attributes,
@@ -63,9 +63,19 @@ it('groups consecutive daily bookings and enforces the minimum on each group', (
   expect(plan.childSessions[0].end).toEqual(new Date('2027-02-03T00:00Z'));
   expect(plan.anchor.start).toEqual(new Date('2027-02-05T00:00Z'));
   expect(plan.customerTotal.amount).toBe(44000);
-  expect(() =>
-    prepareCombinedBooking(space, { ...daily, days: daily.days.slice(0, 3) }, options)
-  ).toThrow('Minimum booking: 2 days');
+  expect(prepareCombinedBooking(space, { ...daily, days: daily.days.slice(0, 3) }, options).customerTotal.amount).toBe(33000);
+  expect(() => prepareCombinedBooking(space,{...daily,days:['2027-02-01']},options)).toThrow('Minimum booking: 2 days');
+});
+
+it('prices 15 plus 2 separated euro days as one payment with no reservation or charge for the gap', () => {
+  const days=Array.from({length:15},(_,i)=>`2027-02-${String(i+1).padStart(2,'0')}`);
+  const space={attributes:{...listing.attributes,publicData:{pricePerDay:{amount:500,currency:'EUR'},minBooking:{minBookingType:'dailyMinBooking',minBookingCount:15}}}};
+  const plan=prepareCombinedBooking(space,{unit:'daily',days:[...days,'2027-02-20','2027-02-21']},{now:options.now});
+  expect(plan.sessions).toHaveLength(2);
+  expect(plan.childSessions[0]).toMatchObject({start:new Date('2027-02-01'),end:new Date('2027-02-16')});
+  expect(plan.anchor).toEqual({start:new Date('2027-02-20'),end:new Date('2027-02-22')});
+  expect(plan.customerTotal).toEqual(new types.Money(9350,'EUR'));
+  expect(()=>prepareCombinedBooking(space,{unit:'daily',days:['2027-02-01','2027-02-21']},{now:options.now})).toThrow('Minimum booking: 15 days');
 });
 
 it('uses each date’s time-zone offset and rejects missing or repeated clock times', () => {

@@ -1,8 +1,8 @@
 import moment from 'moment-timezone';
 import {
   validScheduleTime,
+  validScheduleDate,
   scheduleInstant,
-  dateGroups,
   MAX_SCHEDULE_DATES,
 } from './bookingSchedule';
 
@@ -47,24 +47,19 @@ export const minimumFinishTime = (start, rule, days = [], timeZone = 'Europe/Lon
 export const minimumDayCount = rule => (rule ? Math.max(1, Math.ceil(rule.hours / 24)) : 1);
 
 export const minimumDateSelection = (days, day, rule) => {
+  if (!validScheduleDate(day) || days.some(date => !validScheduleDate(date)))
+    throw new Error('Choose valid booking dates.');
   const count = minimumDayCount(rule);
   if (count > MAX_SCHEDULE_DATES)
     throw new Error('The host’s minimum exceeds the supported 31-date selection.');
   const proposed = Array.from(new Set([...days, day])).sort();
-  const group = dateGroups(proposed).find(dates => dates.includes(day));
-  if (group.length >= count) return proposed;
-  const start = group[0];
-  const extended = Array.from(
-    new Set([
-      ...proposed,
-      ...Array.from({ length: count }, (_, i) =>
-        moment
-          .utc(start)
-          .add(i, 'days')
-          .format('YYYY-MM-DD')
-      ),
-    ])
-  ).sort();
+  const selected = new Set(proposed);
+  let next = moment.utc(day);
+  while (selected.size < count) {
+    selected.add(next.format('YYYY-MM-DD'));
+    next.add(1, 'day');
+  }
+  const extended = Array.from(selected).sort();
   if (
     extended.length > MAX_SCHEDULE_DATES ||
     moment.utc(extended[extended.length - 1]).diff(moment.utc(extended[0]), 'days') > 83

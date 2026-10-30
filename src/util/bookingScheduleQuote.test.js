@@ -1,7 +1,7 @@
 import { quoteListingSchedule } from './bookingScheduleQuote';
 import { transactionLineItems } from './api';
 import { fetchListingScheduleSlots } from './scheduleSearch';
-jest.mock('../config', () => ({ currency: 'GBP', additionalCurrency: 'USD' }));
+jest.mock('../config', () => ({ currency: 'GBP', additionalCurrency: 'USD', additionalCurrencyEuro:'EUR' }));
 jest.mock('./api', () => ({ transactionLineItems: jest.fn() }));
 jest.mock('./scheduleSearch', () => ({ fetchListingScheduleSlots: jest.fn() }));
 const listing = {
@@ -87,4 +87,20 @@ it('rejects incomplete prices and mixed currencies', async () => {
     data: [{ ...item('line-item/units', 60), lineTotal: { amount: 60, currency: 'USD' } }],
   });
   await expect(quoteListingSchedule({}, listing, schedule)).rejects.toThrow('confirmed');
+});
+
+it('quotes the cricket minimum plus two separate days in euros and requires one combined checkout',async()=>{
+  const days=Array.from({length:15},(_,i)=>`2027-02-${String(i+1).padStart(2,'0')}`);
+  const daily={unit:'daily',days:[...days,'2027-02-20','2027-02-21']};
+  const cricket={...listing,attributes:{...listing.attributes,publicData:{pricePerDay:{amount:500,currency:'EUR'},minBooking:{minBookingType:'dailyMinBooking',minBookingCount:15}}}};
+  fetchListingScheduleSlots.mockResolvedValue([{attributes:{start:new Date('2027-02-01'),end:new Date('2027-03-01'),seats:99}}]);
+  transactionLineItems.mockImplementation(async({bookingData})=>{
+    const hire=(bookingData.endDate-bookingData.startDate)/86400000*500;
+    return {data:[{...item('line-item/units',hire),lineTotal:{amount:hire,currency:'EUR'}},{...item('line-item/customer-commission',hire/10),lineTotal:{amount:hire/10,currency:'EUR'}}]};
+  });
+  const result=await quoteListingSchedule({},cricket,daily);
+  expect(result.groups.map(g=>g.total)).toEqual([8250,1100]);
+  expect(result.requiresCombinedCheckout).toBe(true);
+  expect(transactionLineItems.mock.calls.map(c=>c[0].schedule)).toEqual([daily,daily]);
+  expect(transactionLineItems.mock.calls[1][0].bookingData).toMatchObject({startDate:new Date('2027-02-20'),endDate:new Date('2027-02-22')});
 });

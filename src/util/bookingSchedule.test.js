@@ -33,11 +33,18 @@ it('checks the trusted listing minimum against each hourly session', () => {
   expect(meetsListingMinimum(listing('unknown', 5), schedule)).toBe(false);
 });
 
-it('checks each consecutive daily group and retains existing UTC booking-day boundaries', () => {
+it('counts daily minimums across all booked dates and retains UTC booking-day boundaries', () => {
   const daily = { unit: 'daily', days: ['2027-02-01', '2027-02-02', '2027-02-04', '2027-02-05'] };
   expect(meetsListingMinimum(listing('dailyMinBooking', 2), daily)).toBe(true);
-  expect(meetsListingMinimum(listing('dailyMinBooking', 3), daily)).toBe(false);
+  expect(meetsListingMinimum(listing('dailyMinBooking', 3), daily)).toBe(true);
+  expect(meetsListingMinimum(listing('dailyMinBooking', 5), daily)).toBe(false);
   expect(scheduleIntervals(daily)[0]).toMatchObject({ start: new Date('2027-02-01T00:00:00Z'), end: new Date('2027-02-02T00:00:00Z') });
+});
+
+it('accepts the cricket minimum plus two separated days without counting the gap', () => {
+  const days = Array.from({length:15},(_,i)=>`2027-02-${String(i+1).padStart(2,'0')}`);
+  expect(meetsListingMinimum(listing('dailyMinBooking',15),{unit:'daily',days:[...days,'2027-02-20','2027-02-21']})).toBe(true);
+  expect(meetsListingMinimum(listing('dailyMinBooking',15),{unit:'daily',days:['2027-02-01','2027-02-28']})).toBe(false);
 });
 
 it('allows gaps between sessions but rejects a gap or unavailable seat within one session', () => {

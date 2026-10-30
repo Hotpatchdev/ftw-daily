@@ -6,6 +6,7 @@ const {
 const { types } = require('sharetribe-flex-sdk');
 const { Money } = types;
 const { validateBookingMinimum } = require('../../src/util/bookingMinimum');
+const { validateDailyScheduleGroup } = require('../../src/util/bookingSchedule');
 
 // This bookingUnitType needs to be one of the following:
 // line-item/night, line-item/day or line-item/units
@@ -34,8 +35,9 @@ const WITH_DISCOUNT = -10;
  * @param {Object} bookingData
  * @returns {Array} lineItems
  */
-exports.transactionLineItems = (listing, bookingData) => {
-  validateBookingMinimum(listing, bookingData);
+exports.transactionLineItems = (listing, bookingData, { minimumSchedule } = {}) => {
+  if (minimumSchedule !== undefined) validateDailyScheduleGroup(listing, minimumSchedule, bookingData);
+  else validateBookingMinimum(listing, bookingData);
   let unitPrice;
   let quantity;
 

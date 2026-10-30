@@ -30,3 +30,14 @@ it('requires the reservation dates and unit to match the priced booking', () => 
   expect(() => validateBookingRequest(booking, { params: { ...body.params, bookingEnd: new Date('2027-02-01T10:00Z') } })).toThrow('must match');
   expect(() => validateBookingRequest(booking, { params: { ...body.params, type: 'pricePerDay' } })).toThrow('must match');
 });
+
+it('checks a complete daily schedule before pricing one of its shorter groups', () => {
+  const space={attributes:{publicData:{pricePerDay:{amount:500,currency:'EUR'},minBooking:{minBookingType:'dailyMinBooking',minBookingCount:3}}}};
+  const schedule={unit:'daily',days:['2027-02-01','2027-02-02','2027-02-10']};
+  const group={type:'pricePerDay',startDate:'2027-02-10',endDate:'2027-02-11'};
+  expect(transactionLineItems(space,group,{minimumSchedule:schedule})[0].quantity).toBe(1);
+  expect(()=>transactionLineItems(space,group,{minimumSchedule:{...schedule,days:['2027-02-01','2027-02-10']}})).toThrow('Minimum booking');
+  expect(()=>transactionLineItems(space,{...group,endDate:'2027-02-12'},{minimumSchedule:schedule})).toThrow('must match');
+  // Browser fields cannot exempt a standalone checkout from its interval minimum.
+  expect(()=>transactionLineItems(space,{...group,schedule,minimumSchedule:schedule})).toThrow('Minimum booking');
+});

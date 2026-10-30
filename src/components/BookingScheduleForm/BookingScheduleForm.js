@@ -123,8 +123,9 @@ export const BookingScheduleFormComponent = ({
   }, [key, validation, disabled, retry]);
   const quote = result && result.key === key ? result.quote : null;
   const combined = combinedEnabled && quote && quote.groups.length > 1;
+  const needsCombined = quote && quote.requiresCombinedCheckout && !combined;
   const review = (group, all = false) => {
-    if (!quote || checking || validation || disabled) return;
+    if (!quote || checking || validation || disabled || needsCombined) return;
     history.replace({
       ...location,
       search: `?${stringify({
@@ -167,7 +168,11 @@ export const BookingScheduleFormComponent = ({
       {quote ? (
         <section className={css.review} aria-label="Booking price review">
           <h3>Review your booking</h3>
-          {quote.groups.length > 1 ? (
+          {needsCombined ? <p role="alert" className={css.error}>
+            These dates meet the minimum together and need one combined checkout. Combined checkout
+            is currently unavailable; please try again later.
+          </p> : null}
+          {quote.groups.length > 1 && !needsCombined ? (
             <p className={css.hint}>
               {combined
                 ? 'All selected sessions will be included in one payment and one host confirmation.'
@@ -211,7 +216,7 @@ export const BookingScheduleFormComponent = ({
                   <dd>{money(group.total, group.currency)}</dd>
                 </div>
               </dl>
-              {!combined ? <button
+              {!combined && !needsCombined ? <button
                 className={css.continue}
                 type="button"
                 disabled={checking || !!validation || disabled}

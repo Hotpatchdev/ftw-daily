@@ -16,14 +16,16 @@ it('uses elapsed hours across clock changes and avoids ambiguous suggestions', (
   expect(minimumFinishTime('00:30', hours(2), ['2027-10-31'], 'Europe/London')).toBeNull();
   expect(minimumFinishTime('00:30', hours(2), ['2027-03-27','2027-03-28'], 'Europe/London')).toBe('03:30');
 });
-it('selects three inclusive days and preserves separate existing groups', () => {
+it('suggests the total minimum once and adds separated days without another full minimum', () => {
   expect(minimumDateSelection([], '2027-02-01', hours(72))).toEqual(['2027-02-01','2027-02-02','2027-02-03']);
-  expect(minimumDateSelection(['2027-02-01','2027-02-02','2027-02-03'], '2027-02-08', hours(72))).toEqual(['2027-02-01','2027-02-02','2027-02-03','2027-02-08','2027-02-09','2027-02-10']);
+  expect(minimumDateSelection(['2027-02-01','2027-02-02','2027-02-03'], '2027-02-08', hours(72))).toEqual(['2027-02-01','2027-02-02','2027-02-03','2027-02-08']);
+  expect(minimumDateSelection(['2027-02-01'], '2027-02-08', hours(72))).toEqual(['2027-02-01','2027-02-08','2027-02-09']);
 });
 it('extends an existing valid daily group without adding unnecessary extra days', () => {
   expect(minimumDateSelection(['2027-02-01','2027-02-02','2027-02-03'], '2027-02-04', hours(72))).toEqual(['2027-02-01','2027-02-02','2027-02-03','2027-02-04']);
 });
 it('keeps suggestions within the supported booking limits', () => {
+  expect(() => minimumDateSelection([], 'bad-date', hours(72))).toThrow('valid booking dates');
   expect(() => minimumDateSelection([], '2027-02-01', hours(32*24))).toThrow('minimum');
   expect(() => minimumDateSelection(['2027-02-01'], '2027-06-01', hours(72))).toThrow('minimum');
 });

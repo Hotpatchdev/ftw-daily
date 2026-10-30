@@ -69,3 +69,16 @@ it('suggests the inclusive daily minimum and blocks earlier range finishes', () 
   expect(labelledButton(wrapper,'Tuesday 2 February 2027').prop('disabled')).toBe(true);
   expect(wrapper.text()).toContain('Earliest last day: Wed 3 Feb');
 });
+
+it('adds just two separated days to an already valid fifteen-day booking',()=>{
+  const onChange=jest.fn();
+  const days=Array.from({length:15},(_,i)=>`2027-02-${String(i+1).padStart(2,'0')}`);
+  const daily={...value,unit:'daily',days};
+  const wrapper=shallow(<BookingSchedulePicker value={daily} onChange={onChange} minimum={{hours:360}} />);
+  labelledButton(wrapper,'Saturday 20 February 2027').simulate('click');
+  const sixteen=onChange.mock.calls[0][0];expect(sixteen.days).toEqual([...days,'2027-02-20']);
+  wrapper.setProps({value:sixteen});
+  labelledButton(wrapper,'Sunday 21 February 2027').simulate('click');
+  expect(onChange.mock.calls[1][0].days).toEqual([...days,'2027-02-20','2027-02-21']);
+  expect(wrapper.text()).toContain('minimum counts all selected days');
+});

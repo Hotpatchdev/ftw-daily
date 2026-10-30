@@ -71,3 +71,24 @@ it('reviews multiple sessions with one fee-inclusive total and one checkout', as
     expect(p.onReview).toHaveBeenCalledWith('hourly',second,full.schedule);
   } finally { if(old===undefined) delete process.env.REACT_APP_COMBINED_BOOKINGS; else process.env.REACT_APP_COMBINED_BOOKINGS=old; }
 });
+
+it('does not offer separate checkouts when only the total daily schedule meets the minimum',async()=>{
+  const p=props();
+  p.listing={...listing,attributes:{...listing.attributes,publicData:{minBooking:{minBookingType:'dailyMinBooking',minBookingCount:3}}}};
+  p.bookingType='pricePerDay';
+  const daily={unit:'daily',days:['2027-02-01','2027-02-02','2027-02-10']};
+  const full={schedule:daily,requiresCombinedCheckout:true,groups:[{...quote.groups[0],start:new Date('2027-02-01'),end:new Date('2027-02-03')},{...quote.groups[0],day:'2027-02-10',start:new Date('2027-02-10'),end:new Date('2027-02-11')}]};
+  p.onCheckSchedule.mockResolvedValue(full);
+  act(()=>{wrapper=mount(<BookingScheduleFormComponent {...p} initialSchedule={JSON.stringify(daily)} />);});
+  await settle();
+  expect(wrapper.text()).not.toContain('shorter than');
+  expect(wrapper.find('button.continue')).toHaveLength(0);
+  expect(wrapper.text()).toContain('need one combined checkout');
+  wrapper.unmount();
+  p.onCombinedReady=jest.fn().mockResolvedValue(true);
+  act(()=>{wrapper=mount(<BookingScheduleFormComponent {...p} initialSchedule={JSON.stringify(daily)} />);});
+  await settle();
+  expect(wrapper.find('button.continue')).toHaveLength(1);
+  wrapper.find('button.continue').simulate('click');
+  expect(p.onReview).toHaveBeenCalledWith('daily',full.groups[1],daily);
+});
