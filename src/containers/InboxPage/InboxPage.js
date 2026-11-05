@@ -160,12 +160,37 @@ export const txState = (intl, tx, type) => {
 };
 
 // Functional component as internal helper to print BookingTimeInfo if that is needed
-const BookingInfoMaybe = props => {
+export const BookingInfoMaybe = props => {
   const { bookingClassName, isOrder, intl, tx, unitType } = props;
   const isEnquiry = txIsEnquired(tx);
 
   if (isEnquiry) {
     return null;
+  }
+
+  const data = tx.attributes.protectedData || {};
+  if (data.combinedBooking) {
+    const sessions = Array.isArray(data.sessionLabels)
+      ? data.sessionLabels.filter(session => session && typeof session.label === 'string' && session.label.trim())
+      : [];
+    return (
+      <div className={classNames(css.bookingInfoWrapper, css.combinedBookingInfo, bookingClassName)}>
+        <span>
+          {sessions.length ? (
+            <FormattedMessage id="InboxPage.combinedSessions"
+              defaultMessage="{count, plural, one {# session} other {# sessions}} · one booking"
+              values={{ count: sessions.length }} />
+          ) : (
+            <FormattedMessage id="InboxPage.multipleSessions" defaultMessage="Multiple sessions · one booking" />
+          )}
+        </span>
+        {sessions.slice(0, 2).map((session, index) => <span key={index}>{session.label}</span>)}
+        {sessions.length > 2 ? (
+          <span><FormattedMessage id="InboxPage.moreSessions" defaultMessage="+{count, plural, one {# more session} other {# more sessions}}"
+            values={{ count: sessions.length - 2 }} /></span>
+        ) : null}
+      </div>
+    );
   }
 
   // If you want to show the booking price after the booking time on InboxPage you can
