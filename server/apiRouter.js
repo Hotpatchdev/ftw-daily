@@ -20,6 +20,7 @@ const createUserWithIdp = require('./api/auth/createUserWithIdp');
 
 const { authenticateFacebook, authenticateFacebookCallback } = require('./api/auth/facebook');
 const { authenticateGoogle, authenticateGoogleCallback } = require('./api/auth/google');
+const calendarOAuth = require('./api/calendar-oauth');
 
 const router = express.Router();
 
@@ -81,6 +82,13 @@ router.get('/auth/google', authenticateGoogle);
 // with Google. In this route a Passport.js custom callback is used for calling
 // loginWithIdp endpoint in Flex API to authenticate user to Flex
 router.get('/auth/google/callback', authenticateGoogleCallback);
+
+// This is an operator-only, one-time connection for the HotPatch booking diary.
+router.get('/calendar/oauth/start', calendarOAuth.start);
+router.get('/integrations/google-calendar/start', calendarOAuth.start);
+router.get('/calendar/oauth/callback', calendarOAuth.callback);
+// Kept separate from user sign-in and aligned with the Google Cloud redirect URI.
+router.get('/integrations/google-calendar/callback', calendarOAuth.callback);
 
 router.post('/transaction-line-items', transactionLineItems);
 router.post('/initiate-privileged', initiatePrivileged);
