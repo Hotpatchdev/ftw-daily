@@ -78,7 +78,7 @@ const createEvent = async (config, event, request = requestJson) => {
     const privateFields = response.extendedProperties && response.extendedProperties.private || {};
     if (response.status === 'cancelled' || privateFields.hotpatchTransactionId !== event.extendedProperties.private.hotpatchTransactionId ||
       privateFields.hotpatchAudience !== event.extendedProperties.private.hotpatchAudience || emails(response) !== emails(event) ||
-      response.guestsCanModify !== false || response.guestsCanSeeOtherGuests !== false) {
+      response.guestsCanModify === true || response.guestsCanSeeOtherGuests !== false) {
       throw new Error('Existing calendar event does not match this booking.');
     }
   }

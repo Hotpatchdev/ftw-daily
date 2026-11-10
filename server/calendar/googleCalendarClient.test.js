@@ -42,6 +42,15 @@ describe('Calendar retry recovery', () => {
     };
     await expect(createEvent(config,wanted,request)).rejects.toThrow('does not match');
   });
+  it('recovers an event when Google omits its default-false modify permission',async()=>{
+    const wanted=events().host;
+    const request=async r=>{
+      if(r.hostname==='oauth2.googleapis.com')return {access_token:'token'};
+      if(r.method==='POST')throw status(409);
+      const saved={...wanted};delete saved.guestsCanModify;return saved;
+    };
+    await expect(createEvent(config,wanted,request)).resolves.toBe(wanted.id);
+  });
   it('treats an already deleted event as a successful cancellation',async()=>{
     const request=async r=>{
       if(r.hostname==='oauth2.googleapis.com')return {access_token:'token'};
