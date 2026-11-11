@@ -14,6 +14,16 @@ const response = {
 };
 
 describe('syncTransaction', () => {
+  it('retries cancellation cleanup without emitting another metadata update after IDs are cleared', async () => {
+    const cancelled = JSON.parse(JSON.stringify(response));
+    cancelled.data.attributes.lastTransition = 'transition/cancel';
+    cancelled.data.attributes.metadata = { hotpatchCalendar: null };
+    const calendar = { create: jest.fn(), cancel: jest.fn() };
+    const integration = { updateMetadata: jest.fn() };
+    await expect(syncTransaction({ response: cancelled, calendar, integration })).resolves.toBe('cancelled');
+    expect(calendar.cancel).toHaveBeenCalledTimes(1);
+    expect(integration.updateMetadata).not.toHaveBeenCalled();
+  });
   it('creates separate events and retains only their identifiers for later cancellation', async () => {
     const calendar = { create: jest.fn().mockResolvedValue({ internal: 'i', host: 'h', booker: 'b' }), cancel: jest.fn() };
     const integration = { updateMetadata: jest.fn() };

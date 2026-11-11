@@ -29,7 +29,9 @@ const syncTransaction = async ({ response, calendar, integration }) => {
       ? sessionEventIds(resourceId(transaction), calendarSessions(transaction))
       : eventIdsForTransaction(resourceId(transaction));
     await calendar.cancel(eventIds || fallback());
-    await integration.updateMetadata(transaction.id, { hotpatchCalendar: null });
+    // Metadata writes emit transaction events too. Do not keep emitting a new
+    // cancellation event after these identifiers have already been cleared.
+    if (eventIds) await integration.updateMetadata(transaction.id, { hotpatchCalendar: null });
     return 'cancelled';
   }
 
