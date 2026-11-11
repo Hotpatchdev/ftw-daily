@@ -1,0 +1,28 @@
+name: Enable controlled staging calendar
+on:
+  push:
+    branches: [design/search-discovery]
+    paths: [.github/workflows/calendar-staging-browser.yml]
+permissions:
+  contents: read
+jobs:
+  connect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Enable calendar for the controlled booking
+        env:
+          SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
+          SSH_PORT: ${{ secrets.STAGING_SSH_PORT }}
+          SSH_KNOWN_HOSTS: ${{ secrets.STAGING_SSH_KNOWN_HOSTS }}
+        run: |
+          set -eu
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/staging.key
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/staging.key ~/.ssh/known_hosts
+          SCRIPT_B64='cHJvY2Vzcy5lbnYuTk9ERV9FTlYgPSAncHJvZHVjdGlvbic7CnJlcXVpcmUoJy4vc2VydmVyL2VudicpLmNvbmZpZ3VyZUVudigpOwpjb25zdCBmcyA9IHJlcXVpcmUoJ2ZzJyksIHBhdGggPSByZXF1aXJlKCdwYXRoJyksIGFzc2VydCA9IHJlcXVpcmUoJ2Fzc2VydCcpOwpjb25zdCBzZGsgPSByZXF1aXJlKCdzaGFyZXRyaWJlLWZsZXgtaW50ZWdyYXRpb24tc2RrJyk7CmNvbnN0IGdvb2dsZSA9IHJlcXVpcmUoJy4vc2VydmVyL2NhbGVuZGFyL2dvb2dsZUNhbGVuZGFyQ2xpZW50Jyk7CmNvbnN0IHJvb3QgPSAnL2hvbWUvc2hhcmV0cmliZS93ZWIvc3RhZ2luZy5ob3RwYXRjaC5jb20nOwpjb25zdCByZXZpc2lvbiA9ICc1NTdkMjFiYTRiYjZkZjAwZTkxZGFkOTM1ZmZkYmFhNDRlMmUxZDgxJzsKY29uc3QgdHJhbnNhY3Rpb25JZCA9ICc2YWYzYjdjOC00OGJhLTRjNTItOWVkNC1hMzdkNzQzYmQ3NDEnOwpjb25zdCBjdXJyZW50ID0gZnMucmVhbHBhdGhTeW5jKHByb2Nlc3MuY3dkKCkpOwphc3NlcnQub2soY3VycmVudC5zdGFydHNXaXRoKHJvb3QgKyAnL3JlbGVhc2VzLycpKTsKYXNzZXJ0LnN0cmljdEVxdWFsKGZzLnJlYWRGaWxlU3luYyhjdXJyZW50ICsgJy9SRVZJU0lPTicsICd1dGY4JykudHJpbSgpLCByZXZpc2lvbik7CmFzc2VydC5zdHJpY3RFcXVhbChwcm9jZXNzLmVudi5SRUFDVF9BUFBfU0hBUkVUUklCRV9TREtfQ0xJRU5UX0lELCAnYTE4N2FmMmEtMDQ1NC00YmVkLWFiYjktODM0MTI5Y2NmMjQxJyk7CmFzc2VydC5vayhwcm9jZXNzLmVudi5SRUFDVF9BUFBfU1RSSVBFX1BVQkxJU0hBQkxFX0tFWS5zdGFydHNXaXRoKCdwa190ZXN0XycpKTsKYXNzZXJ0LnN0cmljdEVxdWFsKHByb2Nlc3MuZW52LkdPT0dMRV9DQUxFTkRBUl9TWU5DX0VOQUJMRUQsICdmYWxzZScpOwphc3NlcnQuc3RyaWN0RXF1YWwocHJvY2Vzcy5lbnYuR09PR0xFX0NBTEVOREFSX09BVVRIX0VOQUJMRUQsICdmYWxzZScpOwphc3NlcnQuc3RyaWN0RXF1YWwoZnMucmVhbHBhdGhTeW5jKGN1cnJlbnQgKyAnLy5lbnYnKSwgcm9vdCArICcvc2hhcmVkLy5lbnYnKTsKY29uc3QgaW50ZWdyYXRpb24gPSBzZGsuY3JlYXRlSW5zdGFuY2Uoe2NsaWVudElkOiBwcm9jZXNzLmVudi5TSEFSRVRSSUJFX0lOVEVHUkFUSU9OX0NMSUVOVF9JRCwgY2xpZW50U2VjcmV0OiBwcm9jZXNzLmVudi5TSEFSRVRSSUJFX0lOVEVHUkFUSU9OX0NMSUVOVF9TRUNSRVR9KTsKKGFzeW5jICgpID0+IHsKICBjb25zdCByZXNwb25zZSA9IGF3YWl0IGludGVncmF0aW9uLnRyYW5zYWN0aW9ucy5zaG93KHtpZDogbmV3IHNkay50eXBlcy5VVUlEKHRyYW5zYWN0aW9uSWQpLCBpbmNsdWRlOlsnYm9va2luZyddfSk7CiAgY29uc3QgdHggPSByZXNwb25zZS5kYXRhLmRhdGE7CiAgYXNzZXJ0LnN0cmljdEVxdWFsKHR4LmF0dHJpYnV0ZXMuc3RhdGUsICdzdGF0ZS9wcmVhdXRob3JpemVkJyk7CiAgYXNzZXJ0LnN0cmljdEVxdWFsKHR4LnJlbGF0aW9uc2hpcHMuY3VzdG9tZXIuZGF0YS5pZC51dWlkLCAnNmFmMzMwNmUtNTA3Mi00ZDI0LWJkZGItZDEwMDJkMDk0MjMzJyk7CiAgYXNzZXJ0LnN0cmljdEVxdWFsKHR4LnJlbGF0aW9uc2hpcHMubGlzdGluZy5kYXRhLmlkLnV1aWQsICc2MjczYWFmZC1mZTc3LTQ5OWUtYjAwZC02YzNiOWYyZGIwNWInKTsKICBhc3NlcnQub2soIXR4LmF0dHJpYnV0ZXMubWV0YWRhdGEuaG90cGF0Y2hDYWxlbmRhcik7CiAgYXdhaXQgZ29vZ2xlLmFjY2Vzc1Rva2VuKGdvb2dsZS5jb25maWdGcm9tRW52KHByb2Nlc3MuZW52KSk7CiAgY29uc3QgZW52UGF0aCA9IHJvb3QgKyAnL3NoYXJlZC8uZW52Jywgb3JpZ2luYWwgPSBmcy5yZWFkRmlsZVN5bmMoZW52UGF0aCwgJ3V0ZjgnKTsKICBjb25zdCBzZXR0aW5ncyA9IHsKICAgIEdPT0dMRV9DQUxFTkRBUl9TWU5DX0VOQUJMRUQ6ICd0cnVlJywKICAgIEdPT0dMRV9DQUxFTkRBUl9TWU5DX1NUQVJUX0FUOiBuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCksCiAgICBHT09HTEVfQ0FMRU5EQVJfU1lOQ19UUkFOU0FDVElPTl9JRFM6IHRyYW5zYWN0aW9uSWQsCiAgICBHT09HTEVfQ0FMRU5EQVJfU1lOQ19TVE9SRV9ESVI6IHJvb3QgKyAnL3NoYXJlZC9jYWxlbmRhci1zeW5jLWJyb3dzZXItJyArIERhdGUubm93KCksCiAgfTsKICBjb25zdCByZXRhaW5lZCA9IG9yaWdpbmFsLnNwbGl0KC9ccj9cbi8pLmZpbHRlcihsaW5lID0+IHsKICAgIGNvbnN0IG0gPSAvXlxzKig/OmV4cG9ydFxzKyk/KFtBLVpfXSspXHMqPS8uZXhlYyhsaW5lKTsKICAgIHJldHVybiAhbSB8fCAhT2JqZWN0LnByb3RvdHlwZS5oYXNPd25Qcm9wZXJ0eS5jYWxsKHNldHRpbmdzLCBtWzFdKTsKICB9KS5qb2luKCdcbicpLnJlcGxhY2UoL1xuKiQvLCAnXG4nKTsKICBjb25zdCBiYWNrdXAgPSBlbnZQYXRoICsgJy5iZWZvcmUtY2FsZW5kYXItYnJvd3Nlci0nICsgRGF0ZS5ub3coKTsKICBmcy5jb3B5RmlsZVN5bmMoZW52UGF0aCwgYmFja3VwLCBmcy5jb25zdGFudHMuQ09QWUZJTEVfRVhDTCk7IGZzLmNobW9kU3luYyhiYWNrdXAsIDBvNjAwKTsKICBjb25zdCB0ZW1wID0gZW52UGF0aCArICcuY2FsZW5kYXItYnJvd3Nlci0nICsgcHJvY2Vzcy5waWQ7CiAgY29uc3QgZmQgPSBmcy5vcGVuU3luYyh0ZW1wLCAnd3gnLCAwbzYwMCk7CiAgdHJ5IHsgZnMud3JpdGVGaWxlU3luYyhmZCwgcmV0YWluZWQgKyAnXG4nICsgT2JqZWN0LmVudHJpZXMoc2V0dGluZ3MpLm1hcCgoW2ssdl0pID0+IGsgKyAnPScgKyBKU09OLnN0cmluZ2lmeSh2KSkuam9pbignXG4nKSArICdcbicpOyBmcy5mc3luY1N5bmMoZmQpOyB9CiAgZmluYWxseSB7IGZzLmNsb3NlU3luYyhmZCk7IH0KICBmcy5yZW5hbWVTeW5jKHRlbXAsIGVudlBhdGgpOwogIGNvbnNvbGUubG9nKCdDb250cm9sbGVkIHN0YWdpbmcgY2FsZW5kYXIgd29ya2VyIGNvbmZpZ3VyZWQgZm9yIG9uZSBicm93c2VyIGJvb2tpbmc7IG5vIGhpc3RvcnkgYmFja2ZpbGwuJyk7Cn0pKCkuY2F0Y2goZXJyb3IgPT4geyBjb25zb2xlLmVycm9yKCdDb250cm9sbGVkIGNhbGVuZGFyIHNldHVwIGZhaWxlZDonLCBlcnJvci5tZXNzYWdlKTsgcHJvY2Vzcy5leGl0Q29kZSA9IDE7IH0pOwo='
+          ssh -i ~/.ssh/staging.key -p "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "$SSH_USER@$SSH_HOST" "cd /home/sharetribe/web/staging.hotpatch.com/current && /home/sharetribe/.nvm/versions/node/v14.15.4/bin/node -e 'eval(Buffer.from(\"$SCRIPT_B64\",\"base64\").toString(\"utf8\"))'"
+          ssh -i ~/.ssh/staging.key -p "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "$SSH_USER@$SSH_HOST" 'pm2 delete staging && NODE_ENV=production pm2 start /home/sharetribe/web/staging.hotpatch.com/current/server/index.js --cwd /home/sharetribe/web/staging.hotpatch.com/current --interpreter /home/sharetribe/.nvm/versions/node/v14.15.4/bin/node --name staging && pm2 save'
