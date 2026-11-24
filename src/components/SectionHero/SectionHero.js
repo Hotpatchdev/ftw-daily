@@ -30,7 +30,7 @@ const SectionHero = ({ rootClassName, className, history }) => {
       <div className={css.content}>
         <span className={css.eyebrow}>MAKE SPACE WORK FOR YOU</span>
         <h1 id="discovery-title" className={css.title}>
-          Find your perfect workspace
+          Find your perfect Patch
         </h1>
         <p className={css.subtitle}>
           Find &amp; book flexible spaces on demand.

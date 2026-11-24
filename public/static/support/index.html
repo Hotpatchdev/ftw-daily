@@ -11,7 +11,7 @@
     header, main { max-width: 960px; margin: auto; padding: 32px 24px; }
     header { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
     header img { width: 172px; height: auto; }
-    a { color: #852752; text-underline-offset: 4px; }
+    a { color: #ac2858; text-underline-offset: 4px; }
     main { padding-top: 56px; padding-bottom: 140px; }
     h1 { font-size: clamp(36px, 7vw, 60px); line-height: 1.1; letter-spacing: -2px; margin: 0 0 24px; }
     .intro { max-width: 620px; font-size: 21px; }
@@ -19,8 +19,9 @@
     section { background: white; border: 1px solid #e8dce2; border-radius: 18px; padding: 28px; }
     h2 { font-size: 24px; margin: 0 0 12px; }
     p { margin: 0 0 18px; }
-    .button { display: inline-block; background: #852752; color: white; border-radius: 28px; padding: 12px 22px; text-decoration: none; }
-    a:focus-visible { outline: 3px solid #852752; outline-offset: 5px; }
+    .button { display: inline-block; background: #ac2858; color: white; border: 0; font: inherit; cursor: pointer; border-radius: 28px; padding: 12px 22px; text-decoration: none; }
+    [hidden] { display: none !important; }
+    a:focus-visible { outline: 3px solid #ac2858; outline-offset: 5px; }
   </style>
 </head>
 <body>
@@ -36,7 +37,8 @@
         <h2>Chat with us</h2>
         <p>Use the chat bubble in the corner to send us a message. If the team is offline, leave a message and we’ll get back to you.</p>
         <p>If chat doesn’t appear, you can email us instead.</p>
-        <a class="button" href="mailto:hello@hotpatch.com">Email HotPatch</a>
+        <button class="button" id="open-chat" type="button" hidden>Chat with HotPatch</button>
+        <p><a href="mailto:hello@hotpatch.com">Email HotPatch</a></p>
       </section>
       <section>
         <h2>Find an answer</h2>
@@ -45,6 +47,7 @@
       </section>
     </div>
   </main>
+  <script src="/static/support/support.js"></script>
   <script src="https://code.tidio.co/aydusvwoo6umm8ku70jczu86q1tloqvm.js" async></script>
 </body>
 </html>

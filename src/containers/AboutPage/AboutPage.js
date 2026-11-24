@@ -52,7 +52,7 @@ const AboutPage = () => {
 
               <p>Maybe you’re a fitness professional or a hairdresser? An events planner, artist, or photographer? Perhaps a business owner who wants to bring in more income from their awesome space? We’re here to help.</p>
 
-              <p>Have any questions? Head over to our <a href="https://www.hotpatch.com/faq">FAQ</a> or reach out to the HotPatch team at <a href="mailto:hello@hotpatch.com.">hello@hotpatch.com</a>.</p>
+              <p>Have any questions? Head over to our <a href="/faq">FAQ</a> or <a href="/static/support/">Help &amp; support</a>, or email the HotPatch team at <a href="mailto:hello@hotpatch.com">hello@hotpatch.com</a>.</p>
 
               <br></br>
 
