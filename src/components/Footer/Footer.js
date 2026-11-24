@@ -147,8 +147,8 @@ const Footer = props => {
                   </NamedLink>
                 </li>
                 <li className={css.listItem}>
-                  <a href="mailto:hello@hotpatch.com" className={css.link}>
-                    <FormattedMessage id="Footer.toContactPage" />
+                  <a href="/static/support/" className={css.link}>
+                    Help &amp; support
                   </a>
                 </li>
                 <li className={css.listItem}>
