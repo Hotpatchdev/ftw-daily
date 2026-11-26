@@ -7,6 +7,7 @@ const { types } = require('sharetribe-flex-sdk');
 const { Money } = types;
 const { validateBookingMinimum } = require('../../src/util/bookingMinimum');
 const { validateDailyScheduleGroup } = require('../../src/util/bookingSchedule');
+const { bookingPeriod } = require('../../src/util/bookingPeriod');
 
 // This bookingUnitType needs to be one of the following:
 // line-item/night, line-item/day or line-item/units
@@ -75,23 +76,33 @@ exports.transactionLineItems = (listing, bookingData, { minimumSchedule } = {}) 
     includeFor: ['customer', 'provider'],
   };
 
+  const dailyRate = (listing.attributes.publicData || {}).pricePerDay;
+  const period = bookingPeriod(startDate, endDate, type, dailyRate, unitPrice.currency);
+  if (period) booking.quantity = period.units;
+  const hireItems = period && period.extraDays ? [booking, {
+    code: 'line-item/additional-days',
+    unitPrice: new Money(dailyRate.amount, dailyRate.currency),
+    quantity: period.extraDays,
+    includeFor: ['customer', 'provider'],
+  }] : [booking];
+
   const providerCommission = {
     code: 'line-item/provider-commission',
-    unitPrice: calculateTotalFromLineItems([booking]),
+    unitPrice: calculateTotalFromLineItems(hireItems),
     percentage: PROVIDER_COMMISSION_PERCENTAGE,
     includeFor: ['provider'],
   };
 
   const customerCommission = {
     code: 'line-item/customer-commission',
-    unitPrice: calculateTotalFromLineItems([booking]),
+    unitPrice: calculateTotalFromLineItems(hireItems),
     percentage: CUSTOMER_COMMISSION_PERCENTAGE,
     includeFor: ['customer'],
   };
 
   const withDiscount = {
     code: 'line-item/discount',
-    unitPrice: calculateTotalFromLineItems([booking]),
+    unitPrice: calculateTotalFromLineItems(hireItems),
     percentage: WITH_DISCOUNT,
     includeFor: ['customer'],
   };
@@ -102,9 +113,9 @@ exports.transactionLineItems = (listing, bookingData, { minimumSchedule } = {}) 
   //   percentage: calcedPerc,
   //   includeFor: ['customer', 'provider'],
   // }
-  const lineItemsWithDiscount = [booking, customerCommission, providerCommission, withDiscount];
+  const lineItemsWithDiscount = [...hireItems, customerCommission, providerCommission, withDiscount];
 
-  const lineItems = [booking, providerCommission, customerCommission];
+  const lineItems = [...hireItems, providerCommission, customerCommission];
 
   return promocode ? lineItemsWithDiscount : lineItems;
 };

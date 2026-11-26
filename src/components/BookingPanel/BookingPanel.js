@@ -34,7 +34,7 @@ const { Money } = sdkTypes;
 const priceData = (price, intl) => {
   if (
     price &&
-    (price.currency === config.currency || price.currency === config.additionalCurrency)
+    [config.currency, config.additionalCurrency, config.additionalCurrencyEuro].includes(price.currency)
   ) {
     const formattedPrice = formatMoney(intl, price);
     return { formattedPrice, priceTitle: formattedPrice };
@@ -251,6 +251,8 @@ const BookingPanel = props => {
             fetchLineItemsInProgress={fetchLineItemsInProgress}
             fetchLineItemsError={fetchLineItemsError}
             bookingType={bookingType}
+            dailyRate={(publicData || {}).pricePerDay}
+            periodCurrency={((publicData || {})[bookingType] || {}).currency}
             seats={seats}
             minBookingCount={minBookingCount}
             minBookingType={minBookingType}

@@ -13,6 +13,7 @@ import { Form, IconSpinner, PrimaryButton, FieldDateRangeInput } from '../../com
 import EstimatedBreakdownMaybe from './EstimatedBreakdownMaybe';
 import { WEEKLY_PRICE, MONTHLY_PRICE } from '../../util/types';
 import { getTypeDuration } from '../../util/data';
+import { bookingPeriod } from '../../util/bookingPeriod';
 
 import css from './BookingDatesForm.module.css';
 import { value } from 'lodash/seq';
@@ -108,7 +109,7 @@ export class BookingDatesFormComponent extends Component {
     //     </div>
     //   );
     // }
-    if (unitPrice && ![config.currency, config.additionalCurrency].includes(unitPrice.currency)) {
+    if (unitPrice && ![config.currency, config.additionalCurrency, config.additionalCurrencyEuro].includes(unitPrice.currency)) {
       return (
         <div className={classes}>
           <p className={css.error}>
@@ -148,6 +149,15 @@ export class BookingDatesFormComponent extends Component {
             minBookingType,
           } = fieldRenderProps;
           const { startDate, endDate } = values && values.bookingDates ? values.bookingDates : {};
+          const validatePeriod = dates => {
+            if (!dates || !dates.startDate || !dates.endDate) return undefined;
+            try {
+              bookingPeriod(moment(dates.startDate).format('YYYY-MM-DD'),
+                moment(dates.endDate).format('YYYY-MM-DD'), bookingType,
+                this.props.dailyRate, this.props.periodCurrency);
+            } catch (error) { return error.message; }
+            return undefined;
+          };
 
           const bookingStartLabel = intl.formatMessage({
             id: 'BookingDatesForm.bookingStartTitle',
@@ -268,7 +278,8 @@ export class BookingDatesFormComponent extends Component {
                 useMobileMargins
                 validate={composeValidators(
                   required(requiredMessage),
-                  bookingDatesRequired(startDateErrorMessage, endDateErrorMessage)
+                  bookingDatesRequired(startDateErrorMessage, endDateErrorMessage),
+                  validatePeriod
                 )}
                 disabled={fetchLineItemsInProgress}
                 seats={seats}
@@ -278,6 +289,12 @@ export class BookingDatesFormComponent extends Component {
               />
 
               {bookingInfoMaybe}
+              {[WEEKLY_PRICE, MONTHLY_PRICE].includes(bookingType) ? (
+                <p> {this.props.dailyRate && this.props.dailyRate.amount > 0 &&
+                  this.props.dailyRate.currency === this.props.periodCurrency
+                  ? 'Extra days are charged at this Patch’s daily rate.'
+                  : `This Patch offers whole ${bookingType === WEEKLY_PRICE ? 'weeks (7 days)' : 'months (30 days)'} only.`}</p>
+              ) : null}
               {loadingSpinnerMaybe}
               {bookingInfoErrorMaybe}
 

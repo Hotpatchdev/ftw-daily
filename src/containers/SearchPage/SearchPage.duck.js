@@ -168,7 +168,7 @@ export const searchListings = searchParams => (dispatch, getState, sdk) => {
 
   const active = () => !params.schedule || getState().SearchPage.searchParams === searchParams;
   const query = params.schedule
-    ? queryScheduledListings(sdk, params, active, [config.currency, config.additionalCurrency])
+    ? queryScheduledListings(sdk, params, active, [config.currency, config.additionalCurrency, config.additionalCurrencyEuro])
     : sdk.listings.query(params);
   return query
     .then(response => {
@@ -199,7 +199,7 @@ export const searchMapListings = searchParams => (dispatch, getState, sdk) => {
   };
 
   const query = params.schedule
-    ? queryScheduledListings(sdk, params, undefined, [config.currency, config.additionalCurrency])
+    ? queryScheduledListings(sdk, params, undefined, [config.currency, config.additionalCurrency, config.additionalCurrencyEuro])
     : sdk.listings.query(params);
   return query
     .then(response => {

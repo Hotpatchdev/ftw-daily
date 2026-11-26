@@ -34,7 +34,7 @@ const ListingSchedulePanel = ({ listing, value, onReview, disabled, searchReturn
     price &&
     Number.isSafeInteger(price.amount) &&
     price.amount > 0 &&
-    [config.currency, config.additionalCurrency].includes(price.currency);
+    [config.currency, config.additionalCurrency, config.additionalCurrencyEuro].includes(price.currency);
   const eligible = meetsListingMinimum(listing, schedule);
   const canReview = !disabled && eligible && hasPrice;
   return (

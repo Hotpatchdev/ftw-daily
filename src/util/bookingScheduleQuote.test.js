@@ -63,6 +63,26 @@ it('blocks unavailable sessions before quoting any price', async () => {
   await expect(quoteListingSchedule({}, listing, schedule)).rejects.toThrow('unavailable');
   expect(transactionLineItems).not.toHaveBeenCalled();
 });
+it('does not quote a minimum-length session that finishes after the host closes', async () => {
+  fetchListingScheduleSlots.mockResolvedValue([
+    { attributes: { start: new Date('2027-02-01T09:00Z'), end: new Date('2027-02-01T17:00Z'), seats: 1 } },
+  ]);
+  await expect(quoteListingSchedule({}, listing, {
+    ...schedule, days: ['2027-02-01'], start: '14:00', end: '19:00',
+  })).rejects.toThrow('unavailable');
+  expect(transactionLineItems).not.toHaveBeenCalled();
+});
+
+it('rejects a session through a closure even if the total available hours would meet the minimum', async () => {
+  fetchListingScheduleSlots.mockResolvedValue([
+    { attributes: { start: new Date('2027-02-01T09:00Z'), end: new Date('2027-02-01T12:00Z'), seats: 1 } },
+    { attributes: { start: new Date('2027-02-01T13:00Z'), end: new Date('2027-02-01T18:00Z'), seats: 1 } },
+  ]);
+  await expect(quoteListingSchedule({}, listing, {
+    ...schedule, days: ['2027-02-01'], start: '09:00', end: '15:00',
+  })).rejects.toThrow('unavailable');
+  expect(transactionLineItems).not.toHaveBeenCalled();
+});
 it('groups consecutive daily dates and never prices the gap', async () => {
   await quoteListingSchedule({}, listing, {
     unit: 'daily',

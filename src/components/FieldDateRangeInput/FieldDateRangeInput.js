@@ -20,7 +20,6 @@ import {
   WEEKLY_PRICE
 } from '../../util/types';
 import { ValidationError } from '../../components';
-import moment from 'moment';
 import DateRangeInput from './DateRangeInput';
 import css from './FieldDateRangeInput.module.css';
 import {discountTypes} from "../../marketplace-custom-config";
@@ -75,18 +74,7 @@ class FieldDateRangeInputComponent extends Component {
 
 
   getPreparedDates(values){
-    const { offsetLength } = this.props;
-
-    if (!offsetLength || !values.startDate || !values.endDate){
-      return values;
-    }
-
-    const {startDate, endDate} = values;
-
-    return {
-      startDate,
-      endDate: moment(endDate).subtract(moment(endDate).diff(moment(startDate), 'days')%offsetLength, 'days').toDate()
-    }
+    return values;
   }
 
   render() {

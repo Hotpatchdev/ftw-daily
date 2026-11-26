@@ -73,7 +73,7 @@ export const fetchPricePopulation = async (sdk, params, active = () => true) => 
       'fields.listing': ['price', 'publicData'],
     };
     const response = await (params.schedule
-      ? queryScheduledListings(sdk, request, active, [config.currency, config.additionalCurrency])
+      ? queryScheduledListings(sdk, request, active, [config.currency, config.additionalCurrency, config.additionalCurrencyEuro])
       : sdk.listings.query(request));
     if (!active()) throw new Error('Price request superseded');
     const { data, meta } = response.data;

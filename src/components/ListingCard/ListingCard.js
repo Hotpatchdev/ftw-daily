@@ -24,7 +24,7 @@ const MIN_LENGTH_FOR_LONG_WORDS = 10;
 const priceData = (price, intl) => {
   if (
     price &&
-    (price.currency === config.currency || price.currency === config.additionalCurrency)
+    [config.currency, config.additionalCurrency, config.additionalCurrencyEuro].includes(price.currency)
   ) {
     const formattedPrice = formatMoney(intl, price);
     return { formattedPrice, priceTitle: formattedPrice };
