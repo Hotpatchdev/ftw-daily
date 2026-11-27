@@ -1,0 +1,29 @@
+name: Staging booking QA
+on:
+  push:
+    branches: [qa/staging-booking-20261127]
+    paths: [.github/workflows/staging-booking-qa.yml]
+permissions:
+  contents: read
+jobs:
+  qa:
+    name: Verify staging booking environment
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Check staging only
+        env:
+          SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
+          SSH_PORT: ${{ secrets.STAGING_SSH_PORT }}
+          SSH_KNOWN_HOSTS: ${{ secrets.STAGING_SSH_KNOWN_HOSTS }}
+        run: |
+          set -eu
+          test "$SSH_USER" = sharetribe
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/staging.key
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/staging.key ~/.ssh/known_hosts
+          SCRIPT_B64='cHJvY2Vzcy5lbnYuTk9ERV9FTlY9J3Byb2R1Y3Rpb24nOwpyZXF1aXJlKCcuL3NlcnZlci9lbnYnKS5jb25maWd1cmVFbnYoKTsKY29uc3QgZnM9cmVxdWlyZSgnZnMnKSxhc3NlcnQ9cmVxdWlyZSgnYXNzZXJ0Jyk7CmFzc2VydC5vayhmcy5yZWFscGF0aFN5bmMocHJvY2Vzcy5jd2QoKSkuc3RhcnRzV2l0aCgnL2hvbWUvc2hhcmV0cmliZS93ZWIvc3RhZ2luZy5ob3RwYXRjaC5jb20vcmVsZWFzZXMvJykpOwphc3NlcnQuc3RyaWN0RXF1YWwocHJvY2Vzcy5lbnYuUkVBQ1RfQVBQX1NIQVJFVFJJQkVfU0RLX0NMSUVOVF9JRCwnYTE4N2FmMmEtMDQ1NC00YmVkLWFiYjktODM0MTI5Y2NmMjQxJyk7CmFzc2VydC5vayhTdHJpbmcocHJvY2Vzcy5lbnYuUkVBQ1RfQVBQX1NUUklQRV9QVUJMSVNIQUJMRV9LRVkpLnN0YXJ0c1dpdGgoJ3BrX3Rlc3RfJykpOwpjb25zdCBsaWI9cmVxdWlyZSgnc2hhcmV0cmliZS1mbGV4LWludGVncmF0aW9uLXNkaycpOwpjb25zdCBzZGs9bGliLmNyZWF0ZUluc3RhbmNlKHtjbGllbnRJZDpwcm9jZXNzLmVudi5TSEFSRVRSSUJFX0lOVEVHUkFUSU9OX0NMSUVOVF9JRCxjbGllbnRTZWNyZXQ6cHJvY2Vzcy5lbnYuU0hBUkVUUklCRV9JTlRFR1JBVElPTl9DTElFTlRfU0VDUkVUfSk7Cihhc3luYygpPT57Y29uc3Qgcj0oYXdhaXQgc2RrLm1hcmtldHBsYWNlLnNob3coKSkuZGF0YS5kYXRhOwpjb25zb2xlLmxvZygnUUEgcHJlZmxpZ2h0JyxKU09OLnN0cmluZ2lmeSh7bWFya2V0cGxhY2VJZDpyLmlkLnV1aWQsbmFtZTpyLmF0dHJpYnV0ZXMubmFtZSxhdHRyaWJ1dGVLZXlzOk9iamVjdC5rZXlzKHIuYXR0cmlidXRlcyksY29tYmluZWRFbmFibGVkOnJlcXVpcmUoJy4vc2VydmVyL2NvbWJpbmVkL3J1bnRpbWUnKS5lbmFibGVkKCksdGVzdFN0cmlwZTp0cnVlLGN1c3RvbWVyUHJvZmlsZUV4aXN0czpmcy5leGlzdHNTeW5jKCcvaG9tZS9zaGFyZXRyaWJlL3dlYi9zdGFnaW5nLmhvdHBhdGNoLmNvbS9zaGFyZWQvY29tYmluZWQtcWEvY3VzdG9tZXIuanNvbicpfSkpOwp9KSgpLmNhdGNoKGU9Pntjb25zb2xlLmVycm9yKCdQcmVmbGlnaHQgZmFpbGVkJyxlLnN0YXR1c3x8JycsZS5tZXNzYWdlKTtwcm9jZXNzLmV4aXRDb2RlPTE7fSk7Cg=='
+          ssh -i ~/.ssh/staging.key -p "$SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 -o ServerAliveInterval=30 "$SSH_USER@$SSH_HOST" "cd /home/sharetribe/web/staging.hotpatch.com/current && /home/sharetribe/.nvm/versions/node/v14.15.4/bin/node -e 'eval(Buffer.from(\"$SCRIPT_B64\",\"base64\").toString(\"utf8\"))'"
