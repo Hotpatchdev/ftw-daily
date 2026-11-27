@@ -13,6 +13,7 @@ import {
 } from '../../util/bookingSchedule';
 import { minimumFinishTime } from '../../util/bookingMinimumSuggestion';
 import { quoteListingSchedule } from '../../util/bookingScheduleQuote';
+import { fetchListingScheduleSlots } from '../../util/scheduleSearch';
 import { parse, stringify } from '../../util/urlHelpers';
 import css from './BookingScheduleForm.module.css';
 import { combinedBookingEnabled } from '../../util/api';
@@ -36,6 +37,7 @@ export const BookingScheduleFormComponent = ({
   disabled,
   promocode,
   onCheckSchedule,
+  onLoadAvailability,
   onCombinedReady,
   onReview,
   history,
@@ -62,6 +64,23 @@ export const BookingScheduleFormComponent = ({
   const [checking, setChecking] = useState(false);
   const [retry, setRetry] = useState(0);
   const [combinedEnabled, setCombinedEnabled] = useState(false);
+  const [availability, setAvailability] = useState(null);
+  const availabilityKey = JSON.stringify({ listing: listing.id.uuid, days: value.days, zone: value.timeZone });
+  useEffect(() => {
+    let active = true;
+    if (!onLoadAvailability || bookingType === 'pricePerDay' || !value.days.length) return;
+    setAvailability(null);
+    const timer = setTimeout(() => {
+      onLoadAvailability(listing, {
+        unit: 'hourly', days: value.days, timeZone: value.timeZone,
+        same: true, start: '00:00', end: '23:55',
+      }, () => active)
+        .then(slots => { if (active) setAvailability({ key: availabilityKey, slots }); })
+        .catch(() => { if (active) setAvailability({ key: availabilityKey, error: true }); });
+    }, 150);
+    return () => { active = false; clearTimeout(timer); };
+  }, [availabilityKey, bookingType, onLoadAvailability, retry]);
+  const currentAvailability = availability && availability.key === availabilityKey ? availability : null;
   useEffect(() => {
     let active = true;
     if (onCombinedReady) onCombinedReady().then(ready => { if (active) setCombinedEnabled(ready); }).catch(() => {});
@@ -149,7 +168,12 @@ export const BookingScheduleFormComponent = ({
         required
         minimum={minimum}
         initiallySuggested={!initialSchedule}
+        availabilitySlots={onLoadAvailability ? (currentAvailability && currentAvailability.slots) || null : undefined}
+        availabilityError={!!(currentAvailability && currentAvailability.error)}
       />
+      {currentAvailability && currentAvailability.error ? (
+        <button type="button" onClick={() => setRetry(retry + 1)}>Retry availability</button>
+      ) : null}
       {disabled ? <p className={css.error}>Bookings are unavailable for this space.</p> : null}
       {validation ? (
         <p className={css.error} role="alert">
@@ -249,6 +273,8 @@ export const BookingScheduleFormComponent = ({
 
 export default connect(null, dispatch => ({
   onCombinedReady: combinedBookingEnabled,
+  onLoadAvailability: (listing, schedule, active) =>
+    dispatch((dispatch, getState, sdk) => fetchListingScheduleSlots(sdk, listing, schedule, active)),
   onCheckSchedule: (listing, schedule, promocode, active) =>
     dispatch((dispatch, getState, sdk) =>
       quoteListingSchedule(sdk, listing, schedule, promocode, active)

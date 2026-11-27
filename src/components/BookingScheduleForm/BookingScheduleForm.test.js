@@ -13,6 +13,49 @@ let wrapper;
 beforeEach(() => jest.useFakeTimers());
 afterEach(() => { if (wrapper) wrapper.unmount(); jest.useRealTimers(); });
 const settle = async () => { await act(async () => { jest.advanceTimersByTime(400); await Promise.resolve(); }); wrapper.update(); };
+it('waits for live slots before updating an automatic minimum finish', async () => {
+  const p = props();
+  let resolveSlots;
+  p.onLoadAvailability = jest.fn(() => new Promise(resolve => { resolveSlots = resolve; }));
+  act(() => { wrapper = mount(<BookingScheduleFormComponent {...p} searchDates="2027-02-01,2027-02-01" />); });
+  await settle();
+  const picker = wrapper.find(BookingSchedulePicker);
+  const current = picker.prop('value');
+  act(() => { picker.prop('onChange')({...current,start:'10:00'}); });
+  wrapper.update();
+  expect(wrapper.find(BookingSchedulePicker).prop('value').end).toBe('14:00');
+  await act(async () => {
+    resolveSlots([{attributes:{start:'2027-02-01T14:00Z',end:'2027-02-01T22:00Z',seats:1}}]);
+    await Promise.resolve();
+  });
+  wrapper.update();
+  expect(wrapper.find(BookingSchedulePicker).prop('value').end).toBe('15:00');
+});
+it('offers a retry after an availability failure', async () => {
+  const p = props();
+  p.onLoadAvailability = jest.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue([]);
+  act(() => { wrapper = mount(<BookingScheduleFormComponent {...p} initialSchedule={JSON.stringify(schedule)} />); });
+  await settle();
+  expect(wrapper.text()).toContain('Availability could not be checked');
+  act(() => { wrapper.find('button').filterWhere(b => b.text() === 'Retry availability').simulate('click'); });
+  await settle();
+  expect(p.onLoadAvailability).toHaveBeenCalledTimes(2);
+  expect(wrapper.text()).toContain('minimum does not fit');
+});
+it('loads live availability separately from the chosen hours and discards a slow previous date', async () => {
+  const p = props();
+  let resolveOld;
+  p.onLoadAvailability = jest.fn().mockImplementationOnce(() => new Promise(resolve => { resolveOld = resolve; })).mockResolvedValue([]);
+  act(() => { wrapper = mount(<BookingScheduleFormComponent {...p} initialSchedule={JSON.stringify(schedule)} />); });
+  await settle();
+  expect(p.onLoadAvailability.mock.calls[0][1]).toMatchObject({start:'00:00',end:'23:55',days:schedule.days,timeZone:schedule.timeZone});
+  act(() => { wrapper.find(BookingSchedulePicker).prop('onChange')({...schedule,days:['2027-02-03']}); });
+  await settle();
+  await act(async () => { resolveOld([{attributes:{start:'2027-02-01T09:00Z',end:'2027-02-01T17:00Z',seats:1}}]); await Promise.resolve(); });
+  wrapper.update();
+  expect(wrapper.find(BookingSchedulePicker).prop('availabilitySlots')).toEqual([]);
+  expect(wrapper.text()).toContain('minimum does not fit');
+});
 it('appears directly on a listing with the host timezone, minimum and required dates', () => {
   const p = props();
   act(() => { wrapper = mount(<BookingScheduleFormComponent {...p} />); });

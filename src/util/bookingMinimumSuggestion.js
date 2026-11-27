@@ -4,6 +4,7 @@ import {
   validScheduleDate,
   scheduleInstant,
   MAX_SCHEDULE_DATES,
+  slotsCoverSchedule,
 } from './bookingSchedule';
 
 // Match the existing five-minute time inputs; never round a host minimum down.
@@ -39,6 +40,21 @@ export const minimumFinishTime = (start, rule, days = [], timeZone = 'Europe/Lon
     )
       return null;
     return end;
+  } catch (e) {
+    return null;
+  }
+};
+
+// Only suggest a minimum that fits uninterrupted live availability on every date.
+// Undefined slots preserve the standalone search picker; null means still checking.
+export const availableMinimumFinish = (start, rule, days, timeZone, slots) => {
+  const end = minimumFinishTime(start, rule, days, timeZone);
+  if (!end || !days.length || slots === undefined) return end;
+  if (!Array.isArray(slots)) return null;
+  try {
+    return slotsCoverSchedule(slots, {
+      unit: 'hourly', days, start, end, timeZone, same: true,
+    }) ? end : null;
   } catch (e) {
     return null;
   }

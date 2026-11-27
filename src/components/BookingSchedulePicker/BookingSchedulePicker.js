@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import moment from 'moment-timezone';
 import {
   MAX_SCHEDULE_DATES,
@@ -12,6 +12,7 @@ import {
   minimumFinishTime,
   minimumDayCount,
   minimumDateSelection,
+  availableMinimumFinish,
 } from '../../util/bookingMinimumSuggestion';
 import css from './BookingSchedulePicker.module.css';
 
@@ -59,6 +60,8 @@ const BookingSchedulePicker = ({
   required = false,
   minimum = null,
   initiallySuggested = false,
+  availabilitySlots,
+  availabilityError = false,
 }) => {
   const schedule = { ...emptySchedule(), ...value };
   const [month, setMonth] = useState(() =>
@@ -75,12 +78,14 @@ const BookingSchedulePicker = ({
   const today = moment.utc().startOf('day');
   const lastDay = today.clone().add(365, 'days');
   const current = moment.utc(month);
+  const finishFor = (start, days, zone) =>
+    availableMinimumFinish(start, minimum, days, zone, availabilitySlots);
   const update = next => {
     setSelectionError(null);
     if (next.days.length < schedule.days.length) setSuggestedLastDay(null);
     const finish =
       next.unit === 'hourly' && finishSuggested
-        ? minimumFinishTime(next.start, minimum, next.days, next.timeZone)
+        ? finishFor(next.start, next.days, next.timeZone)
         : null;
     onChange(finish ? { ...next, end: finish } : next);
   };
@@ -92,7 +97,11 @@ const BookingSchedulePicker = ({
           .add(dailyMinimum - 1, 'days')
           .format('YYYY-MM-DD')
       : null;
-  const finishHint = minimumFinishTime(schedule.start, minimum, schedule.days, schedule.timeZone);
+  const finishHint = finishFor(schedule.start, schedule.days, schedule.timeZone);
+  useEffect(() => {
+    if (schedule.unit === 'hourly' && schedule.same !== false && finishSuggested && finishHint && schedule.end !== finishHint)
+      onChange({ ...schedule, end: finishHint });
+  }, [finishHint, finishSuggested, schedule.unit, schedule.same]);
   const choose = day => {
     setSuggestedLastDay(null);
     if (mode === 'range' && anchor) {
@@ -170,7 +179,7 @@ const BookingSchedulePicker = ({
     const edited = { start: times.start, end: times.end, [key]: value };
     if (key === 'start' && minimum) {
       const previous = minimumFinishTime(times.start, minimum, [day], schedule.timeZone);
-      const finish = minimumFinishTime(value, minimum, [day], schedule.timeZone);
+      const finish = finishFor(value, [day], schedule.timeZone);
       if (finish && (times.end === previous || !times.end || times.end < finish))
         edited.end = finish;
     }
@@ -317,9 +326,8 @@ const BookingSchedulePicker = ({
                   const startChanged =
                     times.startTime !== schedule.start || times.timeZone !== schedule.timeZone;
                   const endChanged = times.endTime !== schedule.end;
-                  const finish = minimumFinishTime(
+                  const finish = finishFor(
                     times.startTime,
-                    minimum,
                     schedule.days,
                     times.timeZone
                   );
@@ -345,7 +353,11 @@ const BookingSchedulePicker = ({
                     ? `Earliest finish: ${finishHint}.${
                         finishSuggested ? ' Suggested for you; extend it if needed.' : ''
                       }`
-                    : 'This minimum cannot be suggested within the same day. Choose an earlier start or different dates.'}
+                    : availabilityError
+                    ? 'Availability could not be checked. Retry availability or choose different dates.'
+                    : availabilitySlots === null && schedule.days.length
+                    ? 'Checking the host’s availability for your minimum…'
+                    : 'The minimum does not fit this start time on every selected date. Choose an earlier start or different dates.'}
                 </p>
               ) : null}
               <label className={css.same}>
@@ -429,7 +441,7 @@ const BookingSchedulePicker = ({
                         step="300"
                         min={
                           key === 'end'
-                            ? minimumFinishTime(times.start, minimum, [day], schedule.timeZone) ||
+                            ? finishFor(times.start, [day], schedule.timeZone) ||
                               undefined
                             : undefined
                         }

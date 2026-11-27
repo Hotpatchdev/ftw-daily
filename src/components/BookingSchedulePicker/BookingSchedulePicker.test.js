@@ -6,6 +6,15 @@ import SearchTimeFields from '../SearchTimeFields/SearchTimeFields';
 
 const value = { unit: 'hourly', days: ['2027-02-01', '2027-02-03'], start: '09:00', end: '15:00', timeZone: 'Europe/London', same: true, overrides: {} };
 const labelledButton = (wrapper, label) => wrapper.find('button').filterWhere(button => button.prop('aria-label') === label);
+it('does not auto-fill an impossible finish past closing or advertise it as available', () => {
+  const onChange = jest.fn();
+  const slots = value.days.map(day => ({ attributes: { start: `${day}T09:00Z`, end: `${day}T17:00Z`, seats: 1 } }));
+  const wrapper = shallow(<BookingSchedulePicker value={{...value,start:'14:00',end:'16:00'}} onChange={onChange} minimum={{hours:5}} initiallySuggested availabilitySlots={slots} />);
+  expect(wrapper.text()).toContain('minimum does not fit');
+  expect(wrapper.find(SearchTimeFields).prop('minimumEndTime')).toBeNull();
+  wrapper.find(SearchTimeFields).prop('onChange')({startTime:'15:00',endTime:'16:00',timeZone:value.timeZone});
+  expect(onChange.mock.calls[0][0].end).toBe('16:00');
+});
 
 it('selects and removes individual dates without selecting intervening days', () => {
   const onChange = jest.fn();

@@ -1,6 +1,25 @@
-import { minimumFinishTime, minimumDateSelection } from './bookingMinimumSuggestion';
+import { minimumFinishTime, minimumDateSelection, availableMinimumFinish } from './bookingMinimumSuggestion';
 import { readListingMinimum } from './bookingMinimum';
 const hours = count => ({ hours: count });
+const slot = (start, end, seats = 1) => ({ attributes: { start, end, seats } });
+it('requires five uninterrupted available hours and allows finishing exactly at closing', () => {
+  const slots = [slot('2027-02-01T09:00Z', '2027-02-01T17:00Z')];
+  const finish = start => availableMinimumFinish(start, hours(5), ['2027-02-01'], 'Europe/London', slots);
+  expect(finish('09:00')).toBe('14:00');
+  expect(finish('12:00')).toBe('17:00');
+  expect(finish('14:00')).toBeNull();
+  expect(availableMinimumFinish('09:00', hours(5), ['2027-02-01'], 'Europe/London', [
+    slot('2027-02-01T09:00Z', '2027-02-01T12:00Z'),
+    slot('2027-02-01T13:00Z', '2027-02-01T17:00Z'),
+  ])).toBeNull();
+});
+it('checks every selected day, time zone, bookings and pending availability', () => {
+  const slots = [slot('2027-02-01T14:00Z', '2027-02-01T22:00Z')];
+  expect(availableMinimumFinish('09:00', hours(5), ['2027-02-01'], 'America/New_York', slots)).toBe('14:00');
+  expect(availableMinimumFinish('09:00', hours(5), ['2027-02-01', '2027-02-03'], 'America/New_York', slots)).toBeNull();
+  expect(availableMinimumFinish('09:00', hours(5), ['2027-02-01'], 'America/New_York', slots.map(s => ({attributes:{...s.attributes,seats:0}})))).toBeNull();
+  expect(availableMinimumFinish('09:00', hours(5), ['2027-02-01'], 'America/New_York', null)).toBeNull();
+});
 it('suggests 14:00 from 09:00 for a five-hour minimum and supports fractional hours', () => {
   expect(minimumFinishTime('09:00', hours(5))).toBe('14:00');
   expect(minimumFinishTime('09:00', hours(2.5))).toBe('11:30');
