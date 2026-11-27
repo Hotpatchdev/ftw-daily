@@ -36,6 +36,16 @@ export class BookingDatesFormComponent extends Component {
     this.setState({ focusedInput });
   }
 
+  periodValidation(dates) {
+    if (!dates || !dates.startDate || !dates.endDate) return undefined;
+    try {
+      bookingPeriod(moment(dates.startDate).format('YYYY-MM-DD'),
+        moment(dates.endDate).format('YYYY-MM-DD'), this.props.bookingType,
+        this.props.dailyRate, this.props.periodCurrency);
+    } catch (error) { return error.message; }
+    return undefined;
+  }
+
   // In case start or end date for the booking is missing
   // focus on that input, otherwise continue with the
   // default handleSubmit function.
@@ -66,7 +76,7 @@ export class BookingDatesFormComponent extends Component {
     const { bookingType, isOwnListing, listingId } = this.props;
     const promocode = this.props.promocode;
 
-    if (startDate && endDate && !this.props.fetchLineItemsInProgress) {
+    if (startDate && endDate && !this.periodValidation({ startDate, endDate }) && !this.props.fetchLineItemsInProgress) {
       this.props.onFetchTransactionLineItems({
         bookingData: {
           startDate: moment
@@ -149,15 +159,8 @@ export class BookingDatesFormComponent extends Component {
             minBookingType,
           } = fieldRenderProps;
           const { startDate, endDate } = values && values.bookingDates ? values.bookingDates : {};
-          const validatePeriod = dates => {
-            if (!dates || !dates.startDate || !dates.endDate) return undefined;
-            try {
-              bookingPeriod(moment(dates.startDate).format('YYYY-MM-DD'),
-                moment(dates.endDate).format('YYYY-MM-DD'), bookingType,
-                this.props.dailyRate, this.props.periodCurrency);
-            } catch (error) { return error.message; }
-            return undefined;
-          };
+          const validatePeriod = dates => this.periodValidation(dates);
+          const periodError = validatePeriod({ startDate, endDate });
 
           const bookingStartLabel = intl.formatMessage({
             id: 'BookingDatesForm.bookingStartTitle',
@@ -201,7 +204,7 @@ export class BookingDatesFormComponent extends Component {
               : null;
 
           const showEstimatedBreakdown =
-            bookingData && lineItems && !fetchLineItemsInProgress && !fetchLineItemsError;
+            bookingData && lineItems && !periodError && !fetchLineItemsInProgress && !fetchLineItemsError;
 
           const bookingInfoMaybe = showEstimatedBreakdown ? (
             <div className={css.priceBreakdownContainer}>
@@ -223,7 +226,7 @@ export class BookingDatesFormComponent extends Component {
             <IconSpinner className={css.spinner} />
           ) : null;
 
-          const bookingInfoErrorMaybe = fetchLineItemsError ? (
+          const bookingInfoErrorMaybe = fetchLineItemsError && !periodError ? (
             <span className={css.sideBarError}>
               <FormattedMessage id="BookingDatesForm.fetchLineItemsError" />
             </span>

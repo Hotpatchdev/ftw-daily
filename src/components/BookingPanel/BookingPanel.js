@@ -136,7 +136,7 @@ const BookingPanel = props => {
   //   minimumLength > 1
   // ) ? ` Minimum booking length is ${minimumLength} days.` : '';
 
-  const subTitleText = showScheduleForm
+  const subTitleText = showScheduleForm || showBookingDatesForm
     ? 'Choose your dates and review the price before checkout.'
     : !!subTitle
     ? // ? subTitle + subTitleMinLengthText

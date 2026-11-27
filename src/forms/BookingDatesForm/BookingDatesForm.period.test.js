@@ -6,6 +6,17 @@ import { fakeIntl } from '../../util/test-data';
 import { FieldDateRangeInput } from '../../components';
 import { BookingDatesFormComponent } from './BookingDatesForm';
 
+it('does not request an impossible weekly quote, but quotes the next valid full week', () => {
+  const onFetchTransactionLineItems = jest.fn();
+  const form = shallow(<BookingDatesFormComponent intl={fakeIntl} bookingType="pricePerWeek"
+    onSubmit={() => {}} onFetchTransactionLineItems={onFetchTransactionLineItems} />);
+  const startDate = new Date('2027-02-01T12:00Z');
+  form.instance().handleOnChange({ bookingDates: { startDate, endDate: new Date('2027-02-09T12:00Z') } });
+  expect(onFetchTransactionLineItems).not.toHaveBeenCalled();
+  form.instance().handleOnChange({ bookingDates: { startDate, endDate: new Date('2027-02-15T12:00Z') } });
+  expect(onFetchTransactionLineItems).toHaveBeenCalledTimes(1);
+});
+
 it.each([['pricePerWeek', 7, 15], ['pricePerMonth', 30, 61]])(
   'validates %s extra days without modifying selected dates', (bookingType, minimumLength, days) => {
     const dates = { startDate: new Date('2027-02-01T12:00Z'),
